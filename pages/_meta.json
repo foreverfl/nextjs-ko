@@ -1,0 +1,37 @@
+{
+  "index": {
+    "type": "page",
+    "title": "Nextra",
+    "display": "hidden",
+    "theme": {
+      "layout": "default"
+    }
+  },
+  "docs": {
+    "type": "page",
+    "title": "문서"
+  },
+  "showcase": {
+    "type": "page",
+    "title": "사례",
+    "theme": {
+      "typesetting": "article",
+      "layout": "full"
+    }
+  },
+  "about": {
+    "type": "page",
+    "title": "소개",
+    "theme": {
+      "typesetting": "article"
+    }
+  },
+  "404": {
+    "type": "page",
+    "display": "hidden",
+    "theme": {
+      "timestamp": false,
+      "typesetting": "article"
+    }
+  }
+}
