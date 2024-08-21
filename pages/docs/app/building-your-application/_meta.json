@@ -1,0 +1,13 @@
+{
+  "routing": "라우팅",
+  "data-fetching": "데이터 가져오기",
+  "rendering": "렌더링",
+  "caching": "캐싱",
+  "styling": "스타일링",
+  "optimizing": "최적화",
+  "configuring": "구성",
+  "testing": "테스트",
+  "authenticating": "인증",
+  "deploying": "배포",
+  "upgrading": "업그레이드"
+}

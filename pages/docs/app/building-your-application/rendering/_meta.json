@@ -1,0 +1,7 @@
+{
+  "server-components": "서버 컴포넌트",
+  "client-components": "클라이언트 컴포넌트",
+  "composition-patterns": "구성 패턴",
+  "partial-prerendering": "부분 사전 렌더링",
+  "edge-and-nodejs-runtimes": "런타임"
+}
