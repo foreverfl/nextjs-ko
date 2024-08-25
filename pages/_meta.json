@@ -7,24 +7,34 @@
       "layout": "default"
     }
   },
-  "docs": {
-    "type": "page",
-    "title": "문서"
-  },
   "showcase": {
     "type": "page",
     "title": "사례",
-    "theme": {
-      "typesetting": "article",
-      "layout": "full"
-    }
+    "href": "https://nextjs.org/showcase",
+    "newWindow": true
   },
-  "about": {
+  "docs": {
     "type": "page",
-    "title": "소개",
-    "theme": {
-      "typesetting": "article"
-    }
+    "title": "문서",
+    "href": "/docs/app/getting-started"
+  },
+  "blog": {
+    "type": "page",
+    "title": "블로그",
+    "href": "https://nextjs.org/blog",
+    "newWindow": true
+  },
+  "template": {
+    "type": "page",
+    "title": "템플릿",
+    "href": "https://vercel.com/templates/next.js?utm_source=next-site&utm_medium=navbar&utm_campaign=next_site_nav_templates",
+    "newWindow": true
+  },
+  "enterprise": {
+    "type": "page",
+    "title": "비즈니스",
+    "href": "https://vercel.com/contact/sales/nextjs?utm_source=next-site&utm_medium=navbar&utm_campaign=next_site_nav_enterprise",
+    "newWindow": true
   },
   "404": {
     "type": "page",

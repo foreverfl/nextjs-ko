@@ -1,0 +1,14 @@
+{
+  "default": "default.js",
+  "error": "error.js",
+  "instrumentation": "instrumentation.js",
+  "layout": "layout.js",
+  "loading": "loading.js",
+  "mdx-components": "mdx-components.js",
+  "middleware": "middleware.js",
+  "not-found": "not-found.js",
+  "pag": "page.js",
+  "route": "route.js",
+  "route-segment-config": "경로 세그먼트 설정",
+  "template": "template.js"
+}

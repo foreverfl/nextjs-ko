@@ -1,0 +1,6 @@
+{
+  "vitest": "Vitest",
+  "jest": "Jest",
+  "playwright": "Playwright",
+  "cypress": "Cypress"
+}

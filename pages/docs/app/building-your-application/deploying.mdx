@@ -3,6 +3,8 @@ title: Deploying
 description: Learn how to deploy your Next.js app to production, either managed or self-hosted.
 ---
 
+# 배포
+
 {/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
 
 Congratulations, it's time to ship to production.
@@ -146,24 +148,24 @@ To configure the ISR/Data Cache location when self-hosting, you can configure a 
 
 ```jsx filename="next.config.js"
 module.exports = {
-  cacheHandler: require.resolve('./cache-handler.js'),
+  cacheHandler: require.resolve("./cache-handler.js"),
   cacheMaxMemorySize: 0, // disable default in-memory caching
-}
+};
 ```
 
 Then, create `cache-handler.js` in the root of your project, for example:
 
 ```jsx filename="cache-handler.js"
-const cache = new Map()
+const cache = new Map();
 
 module.exports = class CacheHandler {
   constructor(options) {
-    this.options = options
+    this.options = options;
   }
 
   async get(key) {
     // This could be stored anywhere, like durable storage
-    return cache.get(key)
+    return cache.get(key);
   }
 
   async set(key, data, ctx) {
@@ -172,7 +174,7 @@ module.exports = class CacheHandler {
       value: data,
       lastModified: Date.now(),
       tags: ctx.tags,
-    })
+    });
   }
 
   async revalidateTag(tag) {
@@ -180,11 +182,11 @@ module.exports = class CacheHandler {
     for (let [key, value] of cache) {
       // If the value's tags include the specified tag, delete this entry
       if (value.tags.includes(tag)) {
-        cache.delete(key)
+        cache.delete(key);
       }
     }
   }
-}
+};
 ```
 
 Using a custom cache handler will allow you to ensure consistency across all pods hosting your Next.js application. For instance, you can save the cached values anywhere, like [Redis](https://github.com/vercel/next.js/tree/canary/examples/cache-handler-redis) or AWS S3.
@@ -203,9 +205,9 @@ If you are rebuilding for each stage of your environment, you will need to gener
 module.exports = {
   generateBuildId: async () => {
     // This could be anything, using the latest git hash
-    return process.env.GIT_HASH
+    return process.env.GIT_HASH;
   },
-}
+};
 ```
 
 ### Version Skew
@@ -218,8 +220,6 @@ Vercel provides additional [skew protection](https://vercel.com/docs/deployments
 
 You can manually configure the `deploymentId` property in your `next.config.js` file to ensure each request uses either `?dpl` query string or `x-deployment-id` header.
 
-<AppOnly>
-
 ### Streaming and Suspense
 
 The Next.js App Router supports [streaming responses](/docs/app/building-your-application/routing/loading-ui-and-streaming) when self-hosting. If you are using Nginx or a similar proxy, you will need to configure it to disable buffering to enable streaming.
@@ -231,17 +231,17 @@ module.exports = {
   async headers() {
     return [
       {
-        source: '/:path*{/}?',
+        source: "/:path*{/}?",
         headers: [
           {
-            key: 'X-Accel-Buffering',
-            value: 'no',
+            key: "X-Accel-Buffering",
+            value: "no",
           },
         ],
       },
-    ]
+    ];
   },
-}
+};
 ```
 
 ### Partial Prerendering
@@ -253,40 +253,3 @@ module.exports = {
 When using a CDN in front on your Next.js application, the page will include `Cache-Control: private` response header when dynamic APIs are accessed. This ensures that the resulting HTML page is marked as non-cachable. If the page is fully prerendered to static, it will include `Cache-Control: public` to allow the page to be cached on the CDN.
 
 If you don't need a mix of both static and dynamic components, you can make your entire route static and cache the output HTML on a CDN. This Automatic Static Optimization is the default behavior when running `next build` if dynamic APIs are not used.
-
-</AppOnly>
-
-<PagesOnly>
-
-## Manual Graceful Shutdowns
-
-When self-hosting, you might want to run code when the server shuts down on `SIGTERM` or `SIGINT` signals.
-
-You can set the env variable `NEXT_MANUAL_SIG_HANDLE` to `true` and then register a handler for that signal inside your `_document.js` file. You will need to register the environment variable directly in the `package.json` script, and not in the `.env` file.
-
-> **Good to know**: Manual signal handling is not available in `next dev`.
-
-```json filename="package.json"
-{
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "NEXT_MANUAL_SIG_HANDLE=true next start"
-  }
-}
-```
-
-```js filename="pages/_document.js"
-if (process.env.NEXT_MANUAL_SIG_HANDLE) {
-  process.on('SIGTERM', () => {
-    console.log('Received SIGTERM: cleaning up')
-    process.exit(0)
-  })
-  process.on('SIGINT', () => {
-    console.log('Received SIGINT: cleaning up')
-    process.exit(0)
-  })
-}
-```
-
-</PagesOnly>

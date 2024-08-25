@@ -1,0 +1,17 @@
+{
+  "defining-routes": "라우트 정의",
+  "pages": "페이지",
+  "layouts-and-templates": "레이아웃 및 템플릿",
+  "linking-and-navigating": "링크 및 경로 이동",
+  "error-handling": "에러 처리",
+  "loading-ui-and-streaming": "로딩 UI 및 스트리밍",
+  "redirecting": "리다이렉트",
+  "route-groups": "라우트 그룹",
+  "colocation": "프로젝트 구성",
+  "dynamic-routes": "동적 라우트",
+  "parallel-routes": "병렬 라우트",
+  "intercepting-routes": "라우트 가로채기",
+  "route-handlers": "라우트 핸들러",
+  "middleware": "미들웨어",
+  "internationalization": "국제화"
+}

@@ -1,0 +1,7 @@
+{
+  "app-icons": "파비콘, 아이콘, 애플 아이콘",
+  "manifest": "manifest.json",
+  "opengraph-image": "오픈그래프 이미지 및 트위터 이미지",
+  "robots": "robots.txt",
+  "sitemap": "sitemap.xml"
+}

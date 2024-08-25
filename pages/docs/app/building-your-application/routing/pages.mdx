@@ -1,0 +1,61 @@
+---
+title: 페이지
+description: Next.js에서 첫 번째 페이지 만들기
+related:
+  links:
+    - app/building-your-application/routing/layouts-and-templates
+    - app/building-your-application/routing/linking-and-navigating
+---
+
+import Image from "next/image";
+
+# 페이지
+
+페이지는 라우트에 **고유한** UI입니다. `page.js` 파일에서 컴포넌트를 기본 내보내기하여 페이지를 정의할 수 있습니다.
+
+예를 들어, `index` 페이지를 만들려면 `app` 디렉토리 안에 `page.js` 파일을 추가하세요:
+
+<Image
+  alt="page.js 특수 파일"
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fpage-special-file.png&w=1920&q=75"
+  width="1600"
+  height="444"
+/>
+
+```tsx filename="app/page.tsx" switcher
+// `app/page.tsx`는 `/` URL의 UI입니다
+export default function Page() {
+  return <h1>Hello, Home page!</h1>;
+}
+```
+
+```jsx filename="app/page.js" switcher
+// `app/page.js`는 `/` URL의 UI입니다
+export default function Page() {
+  return <h1>Hello, Home page!</h1>;
+}
+```
+
+그 다음, 추가 페이지를 만들려면 새 폴더를 만들고 그 안에 `page.js` 파일을 추가하세요. 예를 들어, `/dashboard` 라우트의 페이지를 만들려면 `dashboard`라는 새 폴더를 만들고 그 안에 `page.js` 파일을 추가하세요:
+
+```tsx filename="app/dashboard/page.tsx" switcher
+// `app/dashboard/page.tsx`는 `/dashboard` URL의 UI입니다
+export default function Page() {
+  return <h1>Hello, Dashboard Page!</h1>;
+}
+```
+
+```jsx filename="app/dashboard/page.js" switcher
+// `app/dashboard/page.js`는 `/dashboard` URL의 UI입니다
+export default function Page() {
+  return <h1>Hello, Dashboard Page!</h1>;
+}
+```
+
+> **알아두면 좋은 점**:
+>
+> - 페이지에는 `.js`, `.jsx`, 또는 `.tsx` 파일 확장자를 사용할 수 있습니다.
+> - 페이지는 항상 [라우트 하위 트리](/docs/app/building-your-application/routing#terminology)의 [리프](/docs/app/building-your-application/routing#terminology)입니다.
+> - 라우트 세그먼트를 공개적으로 접근 가능하게 만들려면 `page.js` 파일이 필요합니다.
+> - 페이지는 기본적으로 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components)이지만, [클라이언트 컴포넌트](/docs/app/building-your-application/rendering/client-components)로 설정할 수 있습니다.
+> - 페이지에서 데이터를 가져올 수 있습니다. 자세한 정보는 [데이터 가져오기](/docs/app/building-your-application/data-fetching) 섹션을 참조하세요.

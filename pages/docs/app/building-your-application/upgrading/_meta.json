@@ -1,0 +1,8 @@
+{
+  "codemods": "Codemods",
+  "version-15": "버전 15",
+  "version-14": "버전 14",
+  "app-router-migration": "앱 라우터 마이그레이션",
+  "from-create-react-app": "Create React App에서 마이그레이션",
+  "from-vite": "Vite에서 마이그레이션"
+}

@@ -7,7 +7,7 @@
   "optimizing": "최적화",
   "configuring": "구성",
   "testing": "테스트",
-  "authenticating": "인증",
+  "authentication": "인증",
   "deploying": "배포",
   "upgrading": "업그레이드"
 }

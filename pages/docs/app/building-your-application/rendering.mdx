@@ -1,78 +1,81 @@
 ---
-title: Rendering
-description: Learn the differences between Next.js rendering environments, strategies, and runtimes.
+title: 렌더링
+description: Next.js의 렌더링 환경, 전략, 런타임 간의 차이점을 알아보세요.
 ---
 
-Rendering converts the code you write into user interfaces. React and Next.js allow you to create hybrid web applications where parts of your code can be rendered on the server or the client. This section will help you understand the differences between these rendering environments, strategies, and runtimes.
+import Image from "next/image";
 
-## Fundamentals
+# 렌더링
 
-To start, it's helpful to be familiar with three foundational web concepts:
+렌더링은 작성한 코드를 사용자 인터페이스로 변환합니다. React와 Next.js를 사용하면 코드의 일부를 서버나 클라이언트에서 렌더링할 수 있는 하이브리드 웹 애플리케이션을 만들 수 있습니다. 이 섹션에서는 이러한 렌더링 환경, 전략, 런타임 간의 차이점을 이해하는 데 도움을 줄 것입니다.
 
-- The [Environments](#rendering-environments) your application code can be executed in: the server and the client.
-- The [Request-Response Lifecycle](#request-response-lifecycle) that's initiated when a user visits or interacts with your application.
-- The [Network Boundary](#network-boundary) that separates server and client code.
+## 기본 개념
 
-### Rendering Environments
+시작하기 전에, 세 가지 기본적인 웹 개념에 대해 알아두면 도움이 됩니다:
 
-There are two environments where web applications can be rendered: the client and the server.
+- 애플리케이션 코드가 실행될 수 있는 [환경](#렌더링-환경): 서버와 클라이언트.
+- 사용자가 애플리케이션을 방문하거나 상호작용할 때 시작되는 [요청-응답 생명주기](#요청-응답-생명주기).
+- 서버와 클라이언트 코드를 분리하는 [네트워크 경계](#네트워크-경계).
+
+### 렌더링 환경
+
+웹 애플리케이션은 두 가지 환경에서 렌더링될 수 있습니다: 클라이언트와 서버.
 
 <Image
-  alt="Client and Server Environments"
-  srcLight="/docs/light/client-and-server-environments.png"
-  srcDark="/docs/dark/client-and-server-environments.png"
+  alt="클라이언트와 서버 환경"
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fclient-and-server-environments.png&w=1920&q=75"
   width="1600"
   height="672"
 />
 
-- The **client** refers to the browser on a user's device that sends a request to a server for your application code. It then turns the response from the server into a user interface.
-- The **server** refers to the computer in a data center that stores your application code, receives requests from a client, and sends back an appropriate response.
+- **클라이언트**는 사용자 기기의 브라우저를 말하며, 애플리케이션 코드를 요청하기 위해 서버로 요청을 보냅니다. 그런 다음 서버로부터 받은 응답을 사용자 인터페이스로 변환합니다.
+- **서버**는 데이터 센터에 있는 컴퓨터를 말하며, 애플리케이션 코드를 저장하고 클라이언트로부터 요청을 받아 적절한 응답을 보냅니다.
 
-Historically, developers had to use different languages (e.g. JavaScript, PHP) and frameworks when writing code for the server and the client. With React, developers can use the **same language** (JavaScript), and the **same framework** (e.g. Next.js or your framework of choice). This flexibility allows you to seamlessly write code for both environments without context switching.
+역사적으로, 개발자들은 서버와 클라이언트용 코드를 작성할 때 서로 다른 언어(예: JavaScript, PHP)와 프레임워크를 사용해야 했습니다. React를 사용하면 개발자들은 **동일한 언어**(JavaScript)와 **동일한 프레임워크**(예: Next.js 또는 선택한 프레임워크)를 사용할 수 있습니다. 이러한 유연성 덕분에 컨텍스트 전환 없이 두 환경 모두에 대한 코드를 원활하게 작성할 수 있습니다.
 
-However, each environment has its own set of capabilities and constraints. Therefore, the code you write for the server and the client is not always the same. There are certain operations (e.g. data fetching or managing user state) that are better suited for one environment over the other.
+그러나 각 환경에는 고유한 기능과 제약이 있습니다. 따라서 서버와 클라이언트용으로 작성하는 코드가 항상 동일하지는 않습니다. 데이터 가져오기나 사용자 상태 관리와 같은 특정 작업은 한 환경에서 더 적합할 수 있습니다.
 
-Understanding these differences is key to effectively using React and Next.js. We'll cover the differences and use cases in more detail on the [Server](/docs/app/building-your-application/rendering/server-components) and [Client](/docs/app/building-your-application/rendering/client-components) Components pages, for now, let's continue building on our foundation.
+이러한 차이점을 이해하는 것은 React와 Next.js를 효과적으로 사용하는 데 중요합니다. [서버](/docs/app/building-your-application/rendering/server-components)와 [클라이언트](/docs/app/building-your-application/rendering/client-components) 컴포넌트 페이지에서 차이점과 사용 사례를 더 자세히 다룰 것입니다. 지금은 계속해서 기본 개념을 살펴보겠습니다.
 
-### Request-Response Lifecycle
+### 요청-응답 생명주기
 
-Broadly speaking, all websites follow the same **Request-Response Lifecycle**:
+일반적으로 모든 웹사이트는 다음과 같은 **요청-응답 생명주기**를 따릅니다:
 
-1. **User Action:** The user interacts with a web application. This could be clicking a link, submitting a form, or typing a URL directly into the browser's address bar.
-2. **HTTP Request:** The client sends an [HTTP](https://developer.mozilla.org/docs/Web/HTTP) request to the server that contains necessary information about what resources are being requested, what method is being used (e.g. `GET`, `POST`), and additional data if necessary.
-3. **Server:** The server processes the request and responds with the appropriate resources. This process may take a couple of steps like routing, fetching data, etc.
-4. **HTTP Response:** After processing the request, the server sends an HTTP response back to the client. This response contains a status code (which tells the client whether the request was successful or not) and requested resources (e.g. HTML, CSS, JavaScript, static assets, etc).
-5. **Client:** The client parses the resources to render the user interface.
-6. **User Action:** Once the user interface is rendered, the user can interact with it, and the whole process starts again.
+1. **사용자 액션:** 사용자가 웹 애플리케이션과 상호작용합니다. 이는 링크 클릭, 양식 제출, 또는 브라우저 주소 표시줄에 직접 URL을 입력하는 것일 수 있습니다.
+2. **HTTP 요청:** 클라이언트는 요청된 리소스, 사용된 메서드(예: `GET`, `POST`), 필요한 경우 추가 데이터에 대한 정보가 포함된 [HTTP](https://developer.mozilla.org/docs/Web/HTTP) 요청을 서버로 보냅니다.
+3. **서버:** 서버는 요청을 처리하고 적절한 리소스로 응답합니다. 이 과정은 라우팅, 데이터 가져오기 등과 같은 몇 가지 단계를 거칠 수 있습니다.
+4. **HTTP 응답:** 요청 처리 후, 서버는 HTTP 응답을 클라이언트로 다시 보냅니다. 이 응답에는 상태 코드(요청이 성공했는지 여부를 클라이언트에 알려줌)와 요청된 리소스(예: HTML, CSS, JavaScript, 정적 자산 등)가 포함됩니다.
+5. **클라이언트:** 클라이언트는 리소스를 파싱하여 사용자 인터페이스를 렌더링합니다.
+6. **사용자 액션:** 사용자 인터페이스가 렌더링되면 사용자는 이와 상호작용할 수 있으며, 전체 과정이 다시 시작됩니다.
 
-A major part of building a hybrid web application is deciding how to split the work in the lifecycle, and where to place the Network Boundary.
+하이브리드 웹 애플리케이션을 구축할 때 중요한 부분은 생명주기에서 작업을 어떻게 분할할지, 그리고 네트워크 경계를 어디에 배치할지 결정하는 것입니다.
 
-### Network Boundary
+### 네트워크 경계
 
-In web development, the **Network Boundary** is a conceptual line that separates the different environments. For example, the client and the server, or the server and the data store.
+웹 개발에서 **네트워크 경계**는 서로 다른 환경을 분리하는 개념적인 선입니다. 예를 들어, 클라이언트와 서버, 또는 서버와 데이터 저장소 사이를 분리합니다.
 
-{/* Diagram: Network Boundary */}
+{/* 다이어그램: 네트워크 경계 */}
 
-In React, you choose where to place the client-server network boundary wherever it makes the most sense.
+React에서는 가장 적합한 위치에 클라이언트-서버 네트워크 경계를 배치할 수 있습니다.
 
-Behind the scenes, the work is split into two parts: the **client module graph** and the **server module graph**. The server module graph contains all the components that are rendered on the server, and the client module graph contains all components that are rendered on the client.
+백그라운드에서 작업은 두 부분으로 나뉩니다: **클라이언트 모듈 그래프**와 **서버 모듈 그래프**. 서버 모듈 그래프에는 서버에서 렌더링되는 모든 컴포넌트가 포함되고, 클라이언트 모듈 그래프에는 클라이언트에서 렌더링되는 모든 컴포넌트가 포함됩니다.
 
-{/* Diagram: Client and Server Module Graphs */}
+{/* 다이어그램: 클라이언트 및 서버 모듈 그래프 */}
 
-It may be helpful to think about module graphs as a visual representation of how files in your application depend on each other.
+모듈 그래프를 애플리케이션의 파일들이 서로 어떻게 의존하는지에 대한 시각적 표현으로 생각하면 도움이 될 수 있습니다.
 
-{/* For example, if you have a file called `Page.jsx` that imports a file called `Button.jsx` on the server, the module graph would look something like this: - Diagram - */}
+{/* 예를 들어, 서버에서 `Button.jsx`라는 파일을 가져오는 `Page.jsx`라는 파일이 있다면, 모듈 그래프는 다음과 같이 보일 것입니다: - 다이어그램 - */}
 
-You can use the React `"use client"` convention to define the boundary. There's also a `"use server"` convention, which tells React to do some computational work on the server.
+React의 `"use client"` 규칙을 사용하여 경계를 정의할 수 있습니다. 또한 서버에서 일부 계산 작업을 수행하도록 React에 지시하는 `"use server"` 규칙도 있습니다.
 
-## Building Hybrid Applications
+## 하이브리드 애플리케이션 구축하기
 
-When working in these environments, it's helpful to think of the flow of the code in your application as **unidirectional**. In other words, during a response, your application code flows in one direction: from the server to the client.
+이러한 환경에서 작업할 때, 애플리케이션의 코드 흐름을 **단방향**으로 생각하는 것이 도움이 됩니다. 다시 말해, 응답 중에 애플리케이션 코드는 한 방향으로 흐릅니다: 서버에서 클라이언트로.
 
-{/* Diagram: Response flow */}
+{/* 다이어그램: 응답 흐름 */}
 
-If you need to access the server from the client, you send a **new** request to the server rather than re-use the same request. This makes it easier to understand where to render your components and where to place the Network Boundary.
+클라이언트에서 서버에 접근해야 하는 경우, 같은 요청을 재사용하는 대신 서버로 **새로운** 요청을 보냅니다. 이렇게 하면 컴포넌트를 어디에서 렌더링할지, 그리고 네트워크 경계를 어디에 배치할지 이해하기 쉬워집니다.
 
-In practice, this model encourages developers to think about what they want to execute on the server first, before sending the result to the client and making the application interactive.
+실제로 이 모델은 개발자들이 애플리케이션을 인터랙티브하게 만들기 전에 먼저 서버에서 실행하고 싶은 것이 무엇인지 생각하도록 장려합니다.
 
-This concept will become clearer when we look at how you can [interleave client and server components](/docs/app/building-your-application/rendering/composition-patterns) in the same component tree.
+이 개념은 [클라이언트와 서버 컴포넌트를 같은 컴포넌트 트리에서 어떻게 교차시킬 수 있는지](/docs/app/building-your-application/rendering/composition-patterns)를 살펴볼 때 더 명확해질 것입니다.

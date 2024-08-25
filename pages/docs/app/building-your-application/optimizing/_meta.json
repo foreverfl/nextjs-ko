@@ -1,0 +1,15 @@
+{
+  "images": "Images",
+  "videos": "Videos",
+  "fonts": "Fonts",
+  "metadata": "Metadata",
+  "scripts": "Scripts",
+  "package-bundling": "패키지 번들링",
+  "lazy-loading": "지연 로딩",
+  "analytics": "분석",
+  "instrumentation": "계측",
+  "open-telemetry": "오픈텔레메트리",
+  "static-assets": "정적 자산",
+  "third-party-libraries": "타사 라이브러리",
+  "memory-usage": "메모리 사용량"
+}

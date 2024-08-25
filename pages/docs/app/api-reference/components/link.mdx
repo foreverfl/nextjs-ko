@@ -1,317 +1,167 @@
 ---
 title: <Link>
-description: Enable fast client-side navigation with the built-in `next/link` component.
+description: 내장된 `next/link` 컴포넌트를 사용하여 빠른 클라이언트 사이드 네비게이션을 활성화하세요.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# \<Link\>
 
-<PagesOnly>
+{/* 이 문서의 내용은 앱 라우터와 페이지 라우터 간에 공유됩니다. `<PagesOnly>내용</PagesOnly>` 컴포넌트를 사용하여 페이지 라우터에만 해당하는 내용을 추가할 수 있습니다. 공유되는 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-<details>
-  <summary>Examples</summary>
-
-- [Hello World](https://github.com/vercel/next.js/tree/canary/examples/hello-world)
-- [Active className on Link](https://github.com/vercel/next.js/tree/canary/examples/active-class-name)
-
-</details>
-
-</PagesOnly>
-
-`<Link>` is a React component that extends the HTML `<a>` element to provide [prefetching](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching) and client-side navigation between routes. It is the primary way to navigate between routes in Next.js.
-
-<AppOnly>
+`<Link>`는 HTML `<a>` 요소를 확장하여 [프리페칭](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching)과 라우트 간 클라이언트 사이드 네비게이션을 제공하는 React 컴포넌트입니다. Next.js에서 라우트 간 네비게이션을 위한 주요 방법입니다.
 
 ```tsx filename="app/page.tsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
-  return <Link href="/dashboard">Dashboard</Link>
+  return <Link href="/dashboard">Dashboard</Link>;
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
-  return <Link href="/dashboard">Dashboard</Link>
+  return <Link href="/dashboard">Dashboard</Link>;
 }
 ```
-
-</AppOnly>
-
-<PagesOnly>
-
-For an example, consider a `pages` directory with the following files:
-
-- `pages/index.js`
-- `pages/about.js`
-- `pages/blog/[slug].js`
-
-We can have a link to each of these pages like so:
-
-```jsx
-import Link from 'next/link'
-
-function Home() {
-  return (
-    <ul>
-      <li>
-        <Link href="/">Home</Link>
-      </li>
-      <li>
-        <Link href="/about">About Us</Link>
-      </li>
-      <li>
-        <Link href="/blog/hello-world">Blog Post</Link>
-      </li>
-    </ul>
-  )
-}
-
-export default Home
-```
-
-</PagesOnly>
 
 ## Props
 
-Here's a summary of the props available for the Link Component:
+다음은 Link 컴포넌트에 사용 가능한 props의 요약입니다:
 
-<PagesOnly>
+| Prop                     | 예시                | 타입               | 필수 여부 |
+| ------------------------ | ------------------- | ------------------ | --------- |
+| [`href`](#href-required) | `href="/dashboard"` | String 또는 Object | 예        |
+| [`replace`](#replace)    | `replace={false}`   | Boolean            | -         |
+| [`scroll`](#scroll)      | `scroll={false}`    | Boolean            | -         |
+| [`prefetch`](#prefetch)  | `prefetch={false}`  | Boolean 또는 null  | -         |
 
-| Prop                     | Example             | Type             | Required |
-| ------------------------ | ------------------- | ---------------- | -------- |
-| [`href`](#href-required) | `href="/dashboard"` | String or Object | Yes      |
-| [`replace`](#replace)    | `replace={false}`   | Boolean          | -        |
-| [`scroll`](#scroll)      | `scroll={false}`    | Boolean          | -        |
-| [`prefetch`](#prefetch)  | `prefetch={false}`  | Boolean          | -        |
+> **알아두면 좋은 점**: `className` 또는 `target="_blank"`와 같은 `<a>` 태그 속성들은 `<Link>`에 props로 추가될 수 있으며 기본 `<a>` 요소로 전달됩니다.
 
-</PagesOnly>
+### `href` (필수)
 
-<AppOnly>
-
-| Prop                     | Example             | Type             | Required |
-| ------------------------ | ------------------- | ---------------- | -------- |
-| [`href`](#href-required) | `href="/dashboard"` | String or Object | Yes      |
-| [`replace`](#replace)    | `replace={false}`   | Boolean          | -        |
-| [`scroll`](#scroll)      | `scroll={false}`    | Boolean          | -        |
-| [`prefetch`](#prefetch)  | `prefetch={false}`  | Boolean or null  | -        |
-
-</AppOnly>
-
-> **Good to know**: `<a>` tag attributes such as `className` or `target="_blank"` can be added to `<Link>` as props and will be passed to the underlying `<a>` element.
-
-### `href` (required)
-
-The path or URL to navigate to.
+네비게이트할 경로 또는 URL입니다.
 
 ```jsx
-<Link href="/dashboard">Dashboard</Link>
+<Link href="/dashboard">대시보드</Link>
 ```
 
-`href` can also accept an object, for example:
+`href`는 객체를 받을 수도 있습니다. 예를 들면:
 
 ```jsx
-// Navigate to /about?name=test
+// /about?name=test로 네비게이트
 <Link
   href={{
-    pathname: '/about',
-    query: { name: 'test' },
+    pathname: "/about",
+    query: { name: "test" },
   }}
 >
-  About
+  소개
 </Link>
 ```
 
 ### `replace`
 
-**Defaults to `false`.** When `true`, `next/link` will replace the current history state instead of adding a new URL into the [browser’s history](https://developer.mozilla.org/docs/Web/API/History_API) stack.
+**기본값은 `false`입니다.** `true`일 때, `next/link`는 새 URL을 [브라우저의 히스토리](https://developer.mozilla.org/docs/Web/API/History_API) 스택에 추가하는 대신 현재 히스토리 상태를 대체합니다.
 
 ```tsx filename="app/page.tsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
     <Link href="/dashboard" replace>
       Dashboard
     </Link>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
     <Link href="/dashboard" replace>
       Dashboard
     </Link>
-  )
+  );
 }
 ```
 
 ### `scroll`
 
-**Defaults to `true`.** The default behavior of `<Link>` **is to scroll to the top of a new route or to maintain the scroll position for backwards and forwards navigation.** When `false`, `next/link` will _not_ scroll to the top of the page after a navigation.
+**기본값은 `true`입니다.** `<Link>`의 **기본 동작은 새 라우트의 상단으로 스크롤하거나 뒤로 가기 및 앞으로 가기 네비게이션에 대해 스크롤 위치를 유지하는 것입니다.** `false`일 때, `next/link`는 네비게이션 후 페이지 상단으로 스크롤하지 _않습니다_.
 
 ```tsx filename="app/page.tsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
     <Link href="/dashboard" scroll={false}>
-      Dashboard
+      대시보드
     </Link>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
     <Link href="/dashboard" scroll={false}>
-      Dashboard
+      대시보드
     </Link>
-  )
+  );
 }
 ```
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - Next.js will scroll to the [Page](/docs/app/building-your-application/routing/pages) if it is not visible in the viewport upon navigation.
+> - Next.js는 네비게이션 시 뷰포트에 보이지 않는 [페이지](/docs/app/building-your-application/routing/pages)로 스크롤합니다.
 
 ### `prefetch`
 
-<AppOnly>
+프리페칭은 `<Link />` 컴포넌트가 사용자의 뷰포트에 들어올 때(초기에 또는 스크롤을 통해) 발생합니다. Next.js는 클라이언트 사이드 네비게이션의 성능을 향상시키기 위해 백그라운드에서 연결된 라우트(`href`로 표시된)와 그 데이터를 프리페치하고 로드합니다. 프리페칭은 프로덕션에서만 활성화됩니다.
 
-Prefetching happens when a `<Link />` component enters the user's viewport (initially or through scroll). Next.js prefetches and loads the linked route (denoted by the `href`) and its data in the background to improve the performance of client-side navigations. Prefetching is only enabled in production.
-
-- **`null` (default)**: Prefetch behavior depends on whether the route is static or dynamic. For static routes, the full route will be prefetched (including all its data). For dynamic routes, the partial route down to the nearest segment with a [`loading.js`](/docs/app/building-your-application/routing/loading-ui-and-streaming#instant-loading-states) boundary will be prefetched.
-- `true`: The full route will be prefetched for both static and dynamic routes.
-- `false`: Prefetching will never happen both on entering the viewport and on hover.
+- **`null` (기본값)**: 프리페치 동작은 라우트가 정적인지 동적인지에 따라 달라집니다. 정적 라우트의 경우, 전체 라우트가 프리페치됩니다(모든 데이터 포함). 동적 라우트의 경우, [`loading.js`](/docs/app/building-your-application/routing/loading-ui-and-streaming#instant-loading-states) 경계가 있는 가장 가까운 세그먼트까지의 부분 라우트가 프리페치됩니다.
+- `true`: 정적 및 동적 라우트 모두에 대해 전체 라우트가 프리페치됩니다.
+- `false`: 뷰포트에 들어오거나 호버할 때 프리페칭이 절대 발생하지 않습니다.
 
 ```tsx filename="app/page.tsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
     <Link href="/dashboard" prefetch={false}>
-      Dashboard
+      대시보드
     </Link>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
     <Link href="/dashboard" prefetch={false}>
-      Dashboard
+      대시보드
     </Link>
-  )
+  );
 }
 ```
 
-</AppOnly>
+## 예시
 
-<PagesOnly>
+### 동적 라우트에 링크하기
 
-Prefetching happens when a `<Link />` component enters the user's viewport (initially or through scroll). Next.js prefetches and loads the linked route (denoted by the `href`) and data in the background to improve the performance of client-side navigations. Prefetching is only enabled in production.
+동적 라우트의 경우, 템플릿 리터럴을 사용하여 링크의 경로를 생성하는 것이 편리할 수 있습니다.
 
-- **`true` (default)**: The full route and its data will be prefetched.
-- `false`: Prefetching will not happen when entering the viewport, but will happen on hover. If you want to completely remove fetching on hover as well, consider using an `<a>` tag or [incrementally adopting](/docs/app/building-your-application/upgrading/app-router-migration) the App Router, which enables disabling prefetching on hover too.
-
-```tsx filename="pages/index.tsx" switcher
-import Link from 'next/link'
-
-export default function Page() {
-  return (
-    <Link href="/dashboard" prefetch={false}>
-      Dashboard
-    </Link>
-  )
-}
-```
-
-```jsx filename="pages/index.js" switcher
-import Link from 'next/link'
-
-export default function Page() {
-  return (
-    <Link href="/dashboard" prefetch={false}>
-      Dashboard
-    </Link>
-  )
-}
-```
-
-## Other Props
-
-### `legacyBehavior`
-
-An `<a>` element is no longer required as a child of `<Link>`. Add the `legacyBehavior` prop to use the legacy behavior or remove the `<a>` to upgrade. A [codemod is available](/docs/app/building-your-application/upgrading/codemods#new-link) to automatically upgrade your code.
-
-> **Good to know**: when `legacyBehavior` is not set to `true`, all [`anchor`](https://developer.mozilla.org/docs/Web/HTML/Element/a) tag properties can be passed to `next/link` as well such as, `className`, `onClick`, etc.
-
-### `passHref`
-
-Forces `Link` to send the `href` property to its child. Defaults to `false`
-
-### `scroll`
-
-Scroll to the top of the page after a navigation. Defaults to `true`
-
-### `shallow`
-
-Update the path of the current page without rerunning [`getStaticProps`](/docs/pages/building-your-application/data-fetching/get-static-props), [`getServerSideProps`](/docs/pages/building-your-application/data-fetching/get-server-side-props) or [`getInitialProps`](/docs/pages/api-reference/functions/get-initial-props). Defaults to `false`
-
-### `locale`
-
-The active locale is automatically prepended. `locale` allows for providing a different locale. When `false` `href` has to include the locale as the default behavior is disabled.
-
-</PagesOnly>
-
-## Examples
-
-### Linking to Dynamic Routes
-
-For dynamic routes, it can be handy to use template literals to create the link's path.
-
-<PagesOnly>
-
-For example, you can generate a list of links to the dynamic route `pages/blog/[slug].js`
-
-```jsx filename="pages/blog/index.js"
-import Link from 'next/link'
-
-function Posts({ posts }) {
-  return (
-    <ul>
-      {posts.map((post) => (
-        <li key={post.id}>
-          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-export default Posts
-```
-
-</PagesOnly>
-
-<AppOnly>
-
-For example, you can generate a list of links to the dynamic route `app/blog/[slug]/page.js`:
+예를 들어, 동적 라우트 `app/blog/[slug]/page.js`에 대한 링크 목록을 생성할 수 있습니다:
 
 ```jsx filename="app/blog/page.js"
-import Link from 'next/link'
+import Link from "next/link";
 
 function Page({ posts }) {
   return (
@@ -322,128 +172,68 @@ function Page({ posts }) {
         </li>
       ))}
     </ul>
-  )
+  );
 }
 ```
 
-</AppOnly>
+### 자식이 `<a>` 태그를 감싸는 사용자 정의 컴포넌트인 경우
 
-### If the child is a custom component that wraps an `<a>` tag
-
-<AppOnly>
-
-If the child of `Link` is a custom component that wraps an `<a>` tag, you must add `passHref` to `Link`. This is necessary if you’re using libraries like [styled-components](https://styled-components.com/). Without this, the `<a>` tag will not have the `href` attribute, which hurts your site's accessibility and might affect SEO. If you're using [ESLint](/docs/app/building-your-application/configuring/eslint#eslint-plugin), there is a built-in rule `next/link-passhref` to ensure correct usage of `passHref`.
-
-</AppOnly>
-
-<PagesOnly>
-
-If the child of `Link` is a custom component that wraps an `<a>` tag, you must add `passHref` to `Link`. This is necessary if you’re using libraries like [styled-components](https://styled-components.com/). Without this, the `<a>` tag will not have the `href` attribute, which hurts your site's accessibility and might affect SEO. If you're using [ESLint](/docs/pages/building-your-application/configuring/eslint#eslint-plugin), there is a built-in rule `next/link-passhref` to ensure correct usage of `passHref`.
-
-</PagesOnly>
+`Link`의 자식이 `<a>` 태그를 감싸는 사용자 정의 컴포넌트인 경우, `Link`에 `passHref`를 추가해야 합니다. 이는 [styled-components](https://styled-components.com/)와 같은 라이브러리를 사용하는 경우 필요합니다. 이 없이는 `<a>` 태그가 `href` 속성을 갖지 않게 되어, 사이트의 접근성을 해치고 SEO에 영향을 줄 수 있습니다. [ESLint](/docs/app/building-your-application/configuring/eslint#eslint-plugin)를 사용하는 경우, `passHref`의 올바른 사용을 보장하는 내장 규칙 `next/link-passhref`가 있습니다.
 
 ```jsx
-import Link from 'next/link'
-import styled from 'styled-components'
+import Link from "next/link";
+import styled from "styled-components";
 
-// This creates a custom component that wraps an <a> tag
+// 이는 <a> 태그를 감싸는 사용자 정의 컴포넌트를 생성합니다
 const RedLink = styled.a`
   color: red;
-`
+`;
 
 function NavLink({ href, name }) {
   return (
     <Link href={href} passHref legacyBehavior>
       <RedLink>{name}</RedLink>
     </Link>
-  )
+  );
 }
 
-export default NavLink
+export default NavLink;
 ```
 
-- If you’re using [emotion](https://emotion.sh/)’s JSX pragma feature (`@jsx jsx`), you must use `passHref` even if you use an `<a>` tag directly.
-- The component should support `onClick` property to trigger navigation correctly
+- [emotion](https://emotion.sh/)의 JSX pragma 기능(`@jsx jsx`)을 사용하는 경우, `<a>` 태그를 직접 사용하더라도 `passHref`를 사용해야 합니다.
+- 컴포넌트는 네비게이션을 올바르게 트리거하기 위해 `onClick` 속성을 지원해야 합니다.
 
-### If the child is a functional component
+### 자식이 함수형 컴포넌트인 경우
 
-If the child of `Link` is a functional component, in addition to using `passHref` and `legacyBehavior`, you must wrap the component in [`React.forwardRef`](https://react.dev/reference/react/forwardRef):
+`Link`의 자식이 함수형 컴포넌트인 경우, `passHref`와 `legacyBehavior`를 사용하는 것 외에도 컴포넌트를 [`React.forwardRef`](https://react.dev/reference/react/forwardRef)로 감싸야 합니다:
 
 ```jsx
-import Link from 'next/link'
+import Link from "next/link";
 
-// `onClick`, `href`, and `ref` need to be passed to the DOM element
-// for proper handling
+// `onClick`, `href`, 그리고 `ref` 속성들은 DOM 요소로 전달되어야
+// 올바르게 처리됩니다
 const MyButton = React.forwardRef(({ onClick, href }, ref) => {
   return (
     <a href={href} onClick={onClick} ref={ref}>
-      Click Me
+      여기를 클릭하세요
     </a>
-  )
-})
+  );
+});
 
 function Home() {
   return (
     <Link href="/about" passHref legacyBehavior>
       <MyButton />
     </Link>
-  )
+  );
 }
 
-export default Home
+export default Home;
 ```
 
-<PagesOnly>
+### push 대신 URL 대체하기
 
-### With URL Object
-
-`Link` can also receive a URL object and it will automatically format it to create the URL string. Here's how to do it:
-
-```jsx
-import Link from 'next/link'
-
-function Home() {
-  return (
-    <ul>
-      <li>
-        <Link
-          href={{
-            pathname: '/about',
-            query: { name: 'test' },
-          }}
-        >
-          About us
-        </Link>
-      </li>
-      <li>
-        <Link
-          href={{
-            pathname: '/blog/[slug]',
-            query: { slug: 'my-post' },
-          }}
-        >
-          Blog Post
-        </Link>
-      </li>
-    </ul>
-  )
-}
-
-export default Home
-```
-
-The above example has a link to:
-
-- A predefined route: `/about?name=test`
-- A [dynamic route](/docs/app/building-your-application/routing/dynamic-routes): `/blog/my-post`
-
-You can use every property as defined in the [Node.js URL module documentation](https://nodejs.org/api/url.html#url_url_strings_and_url_objects).
-
-</PagesOnly>
-
-### Replace the URL instead of push
-
-The default behavior of the `Link` component is to `push` a new URL into the `history` stack. You can use the `replace` prop to prevent adding a new entry, as in the following example:
+`Link` 컴포넌트의 기본 동작은 새 URL을 `history` 스택에 `push`하는 것입니다. 다음 예시와 같이 `replace` prop을 사용하여 새 항목 추가를 방지할 수 있습니다:
 
 ```jsx
 <Link href="/about" replace>
@@ -451,9 +241,9 @@ The default behavior of the `Link` component is to `push` a new URL into the `hi
 </Link>
 ```
 
-### Disable scrolling to the top of the page
+### 페이지 상단으로의 스크롤 비활성화하기
 
-The default behavior of `Link` is to scroll to the top of the page. When there is a hash defined it will scroll to the specific id, like a normal `<a>` tag. To prevent scrolling to the top / hash `scroll={false}` can be added to `Link`:
+`Link`의 기본 동작은 페이지 상단으로 스크롤하는 것입니다. 해시가 정의되어 있을 때는 일반 `<a>` 태그처럼 특정 id로 스크롤합니다. 상단 또는 해시로의 스크롤을 방지하려면 `Link`에 `scroll={false}`를 추가할 수 있습니다:
 
 ```jsx
 <Link href="/#hashid" scroll={false}>
@@ -461,53 +251,47 @@ The default behavior of `Link` is to scroll to the top of the page. When there i
 </Link>
 ```
 
-### Middleware
+### 미들웨어
 
-It's common to use [Middleware](/docs/app/building-your-application/routing/middleware) for authentication or other purposes that involve rewriting the user to a different page. In order for the `<Link />` component to properly prefetch links with rewrites via Middleware, you need to tell Next.js both the URL to display and the URL to prefetch. This is required to avoid un-necessary fetches to middleware to know the correct route to prefetch.
+[미들웨어](/docs/app/building-your-application/routing/middleware)를 인증이나 사용자를 다른 페이지로 리다이렉트하는 등의 목적으로 사용하는 것이 일반적입니다. `<Link />` 컴포넌트가 미들웨어를 통한 리라이트가 있는 링크를 올바르게 프리페치하려면, Next.js에게 표시할 URL과 프리페치할 URL을 모두 알려줘야 합니다. 이는 미들웨어에 불필요한 페치를 피하고 올바른 라우트를 프리페치하기 위해 필요합니다.
 
-For example, if you want to serve a `/dashboard` route that has authenticated and visitor views, you may add something similar to the following in your Middleware to redirect the user to the correct page:
+예를 들어, 인증된 사용자와 방문자 뷰가 있는 `/dashboard` 라우트를 제공하려는 경우, 미들웨어에 다음과 유사한 내용을 추가하여 사용자를 올바른 페이지로 리다이렉트할 수 있습니다:
 
 ```js filename="middleware.js"
 export function middleware(req) {
-  const nextUrl = req.nextUrl
-  if (nextUrl.pathname === '/dashboard') {
+  const nextUrl = req.nextUrl;
+  if (nextUrl.pathname === "/dashboard") {
     if (req.cookies.authToken) {
-      return NextResponse.rewrite(new URL('/auth/dashboard', req.url))
+      return NextResponse.rewrite(new URL("/auth/dashboard", req.url));
     } else {
-      return NextResponse.rewrite(new URL('/public/dashboard', req.url))
+      return NextResponse.rewrite(new URL("/public/dashboard", req.url));
     }
   }
 }
 ```
 
-In this case, you would want to use the following code in your `<Link />` component:
+이 경우, `<Link />` 컴포넌트에서 다음과 같은 코드를 사용하고 싶을 것입니다:
 
 ```js
-import Link from 'next/link'
-import useIsAuthed from './hooks/useIsAuthed'
+import Link from "next/link";
+import useIsAuthed from "./hooks/useIsAuthed";
 
 export default function Page() {
-  const isAuthed = useIsAuthed()
-  const path = isAuthed ? '/auth/dashboard' : '/public/dashboard'
+  const isAuthed = useIsAuthed();
+  const path = isAuthed ? "/auth/dashboard" : "/public/dashboard";
   return (
     <Link as="/dashboard" href={path}>
-      Dashboard
+      대시보드
     </Link>
-  )
+  );
 }
 ```
 
-<PagesOnly>
+## 버전 기록
 
-> **Good to know**: If you're using [Dynamic Routes](/docs/app/building-your-application/routing/dynamic-routes), you'll need to adapt your `as` and `href` props. For example, if you have a Dynamic Route like `/dashboard/authed/[user]` that you want to present differently via middleware, you would write: `<Link href={{ pathname: '/dashboard/authed/[user]', query: { user: username } }} as="/dashboard/[user]">Profile</Link>`.
-
-</PagesOnly>
-
-## Version History
-
-| Version   | Changes                                                                                                                                                                                         |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `v13.0.0` | No longer requires a child `<a>` tag. A [codemod](/docs/app/building-your-application/upgrading/codemods#remove-a-tags-from-link-components) is provided to automatically update your codebase. |
-| `v10.0.0` | `href` props pointing to a dynamic route are automatically resolved and no longer require an `as` prop.                                                                                         |
-| `v8.0.0`  | Improved prefetching performance.                                                                                                                                                               |
-| `v1.0.0`  | `next/link` introduced.                                                                                                                                                                         |
+| 버전      | 변경사항                                                                                                                                                                                                 |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `v13.0.0` | 더 이상 자식 `<a>` 태그가 필요하지 않습니다. 코드베이스를 자동으로 업데이트하기 위한 [코드모드](/docs/app/building-your-application/upgrading/codemods#remove-a-tags-from-link-components)가 제공됩니다. |
+| `v10.0.0` | 동적 라우트를 가리키는 `href` props가 자동으로 해결되며 더 이상 `as` prop이 필요하지 않습니다.                                                                                                           |
+| `v8.0.0`  | 프리페칭 성능이 개선되었습니다.                                                                                                                                                                          |
+| `v1.0.0`  | `next/link` 도입.                                                                                                                                                                                        |

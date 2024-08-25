@@ -1,0 +1,11 @@
+{
+  "typescript": "TypeScript",
+  "eslint": "ESLint",
+  "environment-variables": "환경 변수",
+  "absolute-imports-and-module-aliases": "절대 경로 임포트 및 모듈 경로 별칭",
+  "mdx": "MDX",
+  "src-directory": "src 디렉토리",
+  "custom-server": "커스텀 서버",
+  "draft-mode": "드래프트 모드",
+  "content-security-policy": "콘텐츠 보안 정책"
+}
