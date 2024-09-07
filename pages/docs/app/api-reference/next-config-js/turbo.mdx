@@ -1,48 +1,50 @@
 ---
 title: turbo
-description: Configure Next.js with Turbopack-specific options
+description: Turbopack 관련 옵션으로 Next.js를 구성합니다
 version: experimental
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# turbo
 
-Turbopack can be customized to transform different files and change how modules are resolved.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. Pages 라우터에만 해당하는 내용을 추가하려면 `<PagesOnly>내용</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-> **Good to know**:
+Turbopack은 다른 파일을 변환하고 모듈 해결 방식을 변경하도록 사용자 정의할 수 있습니다.
+
+> **알아두면 좋은 점**:
 >
-> - These features are experimental and will only work with `next --turbo`.
-> - Turbopack for Next.js does not require loaders nor loader configuration for built-in functionality. Turbopack has built-in support for css and compiling modern JavaScript, so there's no need for `css-loader`, `postcss-loader`, or `babel-loader` if you're using `@babel/preset-env`.
+> - 이 기능들은 실험적이며 `next --turbo`에서만 작동합니다.
+> - Next.js용 Turbopack은 내장 기능을 위해 로더나 로더 구성이 필요하지 않습니다. Turbopack은 css와 현대 JavaScript 컴파일을 내장 지원하므로, `@babel/preset-env`를 사용하는 경우 `css-loader`, `postcss-loader`, 또는 `babel-loader`가 필요하지 않습니다.
 
-## webpack loaders
+## webpack 로더
 
-If you need loader support beyond what's built in, many webpack loaders already work with Turbopack. There are currently some limitations:
+내장된 것 이상의 로더 지원이 필요한 경우, 많은 webpack 로더가 이미 Turbopack과 함께 작동합니다. 현재 몇 가지 제한 사항이 있습니다:
 
-- Only a core subset of the webpack loader API is implemented. Currently, there is enough coverage for some popular loaders, and we'll expand our API support in the future.
-- Only loaders that return JavaScript code are supported. Loaders that transform files like stylesheets or images are not currently supported.
-- Options passed to webpack loaders must be plain JavaScript primitives, objects, and arrays. For example, it's not possible to pass `require()`d plugin modules as option values.
+- webpack 로더 API의 핵심 하위 집합만 구현되어 있습니다. 현재 일부 인기 있는 로더에 대해 충분한 지원이 이루어지고 있으며, 향후 API 지원을 확장할 예정입니다.
+- JavaScript 코드를 반환하는 로더만 지원됩니다. 스타일시트나 이미지와 같은 파일을 변환하는 로더는 현재 지원되지 않습니다.
+- webpack 로더에 전달되는 옵션은 일반 JavaScript 원시 타입, 객체, 배열이어야 합니다. 예를 들어, `require()`된 플러그인 모듈을 옵션 값으로 전달하는 것은 불가능합니다.
 
-To configure loaders, add the names of the loaders you've installed and any options in `next.config.js`, mapping file extensions to a list of loaders:
+로더를 구성하려면 `next.config.js`에 설치한 로더의 이름과 옵션을 추가하고, 파일 확장자를 로더 목록에 매핑하세요:
 
 ```js filename="next.config.js"
 module.exports = {
   experimental: {
     turbo: {
       rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
         },
       },
     },
   },
-}
+};
 ```
 
-> **Good to know**: Prior to Next.js version 13.4.4, `experimental.turbo.rules` was named `experimental.turbo.loaders` and only accepted file extensions like `.mdx` instead of `*.mdx`.
+> **알아두면 좋은 점**: Next.js 버전 13.4.4 이전에는 `experimental.turbo.rules`가 `experimental.turbo.loaders`라는 이름이었으며 `*.mdx` 대신 `.mdx`와 같은 파일 확장자만 받았습니다.
 
-### Supported loaders
+### 지원되는 로더
 
-The following loaders have been tested to work with Turbopack's webpack loader implementation:
+다음 로더들은 Turbopack의 webpack 로더 구현과 함께 작동하는 것으로 테스트되었습니다:
 
 - [`babel-loader`](https://www.npmjs.com/package/babel-loader)
 - [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack)
@@ -52,53 +54,53 @@ The following loaders have been tested to work with Turbopack's webpack loader i
 - [`raw-loader`](https://www.npmjs.com/package/raw-loader)
 - [`sass-loader`](https://www.npmjs.com/package/sass-loader)
 
-## Resolve aliases
+## 경로 별칭
 
-Through `next.config.js`, Turbopack can be configured to modify module resolution through aliases, similar to webpack's [`resolve.alias`](https://webpack.js.org/configuration/resolve/#resolvealias) configuration.
+`next.config.js`를 통해 Turbopack을 구성하여 webpack의 [`resolve.alias`](https://webpack.js.org/configuration/resolve/#resolvealias) 구성과 유사하게 별칭을 통해 모듈 해결을 수정할 수 있습니다.
 
-To configure resolve aliases, map imported patterns to their new destination in `next.config.js`:
+경로 별칭을 구성하려면 `next.config.js`에서 가져온 패턴을 새 대상에 매핑하세요:
 
 ```js filename="next.config.js"
 module.exports = {
   experimental: {
     turbo: {
       resolveAlias: {
-        underscore: 'lodash',
-        mocha: { browser: 'mocha/browser-entry.js' },
+        underscore: "lodash",
+        mocha: { browser: "mocha/browser-entry.js" },
       },
     },
   },
-}
+};
 ```
 
-This aliases imports of the `underscore` package to the `lodash` package. In other words, `import underscore from 'underscore'` will load the `lodash` module instead of `underscore`.
+이는 `underscore` 패키지의 가져오기를 `lodash` 패키지로 별칭 지정합니다. 다시 말해, `import underscore from 'underscore'`는 `underscore` 대신 `lodash` 모듈을 로드합니다.
 
-Turbopack also supports conditional aliasing through this field, similar to Node.js's [conditional exports](https://nodejs.org/docs/latest-v18.x/api/packages.html#conditional-exports). At the moment only the `browser` condition is supported. In the case above, imports of the `mocha` module will be aliased to `mocha/browser-entry.js` when Turbopack targets browser environments.
+Turbopack은 또한 Node.js의 [조건부 내보내기](https://nodejs.org/docs/latest-v18.x/api/packages.html#conditional-exports)와 유사하게 이 필드를 통한 조건부 별칭 지정을 지원합니다. 현재는 `browser` 조건만 지원됩니다. 위의 경우, Turbopack이 브라우저 환경을 대상으로 할 때 `mocha` 모듈의 가져오기는 `mocha/browser-entry.js`로 별칭 지정됩니다.
 
-## Resolve extensions
+## 확장자 설정
 
-Through `next.config.js`, Turbopack can be configured to resolve modules with custom extensions, similar to webpack's [`resolve.extensions`](https://webpack.js.org/configuration/resolve/#resolveextensions) configuration.
+`next.config.js`를 통해 Turbopack을 구성하여 webpack의 [`resolve.extensions`](https://webpack.js.org/configuration/resolve/#resolveextensions) 구성과 유사하게 사용자 정의 확장자로 모듈을 해결할 수 있습니다.
 
-To configure resolve extensions, use the `resolveExtensions` field in `next.config.js`:
+확장자 설정을 구성하려면 `next.config.js`에서 `resolveExtensions` 필드를 사용하세요:
 
 ```js filename="next.config.js"
 module.exports = {
   experimental: {
     turbo: {
       resolveExtensions: [
-        '.mdx',
-        '.tsx',
-        '.ts',
-        '.jsx',
-        '.js',
-        '.mjs',
-        '.json',
+        ".mdx",
+        ".tsx",
+        ".ts",
+        ".jsx",
+        ".js",
+        ".mjs",
+        ".json",
       ],
     },
   },
-}
+};
 ```
 
-This overwrites the original resolve extensions with the provided list. Make sure to include the default extensions.
+이는 제공된 목록으로 원래의 확장자 설정을 덮어씁니다. 기본 확장자를 포함해야 합니다.
 
-For more information and guidance for how to migrate your app to Turbopack from webpack, see [Turbopack's documentation on webpack compatibility](https://turbo.build/pack/docs/migrating-from-webpack).
+Turbopack으로 webpack에서 앱을 마이그레이션하는 방법에 대한 자세한 정보와 지침은 [Turbopack의 webpack 호환성에 대한 문서](https://turbo.build/pack/docs/migrating-from-webpack)를 참조하세요.

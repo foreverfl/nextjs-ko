@@ -68,6 +68,7 @@ const logo = (
 );
 
 const config = {
+  docsRepositoryBase: "https://github.com/foreverfl/nextjs-ko/blob/main",
   project: {
     link: "https://github.com/foreverfl/nextjs-ko",
   },
@@ -131,6 +132,10 @@ const config = {
         />
       </>
     );
+  },
+  toc: {
+    title: "목차",
+    backToTop: true,
   },
   editLink: {
     text: "이 페이지를 GitHub에서 편집하기",

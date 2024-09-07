@@ -1,26 +1,28 @@
 ---
 title: draftMode
-description: API Reference for the draftMode function.
+description: draftMode 함수에 대한 API 참조입니다.
 ---
 
-The `draftMode` function allows you to detect [Draft Mode](/docs/app/building-your-application/configuring/draft-mode) inside a [Server Component](/docs/app/building-your-application/rendering/server-components).
+# draftMode
+
+`draftMode` 함수를 사용하면 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components) 내에서 [미리보기 모드(draftmode)](/docs/app/building-your-application/configuring/draft-mode)를 감지할 수 있습니다.
 
 ```jsx filename="app/page.js"
-import { draftMode } from 'next/headers'
+import { draftMode } from "next/headers";
 
 export default function Page() {
-  const { isEnabled } = draftMode()
+  const { isEnabled } = draftMode();
   return (
     <main>
       <h1>My Blog Post</h1>
-      <p>Draft Mode is currently {isEnabled ? 'Enabled' : 'Disabled'}</p>
+      <p>Draft Mode is currently {isEnabled ? "Enabled" : "Disabled"}</p>
     </main>
-  )
+  );
 }
 ```
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                 |
-| --------- | ----------------------- |
-| `v13.4.0` | `draftMode` introduced. |
+| 버전      | 변경 사항                     |
+| --------- | ----------------------------- |
+| `v13.4.0` | `draftMode`가 도입되었습니다. |

@@ -1,42 +1,44 @@
 ---
-title: Custom Server
-description: Start a Next.js app programmatically using a custom server.
+title: 커스텀 서버
+description: 커스텀 서버를 사용하여 프로그래밍 방식으로 Next.js 앱을 시작합니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# 커스텀 서버
 
-Next.js includes its own server with `next start` by default. If you have an existing backend, you can still use it with Next.js (this is not a custom server). A custom Next.js server allows you to programmatically start a server for custom patterns. The majority of the time, you will not need this approach. However, it's available if you need to eject.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 해당하는 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-> **Good to know**:
+Next.js는 기본적으로 `next start`로 자체 서버를 포함합니다. 기존 백엔드가 있다면 Next.js와 함께 사용할 수 있습니다 (이는 커스텀 서버가 아닙니다). 커스텀 Next.js 서버를 사용하면 프로그래밍 방식으로 커스텀 패턴에 맞는 서버를 시작할 수 있습니다. 대부분의 경우 이 접근 방식이 필요하지 않습니다. 하지만 필요한 경우 사용할 수 있습니다.
+
+> **알아두면 좋은 점**:
 >
-> - Before deciding to use a custom server, keep in mind that it should only be used when the integrated router of Next.js can't meet your app requirements. A custom server will remove important performance optimizations, like **[Automatic Static Optimization](/docs/pages/building-your-application/rendering/automatic-static-optimization).**
-> - A custom server **cannot** be deployed on [Vercel](https://vercel.com/frameworks/nextjs).
-> - When using standalone output mode, it does not trace custom server files. This mode outputs a separate minimal `server.js` file, instead. These cannot be used together.
+> - 커스텀 서버 사용을 결정하기 전에, Next.js의 통합 라우터가 앱 요구 사항을 충족할 수 없는 경우에만 사용해야 한다는 점을 유념하세요. 커스텀 서버를 사용하면 **[자동 정적 최적화](/docs/pages/building-your-application/rendering/automatic-static-optimization)** 와 같은 중요한 성능 최적화가 제거됩니다.
+> - 커스텀 서버는 [Vercel](https://vercel.com/frameworks/nextjs)에 배포할 수 **없습니다**.
+> - 독립 실행형 출력 모드를 사용할 때는 커스텀 서버 파일을 추적하지 않습니다. 이 모드는 대신 별도의 최소한의 `server.js` 파일을 출력합니다. 이들은 함께 사용할 수 없습니다.
 
-Take a look at the [following example](https://github.com/vercel/next.js/tree/canary/examples/custom-server) of a custom server:
+커스텀 서버의 [다음 예시](https://github.com/vercel/next.js/tree/canary/examples/custom-server)를 살펴보세요:
 
 ```ts filename="server.ts" switcher
-import { createServer } from 'http'
-import { parse } from 'url'
-import next from 'next'
+import { createServer } from "http";
+import { parse } from "url";
+import next from "next";
 
-const port = parseInt(process.env.PORT || '3000', 10)
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
-const handle = app.getRequestHandler()
+const port = parseInt(process.env.PORT || "3000", 10);
+const dev = process.env.NODE_ENV !== "production";
+const app = next({ dev });
+const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   createServer((req, res) => {
-    const parsedUrl = parse(req.url!, true)
-    handle(req, res, parsedUrl)
-  }).listen(port)
+    const parsedUrl = parse(req.url!, true);
+    handle(req, res, parsedUrl);
+  }).listen(port);
 
   console.log(
     `> Server listening at http://localhost:${port} as ${
-      dev ? 'development' : process.env.NODE_ENV
+      dev ? "development" : process.env.NODE_ENV
     }`
-  )
-})
+  );
+});
 ```
 
 ```js filename="server.js" switcher
@@ -63,9 +65,9 @@ app.prepare().then(() => {
 });
 ```
 
-> `server.js` does not run through the Next.js Compiler or bundling process. Make sure the syntax and source code this file requires are compatible with the current Node.js version you are using. [View an example](https://github.com/vercel/next.js/tree/canary/examples/custom-server).
+> `server.js`는 Next.js 컴파일러나 번들링 프로세스를 거치지 않습니다. 이 파일이 요구하는 구문과 소스 코드가 현재 사용 중인 Node.js 버전과 호환되는지 확인하세요. [예시 보기](https://github.com/vercel/next.js/tree/canary/examples/custom-server).
 
-To run the custom server, you'll need to update the `scripts` in `package.json` like so:
+커스텀 서버를 실행하려면 `package.json`의 `scripts`를 다음과 같이 업데이트해야 합니다:
 
 ```json filename="package.json"
 {
@@ -77,45 +79,25 @@ To run the custom server, you'll need to update the `scripts` in `package.json` 
 }
 ```
 
-Alternatively, you can set up `nodemon` ([example](https://github.com/vercel/next.js/tree/canary/examples/custom-server)). The custom server uses the following import to connect the server with the Next.js application:
+또는 `nodemon`을 설정할 수 있습니다 ([예시](https://github.com/vercel/next.js/tree/canary/examples/custom-server)). 커스텀 서버는 다음 import를 사용하여 서버를 Next.js 애플리케이션과 연결합니다:
 
 ```js
-import next from 'next'
+import next from "next";
 
-const app = next({})
+const app = next({});
 ```
 
-The above `next` import is a function that receives an object with the following options:
+위의 `next` import는 다음 옵션을 가진 객체를 받는 함수입니다:
 
-| Option         | Type               | Description                                                                         |
-| -------------- | ------------------ | ----------------------------------------------------------------------------------- |
-| `conf`         | `Object`           | The same object you would use in `next.config.js`. Defaults to `{}`                 |
-| `customServer` | `Boolean`          | (_Optional_) Set to false when the server was created by Next.js                    |
-| `dev`          | `Boolean`          | (_Optional_) Whether or not to launch Next.js in dev mode. Defaults to `false`      |
-| `dir`          | `String`           | (_Optional_) Location of the Next.js project. Defaults to `'.'`                     |
-| `quiet`        | `Boolean`          | (_Optional_) Hide error messages containing server information. Defaults to `false` |
-| `hostname`     | `String`           | (_Optional_) The hostname the server is running behind                              |
-| `port`         | `Number`           | (_Optional_) The port the server is running behind                                  |
-| `httpServer`   | `node:http#Server` | (_Optional_) The HTTP Server that Next.js is running behind                         |
+| 옵션           | 타입               | 설명                                                                           |
+| -------------- | ------------------ | ------------------------------------------------------------------------------ |
+| `conf`         | `Object`           | `next.config.js`에서 사용할 것과 동일한 객체입니다. 기본값은 `{}`입니다        |
+| `customServer` | `Boolean`          | (_선택사항_) Next.js가 서버를 생성한 경우 false로 설정합니다                   |
+| `dev`          | `Boolean`          | (_선택사항_) Next.js를 개발 모드로 실행할지 여부입니다. 기본값은 `false`입니다 |
+| `dir`          | `String`           | (_선택사항_) Next.js 프로젝트의 위치입니다. 기본값은 `'.'`입니다               |
+| `quiet`        | `Boolean`          | (_선택사항_) 서버 정보가 포함된 오류 메시지를 숨깁니다. 기본값은 `false`입니다 |
+| `hostname`     | `String`           | (_선택사항_) 서버가 실행 중인 호스트 이름입니다                                |
+| `port`         | `Number`           | (_선택사항_) 서버가 실행 중인 포트입니다                                       |
+| `httpServer`   | `node:http#Server` | (_선택사항_) Next.js가 실행 중인 HTTP 서버입니다                               |
 
-The returned `app` can then be used to let Next.js handle requests as required.
-
-<PagesOnly>
-
-## Disabling file-system routing
-
-By default, `Next` will serve each file in the `pages` folder under a pathname matching the filename. If your project uses a custom server, this behavior may result in the same content being served from multiple paths, which can present problems with SEO and UX.
-
-To disable this behavior and prevent routing based on files in `pages`, open `next.config.js` and disable the `useFileSystemPublicRoutes` config:
-
-```js filename="next.config.js"
-module.exports = {
-  useFileSystemPublicRoutes: false,
-}
-```
-
-> Note that `useFileSystemPublicRoutes` disables filename routes from SSR; client-side routing may still access those paths. When using this option, you should guard against navigation to routes you do not want programmatically.
-
-> You may also wish to configure the client-side router to disallow client-side redirects to filename routes; for that refer to [`router.beforePopState`](/docs/pages/api-reference/functions/use-router#routerbeforepopstate).
-
-</PagesOnly>
+반환된 `app`은 필요에 따라 Next.js가 요청을 처리하도록 하는 데 사용할 수 있습니다.

@@ -1,26 +1,28 @@
 ---
 title: trailingSlash
-description: Configure Next.js pages to resolve with or without a trailing slash.
+description: Next.js 페이지가 후행 슬래시와 함께 또는 없이 해결되도록 구성합니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# trailingSlash
 
-By default Next.js will redirect urls with trailing slashes to their counterpart without a trailing slash. For example `/about/` will redirect to `/about`. You can configure this behavior to act the opposite way, where urls without trailing slashes are redirected to their counterparts with trailing slashes.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 사이에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 특정한 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-Open `next.config.js` and add the `trailingSlash` config:
+기본적으로 Next.js는 후행 슬래시가 있는 URL을 후행 슬래시가 없는 상대 URL로 리다이렉트합니다. 예를 들어, `/about/`은 `/about`으로 리다이렉트됩니다. 이 동작을 반대로 구성할 수 있어, 후행 슬래시가 없는 URL이 후행 슬래시가 있는 상대 URL로 리다이렉트되도록 할 수 있습니다.
+
+`next.config.js`를 열고 `trailingSlash` 설정을 추가하세요:
 
 ```js filename="next.config.js"
 module.exports = {
   trailingSlash: true,
-}
+};
 ```
 
-With this option set, urls like `/about` will redirect to `/about/`.
+이 옵션을 설정하면 `/about`과 같은 URL이 `/about/`로 리다이렉트됩니다.
 
-When used with [`output: "export"`](/docs/app/building-your-application/deploying/static-exports) configuration, the `/about` page will output `/about/index.html` (instead of the default `/about.html`).
+[`output: "export"`](/docs/app/building-your-application/deploying/static-exports) 설정과 함께 사용할 때, `/about` 페이지는 (기본값인 `/about.html` 대신) `/about/index.html`로 출력됩니다.
 
-## Version History
+## 버전 기록
 
-| Version  | Changes                |
-| -------- | ---------------------- |
-| `v9.5.0` | `trailingSlash` added. |
+| 버전     | 변경 사항               |
+| -------- | ----------------------- |
+| `v9.5.0` | `trailingSlash` 추가됨. |

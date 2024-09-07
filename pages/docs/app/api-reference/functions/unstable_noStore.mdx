@@ -1,10 +1,12 @@
 ---
 title: unstable_noStore
-description: API Reference for the unstable_noStore function.
+description: unstable_noStore 함수에 대한 API 참조.
 version: unstable
 ---
 
-`unstable_noStore` can be used to declaratively opt out of static rendering and indicate a particular component should not be cached.
+# unstable_noStore
+
+`unstable_noStore`는 정적 렌더링을 선택적으로 제외하고 특정 컴포넌트를 캐시하지 않아야 함을 선언적으로 나타내는 데 사용할 수 있습니다.
 
 ```jsx
 import { unstable_noStore as noStore } from 'next/cache';
@@ -12,20 +14,20 @@ import { unstable_noStore as noStore } from 'next/cache';
 export default async function Component() {
   noStore();
   const result = await db.query(...);
-  ...
+  // ...
 }
 ```
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - `unstable_noStore` is equivalent to `cache: 'no-store'` on a `fetch`
-> - `unstable_noStore` is preferred over `export const dynamic = 'force-dynamic'` as it is more granular and can be used on a per-component basis
+> - `unstable_noStore`는 `fetch`에서 `cache: 'no-store'`와 동등합니다
+> - `unstable_noStore`는 `export const dynamic = 'force-dynamic'`보다 더 세분화되어 컴포넌트 단위로 사용할 수 있으므로 선호됩니다
 
-- Using `unstable_noStore` inside [`unstable_cache`](/docs/app/api-reference/functions/unstable_cache) will not opt out of static generation. Instead, it will defer to the cache configuration to determine whether to cache the result or not.
+- [`unstable_cache`](/docs/app/api-reference/functions/unstable_cache) 내에서 `unstable_noStore`를 사용하면 정적 생성에서 제외되지 않습니다. 대신, 결과를 캐시할지 여부를 결정하기 위해 캐시 구성을 참조합니다.
 
-## Usage
+## 사용법
 
-If you prefer not to pass additional options to `fetch`, like `cache: 'no-store'` or `next: { revalidate: 0 }`, you can use `noStore()` as a replacement for all of these use cases.
+`fetch`에 `cache: 'no-store'` 또는 `next: { revalidate: 0 }`와 같은 추가 옵션을 전달하지 않기를 선호한다면, 이러한 모든 사용 사례에 대한 대체로 `noStore()`를 사용할 수 있습니다.
 
 ```jsx
 import { unstable_noStore as noStore } from 'next/cache';
@@ -33,12 +35,12 @@ import { unstable_noStore as noStore } from 'next/cache';
 export default async function Component() {
   noStore();
   const result = await db.query(...);
-  ...
+  // ...
 }
 ```
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                        |
-| --------- | ------------------------------ |
-| `v14.0.0` | `unstable_noStore` introduced. |
+| 버전      | 변경 사항                  |
+| --------- | -------------------------- |
+| `v14.0.0` | `unstable_noStore` 도입됨. |

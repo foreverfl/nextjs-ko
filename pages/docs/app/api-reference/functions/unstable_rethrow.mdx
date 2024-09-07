@@ -1,55 +1,57 @@
 ---
 title: unstable_rethrow
-description: API Reference for the unstable_rethrow function.
+description: unstable_rethrow 함수에 대한 API 참조.
 version: unstable
 ---
 
-`unstable_rethrow` can be used to avoid catching internal errors thrown by Next.js when attempting to handle errors thrown in your application code.
+# unstable_rethrow
 
-For example, calling the `notFound` function will throw an internal Next.js error and render the [`not-found.js`](/docs/app/api-reference/file-conventions/not-found) component. However, if used inside a `try/catch` block, the error will be caught, preventing `not-found.js` from rendering:
+`unstable_rethrow`는 애플리케이션 코드에서 발생한 오류를 처리하려고 할 때 Next.js가 내부적으로 발생시킨 오류를 잡지 않도록 하는 데 사용할 수 있습니다.
+
+예를 들어, `notFound` 함수를 호출하면 Next.js 내부 오류가 발생하고 [`not-found.js`](/docs/app/api-reference/file-conventions/not-found) 컴포넌트가 렌더링됩니다. 그러나 `try/catch` 블록 내에서 사용되면 오류가 잡혀 `not-found.js`가 렌더링되지 않습니다:
 
 ```tsx filename="@/app/ui/component.tsx"
-import { notFound } from 'next/navigation'
+import { notFound } from "next/navigation";
 
 export default async function Page() {
   try {
-    const post = await fetch('https://.../posts/1').then((res) => {
-      if (res.status === 404) notFound()
-      if (!res.ok) throw new Error(res.statusText)
-      return res.json()
-    })
+    const post = await fetch("https://.../posts/1").then((res) => {
+      if (res.status === 404) notFound();
+      if (!res.ok) throw new Error(res.statusText);
+      return res.json();
+    });
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
 }
 ```
 
-You can use `unstable_rethrow` API to re-throw the internal error and continue with the expected behavior:
+`unstable_rethrow` API를 사용하여 내부 오류를 다시 던지고 예상된 동작을 계속할 수 있습니다:
 
 ```tsx filename="@/app/ui/component.tsx"
-import { notFound, unstable_rethrow } from 'next/navigation'
+import { notFound, unstable_rethrow } from "next/navigation";
 
 export default async function Page() {
   try {
-    const post = await fetch('https://.../posts/1').then((res) => {
-      if (res.status === 404) notFound()
-      if (!res.ok) throw new Error(res.statusText)
-      return res.json()
-    })
+    const post = await fetch("https://.../posts/1").then((res) => {
+      if (res.status === 404) notFound();
+      if (!res.ok) throw new Error(res.statusText);
+      return res.json();
+    });
   } catch (err) {
-    unstable_rethrow(err)
-    console.error(err)
+    unstable_rethrow(err);
+    console.error(err);
   }
 }
 ```
 
-The following Next.js APIs rely on throwing an error which should be rethrown and handled by Next.js itself:
+다음 Next.js API들은 오류를 던지는 것에 의존하며, 이 오류들은 다시 던져져서 Next.js 자체에 의해 처리되어야 합니다:
 
 - [`notFound()`](/docs/app/api-reference/functions/not-found)
 - [`redirect()`](/docs/app/building-your-application/routing/redirecting#redirect-function)
 - [`permanentRedirect()`](/docs/app/building-your-application/routing/redirecting#permanentredirect-function)
 
-If a route segment is marked to throw an error unless it's static, a dynamic function call will also throw an error that should similarly not be caught by the developer. Note that Partial Prerendering (PPR) affects this behavior as well. These APIs are:
+라우트 세그먼트가 정적이 아닌 한 오류를 던지도록 표시된 경우, 동적 함수 호출도 개발자가 잡지 말아야 할 오류를 던집니다. 부분 사전 렌더링(PPR)도 이 동작에 영향을 미칩니다. 이러한 API들은 다음과 같습니다:
 
 - [`cookies()`](/docs/app/api-reference/functions/cookies)
 - [`headers()`](/docs/app/api-reference/functions/headers)
@@ -57,8 +59,8 @@ If a route segment is marked to throw an error unless it's static, a dynamic fun
 - `fetch(..., { cache: 'no-store' })`
 - `fetch(..., { next: { revalidate: 0 } })`
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - This method should be called at the top of the catch block, passing the error object as its only argument. It can also be used within a `.catch` handler of a promise.
-> - If you ensure that your calls to APIs that throw are not wrapped in a try/catch then you don't need to use `unstable_rethrow`
-> - Any resource cleanup (like clearing intervals, timers, etc) would have to either happen prior to the call to `unstable_rethrow` or within a `finally` block.
+> - 이 메서드는 catch 블록의 맨 위에서 호출되어야 하며, 오류 객체를 유일한 인수로 전달해야 합니다. 프로미스의 `.catch` 핸들러 내에서도 사용할 수 있습니다.
+> - 오류를 던지는 API 호출이 try/catch로 감싸져 있지 않도록 한다면 `unstable_rethrow`를 사용할 필요가 없습니다.
+> - 리소스 정리(인터벌 해제, 타이머 해제 등)는 `unstable_rethrow` 호출 이전에 수행되거나 `finally` 블록 내에서 수행되어야 합니다.

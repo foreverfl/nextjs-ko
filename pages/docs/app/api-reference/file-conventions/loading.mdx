@@ -1,34 +1,36 @@
 ---
 title: loading.js
-description: API reference for the loading.js  file.
+description: loading.js 파일에 대한 API 참조.
 ---
 
-A **loading** file can create instant loading states built on [Suspense](/docs/app/building-your-application/routing/loading-ui-and-streaming).
+# loading.js
 
-By default, this file is a [Server Component](/docs/app/building-your-application/rendering/server-components) - but can also be used as a Client Component through the `"use client"` directive.
+**loading** 파일은 [Suspense](/docs/app/building-your-application/routing/loading-ui-and-streaming)를 기반으로 한 즉각적인 로딩 상태를 생성할 수 있습니다.
+
+기본적으로 이 파일은 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components)이지만, `"use client"` 지시문을 통해 클라이언트 컴포넌트로도 사용할 수 있습니다.
 
 ```tsx filename="app/feed/loading.tsx" switcher
 export default function Loading() {
-  // Or a custom loading skeleton component
-  return <p>Loading...</p>
+  // 또는 사용자 정의 로딩 스켈레톤 컴포넌트
+  return <p>Loading...</p>;
 }
 ```
 
 ```jsx filename="app/feed/loading.js" switcher
 export default function Loading() {
-  // Or a custom loading skeleton component
-  return <p>Loading...</p>
+  // 또는 사용자 정의 로딩 스켈레톤 컴포넌트
+  return <p>Loading...</p>;
 }
 ```
 
-Loading UI components do not accept any parameters.
+로딩 UI 컴포넌트는 어떤 매개변수도 받지 않습니다.
 
-> **Good to know**
+> **알아두면 좋은 점**
 >
-> - While designing loading UI, you may find it helpful to use the [React Developer Tools](https://react.dev/learn/react-developer-tools) to manually toggle Suspense boundaries.
+> - 로딩 UI를 설계할 때, [React 개발자 도구](https://react.dev/learn/react-developer-tools)를 사용하여 Suspense 경계를 수동으로 토글하는 것이 도움이 될 수 있습니다.
 
-## Version History
+## 버전 기록
 
-| Version   | Changes               |
-| --------- | --------------------- |
-| `v13.0.0` | `loading` introduced. |
+| 버전      | 변경 사항         |
+| --------- | ----------------- |
+| `v13.0.0` | `loading` 도입됨. |

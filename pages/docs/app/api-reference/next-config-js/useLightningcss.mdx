@@ -1,0 +1,32 @@
+---
+title: useLightningcss
+description: Lightning CSS에 대한 실험적 지원을 활성화합니다.
+version: experimental
+---
+
+# useLightningcss
+
+Rust로 작성된 빠른 CSS 번들러 및 압축기인 [Lightning CSS](https://lightningcss.dev)를 사용하기 위한 실험적 지원입니다.
+
+```ts filename="next.config.ts"
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  experimental: {
+    useLightningcss: true,
+  },
+};
+
+export default nextConfig;
+```
+
+```js filename="next.config.js"
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    useLightningcss: true,
+  },
+};
+
+module.exports = nextConfig;
+```

@@ -1,78 +1,80 @@
 ---
 title: redirect
-description: API Reference for the redirect function.
+description: redirect 함수에 대한 API 참조입니다.
 related:
   links:
     - app/api-reference/functions/permanentRedirect
 ---
 
-The `redirect` function allows you to redirect the user to another URL. `redirect` can be used in [Server Components](/docs/app/building-your-application/rendering/server-components), [Route Handlers](/docs/app/building-your-application/routing/route-handlers), and [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations).
+# redirect
 
-When used in a [streaming context](/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming), this will insert a meta tag to emit the redirect on the client side. When used in a server action, it will serve a 303 HTTP redirect response to the caller. Otherwise, it will serve a 307 HTTP redirect response to the caller.
+`redirect` 함수를 사용하면 사용자를 다른 URL로 리다이렉트할 수 있습니다. `redirect`는 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components), [라우트 핸들러](/docs/app/building-your-application/routing/route-handlers), 그리고 [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)에서 사용할 수 있습니다.
 
-If a resource doesn't exist, you can use the [`notFound` function](/docs/app/api-reference/functions/not-found) instead.
+[스트리밍 컨텍스트](/docs/app/building-your-application/routing/loading-ui-and-streaming#what-is-streaming)에서 사용될 때, 이는 클라이언트 측에서 리다이렉트를 수행하기 위한 메타 태그를 삽입합니다. 서버 액션에서 사용될 때는 호출자에게 303 HTTP 리다이렉트 응답을 제공합니다. 그 외의 경우에는 호출자에게 307 HTTP 리다이렉트 응답을 제공합니다.
 
-> **Good to know**:
+리소스가 존재하지 않는 경우, 대신 [`notFound` 함수](/docs/app/api-reference/functions/not-found)를 사용할 수 있습니다.
+
+> **알아두면 좋은 점**:
 >
-> - In Server Actions and Route Handlers, `redirect` should be called after the `try/catch` block.
-> - If you prefer to return a 308 (Permanent) HTTP redirect instead of 307 (Temporary), you can use the [`permanentRedirect` function](/docs/app/api-reference/functions/permanentRedirect) instead.
+> - 서버 액션과 라우트 핸들러에서 `redirect`는 `try/catch` 블록 이후에 호출되어야 합니다.
+> - 307(임시) HTTP 리다이렉트 대신 308(영구) HTTP 리다이렉트를 반환하고 싶다면, 대신 [`permanentRedirect` 함수](/docs/app/api-reference/functions/permanentRedirect)를 사용할 수 있습니다.
 
-## Parameters
+## 매개변수
 
-The `redirect` function accepts two arguments:
+`redirect` 함수는 두 개의 인수를 받습니다:
 
 ```js
-redirect(path, type)
+redirect(path, type);
 ```
 
-| Parameter | Type                                                          | Description                                                 |
-| --------- | ------------------------------------------------------------- | ----------------------------------------------------------- |
-| `path`    | `string`                                                      | The URL to redirect to. Can be a relative or absolute path. |
-| `type`    | `'replace'` (default) or `'push'` (default in Server Actions) | The type of redirect to perform.                            |
+| 매개변수 | 타입                                                        | 설명                                                      |
+| -------- | ----------------------------------------------------------- | --------------------------------------------------------- |
+| `path`   | `string`                                                    | 리다이렉트할 URL. 상대 경로나 절대 경로가 될 수 있습니다. |
+| `type`   | `'replace'` (기본값) 또는 `'push'` (서버 액션에서의 기본값) | 수행할 리다이렉트의 타입.                                 |
 
-By default, `redirect` will use `push` (adding a new entry to the browser history stack) in [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) and `replace` (replacing the current URL in the browser history stack) everywhere else. You can override this behavior by specifying the `type` parameter.
+기본적으로 `redirect`는 [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)에서는 `push`(브라우저 히스토리 스택에 새 항목 추가)를 사용하고, 그 외의 곳에서는 `replace`(브라우저 히스토리 스택에서 현재 URL 대체)를 사용합니다. `type` 매개변수를 지정하여 이 동작을 재정의할 수 있습니다.
 
-The `type` parameter has no effect when used in Server Components.
+서버 컴포넌트에서 사용할 때는 `type` 매개변수가 효과가 없습니다.
 
-## Returns
+## 반환값
 
-`redirect` does not return a value.
+`redirect`는 값을 반환하지 않습니다.
 
-## Example
+## 예시
 
-### Server Component
+### 서버 컴포넌트
 
-Invoking the `redirect()` function throws a `NEXT_REDIRECT` error and terminates rendering of the route segment in which it was thrown.
+`redirect()` 함수를 호출하면 `NEXT_REDIRECT` 오류가 발생하고 해당 함수가 호출된 라우트 세그먼트의 렌더링이 종료됩니다.
 
 ```jsx filename="app/team/[id]/page.js"
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 async function fetchTeam(id) {
-  const res = await fetch('https://...')
-  if (!res.ok) return undefined
-  return res.json()
+  const res = await fetch("https://...");
+  if (!res.ok) return undefined;
+  return res.json();
 }
 
 export default async function Profile({ params }) {
-  const team = await fetchTeam(params.id)
+  const team = await fetchTeam(params.id);
   if (!team) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // ...
 }
 ```
 
-> **Good to know**: `redirect` does not require you to use `return redirect()` as it uses the TypeScript [`never`](https://www.typescriptlang.org/docs/handbook/2/functions.html#never) type.
+> **알아두면 좋은 점**: `redirect`는 TypeScript [`never`](https://www.typescriptlang.org/docs/handbook/2/functions.html#never) 타입을 사용하기 때문에 `return redirect()`를 사용할 필요가 없습니다.
 
-### Client Component
+### 클라이언트 컴포넌트
 
-`redirect` can be used in a Client Component through a Server Action. If you need to use an event handler to redirect the user, you can use the [`useRouter`](/docs/app/api-reference/functions/use-router) hook.
+`redirect`는 서버 액션을 통해 클라이언트 컴포넌트에서 사용할 수 있습니다. 이벤트 핸들러를 사용하여 사용자를 리다이렉트해야 하는 경우, [`useRouter`](/docs/app/api-reference/functions/use-router) 훅을 사용할 수 있습니다.
 
 ```tsx filename="app/client-redirect.tsx" switcher
-'use client'
+"use client";
 
-import { navigate } from './actions'
+import { navigate } from "./actions";
 
 export function ClientRedirect() {
   return (
@@ -80,14 +82,14 @@ export function ClientRedirect() {
       <input type="text" name="id" />
       <button>Submit</button>
     </form>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/client-redirect.jsx" switcher
-'use client'
+"use client";
 
-import { navigate } from './actions'
+import { navigate } from "./actions";
 
 export function ClientRedirect() {
   return (
@@ -95,49 +97,49 @@ export function ClientRedirect() {
       <input type="text" name="id" />
       <button>Submit</button>
     </form>
-  )
+  );
 }
 ```
 
 ```ts filename="app/actions.ts" switcher
-'use server'
+"use server";
 
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 export async function navigate(data: FormData) {
-  redirect(`/posts/${data.get('id')}`)
+  redirect(`/posts/${data.get("id")}`);
 }
 ```
 
 ```js filename="app/actions.js" switcher
-'use server'
+"use server";
 
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 export async function navigate(data) {
-  redirect(`/posts/${data.get('id')}`)
+  redirect(`/posts/${data.get("id")}`);
 }
 ```
 
 ## FAQ
 
-### Why does `redirect` use 307 and 308?
+### `redirect`가 307과 308을 사용하는 이유는 무엇인가요?
 
-When using `redirect()` you may notice that the status codes used are `307` for a temporary redirect, and `308` for a permanent redirect. While traditionally a `302` was used for a temporary redirect, and a `301` for a permanent redirect, many browsers changed the request method of the redirect, from a `POST` to `GET` request when using a `302`, regardless of the origins request method.
+`redirect()`를 사용할 때 임시 리다이렉트에는 `307`, 영구 리다이렉트에는 `308` 상태 코드가 사용되는 것을 볼 수 있습니다. 전통적으로 임시 리다이렉트에는 `302`, 영구 리다이렉트에는 `301`이 사용되었지만, 많은 브라우저에서 `302`를 사용할 때 원래의 요청 메서드와 상관없이 리다이렉트 요청 메서드를 `POST`에서 `GET` 요청으로 변경했습니다.
 
-Taking the following example of a redirect from `/users` to `/people`, if you make a `POST` request to `/users` to create a new user, and are conforming to a `302` temporary redirect, the request method will be changed from a `POST` to a `GET` request. This doesn't make sense, as to create a new user, you should be making a `POST` request to `/people`, and not a `GET` request.
+`/users`에서 `/people`로 리다이렉트하는 다음 예를 살펴보겠습니다. 새 사용자를 생성하기 위해 `/users`에 `POST` 요청을 하고 `302` 임시 리다이렉트를 따르는 경우, 요청 메서드가 `POST`에서 `GET` 요청으로 변경됩니다. 이는 새 사용자를 생성하기 위해 `/people`에 `POST` 요청을 해야 하는데, `GET` 요청을 하게 되므로 의미가 없습니다.
 
-The introduction of the `307` status code means that the request method is preserved as `POST`.
+`307` 상태 코드의 도입은 요청 메서드가 `POST`로 유지됨을 의미합니다.
 
-- `302` - Temporary redirect, will change the request method from `POST` to `GET`
-- `307` - Temporary redirect, will preserve the request method as `POST`
+- `302` - 임시 리다이렉트, 요청 메서드를 `POST`에서 `GET`으로 변경합니다
+- `307` - 임시 리다이렉트, 요청 메서드를 `POST`로 유지합니다
 
-The `redirect()` method uses a `307` by default, instead of a `302` temporary redirect, meaning your requests will _always_ be preserved as `POST` requests.
+`redirect()` 메서드는 기본적으로 `302` 임시 리다이렉트 대신 `307`을 사용하므로, 요청은 _항상_ `POST` 요청으로 유지됩니다.
 
-[Learn more](https://developer.mozilla.org/docs/Web/HTTP/Redirections) about HTTP Redirects.
+HTTP 리다이렉트에 대해 [자세히 알아보기](https://developer.mozilla.org/docs/Web/HTTP/Redirections).
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                |
-| --------- | ---------------------- |
-| `v13.0.0` | `redirect` introduced. |
+| 버전      | 변경 사항                    |
+| --------- | ---------------------------- |
+| `v13.0.0` | `redirect`가 도입되었습니다. |

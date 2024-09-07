@@ -1,114 +1,116 @@
 ---
 title: generateViewport
-description: API Reference for the generateViewport function.
+description: generateViewport 함수에 대한 API 참조.
 related:
-  title: Next Steps
-  description: View all the Metadata API options.
+  title: 다음 단계
+  description: 모든 메타데이터 API 옵션을 확인하세요.
   links:
     - app/api-reference/file-conventions/metadata
     - app/building-your-application/optimizing/metadata
 ---
 
-You can customize the initial viewport of the page with the static `viewport` object or the dynamic `generateViewport` function.
+# generateViewport
 
-> **Good to know**:
+정적 `viewport` 객체 또는 동적 `generateViewport` 함수를 사용하여 페이지의 초기 뷰포트를 사용자 정의할 수 있습니다.
+
+> **알아두면 좋은 점**:
 >
-> - The `viewport` object and `generateViewport` function exports are **only supported in Server Components**.
-> - You cannot export both the `viewport` object and `generateViewport` function from the same route segment.
-> - If you're coming from migrating `metadata` exports, you can use [metadata-to-viewport-export codemod](/docs/app/building-your-application/upgrading/codemods#metadata-to-viewport-export) to update your changes.
+> - `viewport` 객체와 `generateViewport` 함수 내보내기는 **서버 컴포넌트에서만 지원됩니다**.
+> - 동일한 라우트 세그먼트에서 `viewport` 객체와 `generateViewport` 함수를 모두 내보낼 수 없습니다.
+> - `metadata` 내보내기에서 마이그레이션하는 경우, [metadata-to-viewport-export codemod](/docs/app/building-your-application/upgrading/codemods#metadata-to-viewport-export)를 사용하여 변경 사항을 업데이트할 수 있습니다.
 
-## The `viewport` object
+## `viewport` 객체
 
-To define the viewport options, export a `viewport` object from a `layout.jsx` or `page.jsx` file.
+뷰포트 옵션을 정의하려면 `layout.jsx` 또는 `page.jsx` 파일에서 `viewport` 객체를 내보내세요.
 
 ```tsx filename="layout.tsx | page.tsx" switcher
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export const viewport: Viewport = {
-  themeColor: 'black',
-}
+  themeColor: "black",
+};
 
 export default function Page() {}
 ```
 
 ```jsx filename="layout.jsx | page.jsx" switcher
 export const viewport = {
-  themeColor: 'black',
-}
+  themeColor: "black",
+};
 
 export default function Page() {}
 ```
 
-## `generateViewport` function
+## `generateViewport` 함수
 
-`generateViewport` should return a [`Viewport` object](#viewport-fields) containing one or more viewport fields.
+`generateViewport`는 하나 이상의 뷰포트 필드를 포함하는 [`Viewport` 객체](#viewport-fields)를 반환해야 합니다.
 
 ```tsx filename="layout.tsx | page.tsx" switcher
 export function generateViewport({ params }) {
   return {
-    themeColor: '...',
-  }
+    themeColor: "...",
+  };
 }
 ```
 
 ```jsx filename="layout.js | page.js" switcher
 export function generateViewport({ params }) {
   return {
-    themeColor: '...',
-  }
+    themeColor: "...",
+  };
 }
 ```
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - If the viewport doesn't depend on runtime information, it should be defined using the static [`viewport` object](#the-viewport-object) rather than `generateViewport`.
+> - 뷰포트가 런타임 정보에 의존하지 않는 경우, `generateViewport` 대신 정적 [`viewport` 객체](#the-viewport-object)를 사용하여 정의해야 합니다.
 
-## Viewport Fields
+## 뷰포트 필드
 
 ### `themeColor`
 
-Learn more about [`theme-color`](https://developer.mozilla.org/docs/Web/HTML/Element/meta/name/theme-color).
+[`theme-color`](https://developer.mozilla.org/docs/Web/HTML/Element/meta/name/theme-color)에 대해 자세히 알아보세요.
 
-**Simple theme color**
+**간단한 테마 색상**
 
 ```tsx filename="layout.tsx | page.tsx" switcher
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export const viewport: Viewport = {
-  themeColor: 'black',
-}
+  themeColor: "black",
+};
 ```
 
 ```jsx filename="layout.jsx | page.jsx" switcher
 export const viewport = {
-  themeColor: 'black',
-}
+  themeColor: "black",
+};
 ```
 
 ```html filename="<head> output" hideLineNumbers
 <meta name="theme-color" content="black" />
 ```
 
-**With media attribute**
+**media 속성 포함**
 
 ```tsx filename="layout.tsx | page.tsx" switcher
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'cyan' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: "(prefers-color-scheme: light)", color: "cyan" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
-}
+};
 ```
 
 ```jsx filename="layout.jsx | page.jsx" switcher
 export const viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'cyan' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: "(prefers-color-scheme: light)", color: "cyan" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
-}
+};
 ```
 
 ```html filename="<head> output" hideLineNumbers
@@ -116,32 +118,32 @@ export const viewport = {
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
 ```
 
-### `width`, `initialScale`, `maximumScale` and `userScalable`
+### `width`, `initialScale`, `maximumScale` 및 `userScalable`
 
-> **Good to know**: The `viewport` meta tag is automatically set, and manual configuration is usually unnecessary as the default is sufficient. However, the information is provided for completeness.
+> **알아두면 좋은 점**: `viewport` 메타 태그는 자동으로 설정되며, 일반적으로 기본값이 충분하므로 수동 구성이 필요하지 않습니다. 그러나 참고를 위해 이 정보를 제공합니다.
 
 ```tsx filename="layout.tsx | page.tsx" switcher
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  // Also supported by less commonly used
+  // 덜 일반적으로 사용되는 다음 옵션도 지원됩니다
   // interactiveWidget: 'resizes-visual',
-}
+};
 ```
 
 ```jsx filename="layout.jsx | page.jsx" switcher
 export const viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  // Also supported by less commonly used
+  // 덜 일반적으로 사용되는 다음 옵션도 지원됩니다
   // interactiveWidget: 'resizes-visual',
-}
+};
 ```
 
 ```html filename="<head> output" hideLineNumbers
@@ -153,86 +155,86 @@ export const viewport = {
 
 ### `colorScheme`
 
-Learn more about [`color-scheme`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name#:~:text=color%2Dscheme%3A%20specifies,of%20the%20following%3A).
+[`color-scheme`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name#:~:text=color%2Dscheme%3A%20specifies,of%20the%20following%3A)에 대해 자세히 알아보세요.
 
 ```tsx filename="layout.tsx | page.tsx" switcher
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-}
+  colorScheme: "dark",
+};
 ```
 
 ```jsx filename="layout.jsx | page.jsx" switcher
 export const viewport = {
-  colorScheme: 'dark',
-}
+  colorScheme: "dark",
+};
 ```
 
 ```html filename="<head> output" hideLineNumbers
 <meta name="color-scheme" content="dark" />
 ```
 
-## Types
+## 타입
 
-You can add type safety to your viewport object by using the `Viewport` type. If you are using the [built-in TypeScript plugin](/docs/app/building-your-application/configuring/typescript) in your IDE, you do not need to manually add the type, but you can still explicitly add it if you want.
+`Viewport` 타입을 사용하여 뷰포트 객체에 타입 안전성을 추가할 수 있습니다. IDE에서 [내장 TypeScript 플러그인](/docs/app/building-your-application/configuring/typescript)을 사용하는 경우 수동으로 타입을 추가할 필요가 없지만, 원한다면 명시적으로 추가할 수 있습니다.
 
-### `viewport` object
+### `viewport` 객체
 
 ```tsx
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export const viewport: Viewport = {
-  themeColor: 'black',
-}
+  themeColor: "black",
+};
 ```
 
-### `generateViewport` function
+### `generateViewport` 함수
 
-#### Regular function
+#### 일반 함수
 
 ```tsx
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 export function generateViewport(): Viewport {
   return {
-    themeColor: 'black',
-  }
+    themeColor: "black",
+  };
 }
 ```
 
-#### With segment props
+#### 세그먼트 props 포함
 
 ```tsx
-import type { Viewport } from 'next'
+import type { Viewport } from "next";
 
 type Props = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
 export function generateViewport({ params, searchParams }: Props): Viewport {
   return {
-    themeColor: 'black',
-  }
+    themeColor: "black",
+  };
 }
 
 export default function Page({ params, searchParams }: Props) {}
 ```
 
-#### JavaScript Projects
+#### JavaScript 프로젝트
 
-For JavaScript projects, you can use JSDoc to add type safety.
+JavaScript 프로젝트의 경우 JSDoc을 사용하여 타입 안전성을 추가할 수 있습니다.
 
 ```js
 /** @type {import("next").Viewport} */
 export const viewport = {
-  themeColor: 'black',
-}
+  themeColor: "black",
+};
 ```
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                                       |
-| --------- | --------------------------------------------- |
-| `v14.0.0` | `viewport` and `generateViewport` introduced. |
+| 버전      | 변경 사항                                         |
+| --------- | ------------------------------------------------- |
+| `v14.0.0` | `viewport`와 `generateViewport`가 도입되었습니다. |

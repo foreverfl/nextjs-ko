@@ -1,74 +1,76 @@
 ---
 title: generateSitemaps
 nav_title: generateSitemaps
-description: Learn how to use the generateSiteMaps function to create multiple sitemaps for your application.
+description: generateSiteMaps 함수를 사용하여 애플리케이션에 대한 여러 사이트맵을 생성하는 방법을 알아보세요.
 related:
-  title: Next Steps
-  description: Learn how to create sitemaps for your Next.js application.
+  title: 다음 단계
+  description: Next.js 애플리케이션에 대한 사이트맵을 생성하는 방법을 알아보세요.
   links:
     - app/api-reference/file-conventions/metadata/sitemap
 ---
 
-You can use the `generateSitemaps` function to generate multiple sitemaps for your application.
+# generateSitemaps
 
-## Returns
+`generateSitemaps` 함수를 사용하여 애플리케이션에 대한 여러 사이트맵을 생성할 수 있습니다.
 
-The `generateSitemaps` returns an array of objects with an `id` property.
+## 반환값
 
-## URLs
+`generateSitemaps`는 `id` 속성이 있는 객체의 배열을 반환합니다.
 
-In production, your generated sitemaps will be available at `/.../sitemap/[id].xml`. For example, `/product/sitemap/1.xml`.
+## URL
 
-In development, you can view the generated sitemap on `/.../sitemap.xml/[id]`. For example, `/product/sitemap.xml/1`. This difference is temporary and will follow the production format.
+프로덕션에서는 생성된 사이트맵을 `/.../sitemap/[id].xml`에서 사용할 수 있습니다. 예를 들어, `/product/sitemap/1.xml`과 같습니다.
 
-## Example
+개발 환경에서는 `/.../sitemap.xml/[id]`에서 생성된 사이트맵을 볼 수 있습니다. 예를 들어, `/product/sitemap.xml/1`과 같습니다. 이 차이는 임시적이며 프로덕션 형식을 따를 예정입니다.
 
-For example, to split a sitemap using `generateSitemaps`, return an array of objects with the sitemap `id`. Then, use the `id` to generate the unique sitemaps.
+## 예시
+
+예를 들어, `generateSitemaps`를 사용하여 사이트맵을 분할하려면 사이트맵 `id`가 포함된 객체 배열을 반환합니다. 그런 다음 `id`를 사용하여 고유한 사이트맵을 생성합니다.
 
 ```ts filename="app/product/sitemap.ts" switcher
-import { BASE_URL } from '@/app/lib/constants'
+import { BASE_URL } from "@/app/lib/constants";
 
 export async function generateSitemaps() {
-  // Fetch the total number of products and calculate the number of sitemaps needed
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]
+  // 총 제품 수를 가져와서 필요한 사이트맵 수를 계산합니다
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 }
 
 export default async function sitemap({
   id,
 }: {
-  id: number
+  id: number;
 }): Promise<MetadataRoute.Sitemap> {
-  // Google's limit is 50,000 URLs per sitemap
-  const start = id * 50000
-  const end = start + 50000
+  // Google의 제한은 사이트맵당 50,000개의 URL입니다
+  const start = id * 50000;
+  const end = start + 50000;
   const products = await getProducts(
     `SELECT id, date FROM products WHERE id BETWEEN ${start} AND ${end}`
-  )
+  );
   return products.map((product) => ({
     url: `${BASE_URL}/product/${product.id}`,
     lastModified: product.date,
-  }))
+  }));
 }
 ```
 
 ```js filename="app/product/sitemap.js" switcher
-import { BASE_URL } from '@/app/lib/constants'
+import { BASE_URL } from "@/app/lib/constants";
 
 export async function generateSitemaps() {
-  // Fetch the total number of products and calculate the number of sitemaps needed
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]
+  // 총 제품 수를 가져와서 필요한 사이트맵 수를 계산합니다
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 }
 
 export default async function sitemap({ id }) {
-  // Google's limit is 50,000 URLs per sitemap
-  const start = id * 50000
-  const end = start + 50000
+  // Google의 제한은 사이트맵당 50,000개의 URL입니다
+  const start = id * 50000;
+  const end = start + 50000;
   const products = await getProducts(
     `SELECT id, date FROM products WHERE id BETWEEN ${start} AND ${end}`
-  )
+  );
   return products.map((product) => ({
     url: `${BASE_URL}/product/${id}`,
     lastModified: product.date,
-  }))
+  }));
 }
 ```

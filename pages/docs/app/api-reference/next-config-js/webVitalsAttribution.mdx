@@ -1,24 +1,26 @@
 ---
 title: webVitalsAttribution
-description: Learn how to use the webVitalsAttribution option to pinpoint the source of Web Vitals issues.
+description: Web Vitals 문제의 출처를 파악하기 위해 webVitalsAttribution 옵션을 사용하는 방법을 알아보세요.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# webVitalsAttribution
 
-When debugging issues related to Web Vitals, it is often helpful if we can pinpoint the source of the problem.
-For example, in the case of Cumulative Layout Shift (CLS), we might want to know the first element that shifted when the single largest layout shift occurred.
-Or, in the case of Largest Contentful Paint (LCP), we might want to identify the element corresponding to the LCP for the page.
-If the LCP element is an image, knowing the URL of the image resource can help us locate the asset we need to optimize.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. Pages 라우터에만 해당하는 내용을 추가하려면 `<PagesOnly>내용</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-Pinpointing the biggest contributor to the Web Vitals score, aka [attribution](https://github.com/GoogleChrome/web-vitals/blob/4ca38ae64b8d1e899028c692f94d4c56acfc996c/README.md#attribution),
-allows us to obtain more in-depth information like entries for [PerformanceEventTiming](https://developer.mozilla.org/docs/Web/API/PerformanceEventTiming), [PerformanceNavigationTiming](https://developer.mozilla.org/docs/Web/API/PerformanceNavigationTiming) and [PerformanceResourceTiming](https://developer.mozilla.org/docs/Web/API/PerformanceResourceTiming).
+Web Vitals와 관련된 문제를 디버깅할 때, 문제의 출처를 정확히 파악하는 것이 종종 도움이 됩니다.
+예를 들어, 누적 레이아웃 이동(CLS)의 경우, 단일 최대 레이아웃 이동이 발생했을 때 처음 이동한 요소가 무엇인지 알고 싶을 수 있습니다.
+또는 최대 콘텐츠풀 페인트(LCP)의 경우, 페이지의 LCP에 해당하는 요소를 식별하고 싶을 수 있습니다.
+LCP 요소가 이미지인 경우, 이미지 리소스의 URL을 아는 것이 최적화가 필요한 자산을 찾는 데 도움이 될 수 있습니다.
 
-Attribution is disabled by default in Next.js but can be enabled **per metric** by specifying the following in `next.config.js`.
+Web Vitals 점수에 가장 큰 영향을 미치는 요소를 정확히 파악하는 것, 즉 [속성](https://github.com/GoogleChrome/web-vitals/blob/4ca38ae64b8d1e899028c692f94d4c56acfc996c/README.md#attribution)을 파악하면
+[PerformanceEventTiming](https://developer.mozilla.org/docs/Web/API/PerformanceEventTiming), [PerformanceNavigationTiming](https://developer.mozilla.org/docs/Web/API/PerformanceNavigationTiming), [PerformanceResourceTiming](https://developer.mozilla.org/docs/Web/API/PerformanceResourceTiming)과 같은 항목에 대한 더 자세한 정보를 얻을 수 있습니다.
+
+Next.js에서는 기본적으로 속성 파악이 비활성화되어 있지만, `next.config.js`에서 다음과 같이 **지표별로** 활성화할 수 있습니다.
 
 ```js filename="next.config.js"
 experimental: {
-  webVitalsAttribution: ['CLS', 'LCP']
+  webVitalsAttribution: ["CLS", "LCP"];
 }
 ```
 
-Valid attribution values are all `web-vitals` metrics specified in the [`NextWebVitalsMetric`](https://github.com/vercel/next.js/blob/442378d21dd56d6e769863eb8c2cb521a463a2e0/packages/next/shared/lib/utils.ts#L43) type.
+유효한 속성 값은 [`NextWebVitalsMetric`](https://github.com/vercel/next.js/blob/442378d21dd56d6e769863eb8c2cb521a463a2e0/packages/next/shared/lib/utils.ts#L43) 타입에 지정된 모든 `web-vitals` 지표입니다.

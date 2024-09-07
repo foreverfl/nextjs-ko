@@ -1,118 +1,120 @@
 ---
 title: fetch
-description: API reference for the extended fetch function.
+description: 확장된 fetch 함수에 대한 API 참조입니다.
 ---
 
-Next.js extends the native [Web `fetch()` API](https://developer.mozilla.org/docs/Web/API/Fetch_API) to allow each request on the server to set its own persistent caching and revalidation semantics.
+# fetch
 
-In the browser, the `cache` option indicates how a fetch request will interact with the _browser's_ HTTP cache. With this extension, `cache` indicates how a _server-side_ fetch request will interact with the framework's persistent [Data Cache](/docs/app/building-your-application/caching#data-cache).
+Next.js는 네이티브 [Web `fetch()` API](https://developer.mozilla.org/docs/Web/API/Fetch_API)를 확장하여 서버의 각 요청이 자체적인 지속적 캐싱 및 재검증 정책을 설정할 수 있도록 합니다.
 
-You can call `fetch` with `async` and `await` directly within Server Components.
+브라우저에서 `cache` 옵션은 fetch 요청이 _브라우저의_ HTTP 캐시와 어떻게 상호작용할지를 나타냅니다. 이 확장을 통해 `cache`는 _서버 측_ fetch 요청이 프레임워크의 지속적인 [데이터 캐시](/docs/app/building-your-application/caching#data-cache)와 어떻게 상호작용할지를 나타냅니다.
+
+서버 컴포넌트 내에서 `async`와 `await`를 사용하여 직접 `fetch`를 호출할 수 있습니다.
 
 ```tsx filename="app/page.tsx" switcher
 export default async function Page() {
-  // This request should be cached until manually invalidated.
-  // Similar to `getStaticProps`.
-  // `force-cache` is the default and can be omitted.
-  const staticData = await fetch(`https://...`, { cache: 'force-cache' })
+  // 이 요청은 수동으로 무효화될 때까지 캐시되어야 합니다.
+  // `getStaticProps`와 유사합니다.
+  // `force-cache`는 기본값이며 생략할 수 있습니다.
+  const staticData = await fetch(`https://...`, { cache: "force-cache" });
 
-  // This request should be refetched on every request.
-  // Similar to `getServerSideProps`.
-  const dynamicData = await fetch(`https://...`, { cache: 'no-store' })
+  // 이 요청은 모든 요청에서 다시 가져와야 합니다.
+  // `getServerSideProps`와 유사합니다.
+  const dynamicData = await fetch(`https://...`, { cache: "no-store" });
 
-  // This request should be cached with a lifetime of 10 seconds.
-  // Similar to `getStaticProps` with the `revalidate` option.
+  // 이 요청은 10초의 수명으로 캐시되어야 합니다.
+  // `revalidate` 옵션이 있는 `getStaticProps`와 유사합니다.
   const revalidatedData = await fetch(`https://...`, {
     next: { revalidate: 10 },
-  })
+  });
 
-  return <div>...</div>
+  return <div>...</div>;
 }
 ```
 
 ```jsx filename="app/page.js" switcher
 export default async function Page() {
-  // This request should be cached until manually invalidated.
-  // Similar to `getStaticProps`.
-  // `force-cache` is the default and can be omitted.
-  const staticData = await fetch(`https://...`, { cache: 'force-cache' })
+  // 이 요청은 수동으로 무효화될 때까지 캐시되어야 합니다.
+  // `getStaticProps`와 유사합니다.
+  // `force-cache`는 기본값이며 생략할 수 있습니다.
+  const staticData = await fetch(`https://...`, { cache: "force-cache" });
 
-  // This request should be refetched on every request.
-  // Similar to `getServerSideProps`.
-  const dynamicData = await fetch(`https://...`, { cache: 'no-store' })
+  // 이 요청은 모든 요청에서 다시 가져와야 합니다.
+  // `getServerSideProps`와 유사합니다.
+  const dynamicData = await fetch(`https://...`, { cache: "no-store" });
 
-  // This request should be cached with a lifetime of 10 seconds.
-  // Similar to `getStaticProps` with the `revalidate` option.
+  // 이 요청은 10초의 수명으로 캐시되어야 합니다.
+  // `revalidate` 옵션이 있는 `getStaticProps`와 유사합니다.
   const revalidatedData = await fetch(`https://...`, {
     next: { revalidate: 10 },
-  })
+  });
 
-  return <div>...</div>
+  return <div>...</div>;
 }
 ```
 
 ## `fetch(url, options)`
 
-Since Next.js extends the [Web `fetch()` API](https://developer.mozilla.org/docs/Web/API/Fetch_API), you can use any of the [native options available](https://developer.mozilla.org/docs/Web/API/fetch#parameters).
+Next.js는 [Web `fetch()` API](https://developer.mozilla.org/docs/Web/API/Fetch_API)를 확장하므로, [사용 가능한 모든 네이티브 옵션](https://developer.mozilla.org/docs/Web/API/fetch#parameters)을 사용할 수 있습니다.
 
 ### `options.cache`
 
-Configure how the request should interact with Next.js [Data Cache](/docs/app/building-your-application/caching#data-cache).
+요청이 Next.js [데이터 캐시](/docs/app/building-your-application/caching#data-cache)와 어떻게 상호작용해야 하는지 구성합니다.
 
 ```ts
-fetch(`https://...`, { cache: 'force-cache' | 'no-store' })
+fetch(`https://...`, { cache: "force-cache" | "no-store" });
 ```
 
-- **`no-store`** (default): Next.js fetches the resource from the remote server on every request without looking in the cache, and it will not update the cache with the downloaded resource.
-- **`force-cache`**: Next.js looks for a matching request in its Data Cache.
-  - If there is a match and it is fresh, it will be returned from the cache.
-  - If there is no match or a stale match, Next.js will fetch the resource from the remote server and update the cache with the downloaded resource.
+- **`no-store`** (기본값): Next.js는 모든 요청에서 캐시를 확인하지 않고 원격 서버에서 리소스를 가져오며, 다운로드된 리소스로 캐시를 업데이트하지 않습니다.
+- **`force-cache`**: Next.js는 데이터 캐시에서 일치하는 요청을 찾습니다.
+  - 일치하는 항목이 있고 신선하다면, 캐시에서 반환됩니다.
+  - 일치하는 항목이 없거나 오래된 경우, Next.js는 원격 서버에서 리소스를 가져와 다운로드된 리소스로 캐시를 업데이트합니다.
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - In version 15, the default cache option was changed from `'force-cache'` to `'no-store'`. If you're using an older version of Next.js, the default cache option is `'force-cache'`.
-> - The `no-cache` option behaves the same way as `no-store` in Next.js.
+> - 버전 15에서 기본 캐시 옵션이 `'force-cache'`에서 `'no-store'`로 변경되었습니다. 이전 버전의 Next.js를 사용 중이라면 기본 캐시 옵션은 `'force-cache'`입니다.
+> - Next.js에서 `no-cache` 옵션은 `no-store`와 동일하게 작동합니다.
 
 ### `options.next.revalidate`
 
 ```ts
-fetch(`https://...`, { next: { revalidate: false | 0 | number } })
+fetch(`https://...`, { next: { revalidate: false | 0 | number } });
 ```
 
-Set the cache lifetime of a resource (in seconds).
+리소스의 캐시 수명을 설정합니다(초 단위).
 
-- **`false`** - Cache the resource indefinitely. Semantically equivalent to `revalidate: Infinity`. The HTTP cache may evict older resources over time.
-- **`0`** - Prevent the resource from being cached.
-- **`number`** - (in seconds) Specify the resource should have a cache lifetime of at most `n` seconds.
+- **`false`** - 리소스를 무기한 캐시합니다. 의미상 `revalidate: Infinity`와 동일합니다. HTTP 캐시는 시간이 지남에 따라 오래된 리소스를 제거할 수 있습니다.
+- **`0`** - 리소스가 캐시되는 것을 방지합니다.
+- **`number`** - (초 단위) 리소스의 캐시 수명을 최대 `n`초로 지정합니다.
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - If an individual `fetch()` request sets a `revalidate` number lower than the [default `revalidate`](/docs/app/api-reference/file-conventions/route-segment-config#revalidate) of a route, the whole route revalidation interval will be decreased.
-> - If two fetch requests with the same URL in the same route have different `revalidate` values, the lower value will be used.
-> - As a convenience, it is not necessary to set the `cache` option if `revalidate` is set to a number.
-> - Conflicting options such as `{ revalidate: 3600, cache: 'no-store' }` will cause an error.
+> - 개별 `fetch()` 요청이 라우트의 [기본 `revalidate`](/docs/app/api-reference/file-conventions/route-segment-config#revalidate)보다 낮은 숫자를 설정하면, 전체 라우트 재검증 간격이 감소합니다.
+> - 같은 라우트에서 같은 URL을 가진 두 fetch 요청의 `revalidate` 값이 다르면, 더 낮은 값이 사용됩니다.
+> - 편의상 `revalidate`가 숫자로 설정된 경우 `cache` 옵션을 설정할 필요가 없습니다.
+> - `{ revalidate: 3600, cache: 'no-store' }`와 같은 충돌하는 옵션은 오류를 발생시킵니다.
 
 ### `options.next.tags`
 
 ```ts
-fetch(`https://...`, { next: { tags: ['collection'] } })
+fetch(`https://...`, { next: { tags: ["collection"] } });
 ```
 
-Set the cache tags of a resource. Data can then be revalidated on-demand using [`revalidateTag`](https://nextjs.org/docs/app/api-reference/functions/revalidateTag). The max length for a custom tag is 256 characters and the max tag items is 64.
+리소스의 캐시 태그를 설정합니다. 그런 다음 [`revalidateTag`](/docs/app/api-reference/functions/revalidateTag)를 사용하여 데이터를 온디맨드로 재검증할 수 있습니다. 사용자 정의 태그의 최대 길이는 256자이며, 최대 태그 항목 수는 64개입니다.
 
-## Troubleshooting
+## 문제 해결
 
-## Fetch `cache: 'no-store'` not showing fresh data in development
+## Fetch `cache: 'no-store'`가 개발 환경에서 새로운 데이터를 보여주지 않음
 
-Next.js caches `fetch` responses in Server Components across Hot Module Replacement (HMR) in local development for faster responses and to reduce costs for billed API calls.
+Next.js는 로컬 개발 환경에서 더 빠른 응답과 청구되는 API 호출 비용 감소를 위해 서버 컴포넌트의 `fetch` 응답을 Hot Module Replacement (HMR) 전반에 걸쳐 캐시합니다.
 
-By default, the [HMR cache](docs/app/api-reference/next-config-js/servercomponentshmrcache) applies to all fetch requests, including those with the `cache: 'no-store'` option. This means uncached requests will not show fresh data between HMR refreshes. However, the cache will be cleared on navigation or full-page reloads.
+기본적으로 [HMR 캐시](docs/app/api-reference/next-config-js/servercomponentshmrcache)는 `cache: 'no-store'` 옵션이 있는 요청을 포함한 모든 fetch 요청에 적용됩니다. 이는 캐시되지 않은 요청이 HMR 새로 고침 사이에 새로운 데이터를 보여주지 않는다는 것을 의미합니다. 그러나 캐시는 탐색이나 전체 페이지 새로 고침 시 지워집니다.
 
-See the [`serverComponentsHmrCache`](docs/app/api-reference/next-config-js/servercomponentshmrcache) docs for more information.
+자세한 정보는 [`serverComponentsHmrCache`](docs/app/api-reference/next-config-js/servercomponentshmrcache) 문서를 참조하세요.
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                                                                 |
-| --------- | ----------------------------------------------------------------------- |
-| `v15.0.0` | Default `cache` option was changed from `'force-cache'` to `'no-store'` |
-| `v13.0.0` | `fetch` introduced.                                                     |
+| 버전      | 변경 사항                                                              |
+| --------- | ---------------------------------------------------------------------- |
+| `v15.0.0` | 기본 `cache` 옵션이 `'force-cache'`에서 `'no-store'`로 변경되었습니다. |
+| `v13.0.0` | `fetch` 도입되었습니다.                                                |

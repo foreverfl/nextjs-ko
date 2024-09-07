@@ -1,151 +1,132 @@
 ---
 title: NextRequest
-description: API Reference for NextRequest.
+description: NextRequest에 대한 API 참조입니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# NextRequest
 
-NextRequest extends the [Web Request API](https://developer.mozilla.org/docs/Web/API/Request) with additional convenience methods.
+{/* 이 문서의 내용은 app과 pages 라우터 사이에 공유됩니다. Pages 라우터에만 해당하는 내용을 추가하려면 `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유된 모든 내용은 컴포넌트로 감싸지 않아야 합니다. */}
+
+NextRequest는 [Web Request API](https://developer.mozilla.org/docs/Web/API/Request)를 추가적인 편의 메서드로 확장합니다.
 
 ## `cookies`
 
-Read or mutate the [`Set-Cookie`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie) header of the request.
+요청의 [`Set-Cookie`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie) 헤더를 읽거나 변경합니다.
 
 ### `set(name, value)`
 
-Given a name, set a cookie with the given value on the request.
+주어진 이름으로 요청에 주어진 값의 쿠키를 설정합니다.
 
 ```ts
-// Given incoming request /home
-// Set a cookie to hide the banner
-// request will have a `Set-Cookie:show-banner=false;path=/home` header
-request.cookies.set('show-banner', 'false')
+// 들어오는 요청 /home이 주어졌을 때
+// 배너를 숨기기 위해 쿠키 설정
+// 요청은 `Set-Cookie:show-banner=false;path=/home` 헤더를 가질 것입니다
+request.cookies.set("show-banner", "false");
 ```
 
 ### `get(name)`
 
-Given a cookie name, return the value of the cookie. If the cookie is not found, `undefined` is returned. If multiple cookies are found, the first one is returned.
+쿠키 이름이 주어지면 쿠키의 값을 반환합니다. 쿠키를 찾을 수 없으면 `undefined`가 반환됩니다. 여러 쿠키가 발견되면 첫 번째 쿠키가 반환됩니다.
 
 ```ts
-// Given incoming request /home
+// 들어오는 요청 /home이 주어졌을 때
 // { name: 'show-banner', value: 'false', Path: '/home' }
-request.cookies.get('show-banner')
+request.cookies.get("show-banner");
 ```
 
 ### `getAll()`
 
-Given a cookie name, return the values of the cookie. If no name is given, return all cookies on the request.
+쿠키 이름이 주어지면 쿠키의 값들을 반환합니다. 이름이 주어지지 않으면 요청의 모든 쿠키를 반환합니다.
 
 ```ts
-// Given incoming request /home
+// 들어오는 요청 /home이 주어졌을 때
 // [
 //   { name: 'experiments', value: 'new-pricing-page', Path: '/home' },
 //   { name: 'experiments', value: 'winter-launch', Path: '/home' },
 // ]
-request.cookies.getAll('experiments')
-// Alternatively, get all cookies for the request
-request.cookies.getAll()
+request.cookies.getAll("experiments");
+// 또는 요청의 모든 쿠키 가져오기
+request.cookies.getAll();
 ```
 
 ### `delete(name)`
 
-Given a cookie name, delete the cookie from the request.
+쿠키 이름이 주어지면 요청에서 해당 쿠키를 삭제합니다.
 
 ```ts
-// Returns true for deleted, false is nothing is deleted
-request.cookies.delete('experiments')
+// 삭제되면 true를 반환하고, 아무것도 삭제되지 않으면 false를 반환합니다
+request.cookies.delete("experiments");
 ```
 
 ### `has(name)`
 
-Given a cookie name, return `true` if the cookie exists on the request.
+쿠키 이름이 주어지면 요청에 쿠키가 존재하는 경우 `true`를 반환합니다.
 
 ```ts
-// Returns true if cookie exists, false if it does not
-request.cookies.has('experiments')
+// 쿠키가 존재하면 true를 반환하고, 존재하지 않으면 false를 반환합니다
+request.cookies.has("experiments");
 ```
 
 ### `clear()`
 
-Remove the `Set-Cookie` header from the request.
+요청에서 `Set-Cookie` 헤더를 제거합니다.
 
 ```ts
-request.cookies.clear()
+request.cookies.clear();
 ```
 
 ## `nextUrl`
 
-Extends the native [`URL`](https://developer.mozilla.org/docs/Web/API/URL) API with additional convenience methods, including Next.js specific properties.
+네이티브 [`URL`](https://developer.mozilla.org/docs/Web/API/URL) API를 Next.js 특정 속성을 포함한 추가적인 편의 메서드로 확장합니다.
 
 ```ts
-// Given a request to /home, pathname is /home
-request.nextUrl.pathname
-// Given a request to /home?name=lee, searchParams is { 'name': 'lee' }
-request.nextUrl.searchParams
+// /home에 대한 요청이 주어졌을 때, pathname은 /home입니다
+request.nextUrl.pathname;
+// /home?name=lee에 대한 요청이 주어졌을 때, searchParams는 { 'name': 'lee' }입니다
+request.nextUrl.searchParams;
 ```
 
-The following options are available:
+다음 옵션을 사용할 수 있습니다:
 
-<PagesOnly>
+| 속성           | 타입                    | 설명                                                                                                                           |
+| -------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `basePath`     | `string`                | URL의 [기본 경로](/docs/app/api-reference/next-config-js/basePath)입니다.                                                      |
+| `buildId`      | `string` \| `undefined` | Next.js 애플리케이션의 빌드 식별자입니다. [사용자 정의](/docs/app/api-reference/next-config-js/generateBuildId)할 수 있습니다. |
+| `pathname`     | `string`                | URL의 경로명입니다.                                                                                                            |
+| `searchParams` | `Object`                | URL의 검색 매개변수입니다.                                                                                                     |
 
-| Property          | Type                      | Description                                                                                                                     |
-| ----------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `basePath`        | `string`                  | The [base path](/docs/pages/api-reference/next-config-js/basePath) of the URL.                                                  |
-| `buildId`         | `string` \| `undefined`   | The build identifier of the Next.js application. Can be [customized](/docs/pages/api-reference/next-config-js/generateBuildId). |
-| `defaultLocale`   | `string` \| `undefined`   | The default locale for [internationalization](/docs/pages/building-your-application/routing/internationalization).              |
-| `domainLocale`    |                           |                                                                                                                                 |
-| - `defaultLocale` | `string`                  | The default locale within a domain.                                                                                             |
-| - `domain`        | `string`                  | The domain associated with a specific locale.                                                                                   |
-| - `http`          | `boolean` \| `undefined`  | Indicates if the domain is using HTTP.                                                                                          |
-| `locales`         | `string[]` \| `undefined` | An array of available locales.                                                                                                  |
-| `locale`          | `string` \| `undefined`   | The currently active locale.                                                                                                    |
-| `url`             | `URL`                     | The URL object.                                                                                                                 |
-
-</PagesOnly>
-
-<AppOnly>
-
-| Property       | Type                    | Description                                                                                                                   |
-| -------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `basePath`     | `string`                | The [base path](/docs/app/api-reference/next-config-js/basePath) of the URL.                                                  |
-| `buildId`      | `string` \| `undefined` | The build identifier of the Next.js application. Can be [customized](/docs/app/api-reference/next-config-js/generateBuildId). |
-| `pathname`     | `string`                | The pathname of the URL.                                                                                                      |
-| `searchParams` | `Object`                | The search parameters of the URL.                                                                                             |
-
-> **Note:** The internationalization properties from the Pages Router are not available for usage in the App Router. Learn more about [internationalization with the App Router](/docs/app/building-your-application/routing/internationalization).
-
-</AppOnly>
+> **참고:** Pages 라우터의 국제화 속성은 App 라우터에서 사용할 수 없습니다. [App 라우터를 사용한 국제화](/docs/app/building-your-application/routing/internationalization)에 대해 자세히 알아보세요.
 
 ## `ip`
 
-The `ip` property is a string that contains the IP address of the request. This value can optionally be provided by your hosting platform.
+`ip` 속성은 요청의 IP 주소를 포함하는 문자열입니다. 이 값은 선택적으로 호스팅 플랫폼에서 제공할 수 있습니다.
 
-> **Good to know:** On [Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website), this value is provided by default. On other platforms, you can use the [`X-Forwarded-For`](https://developer.mozilla.org/docs/Web/HTTP/Headers/X-Forwarded-For) header to provide the IP address.
+> **알아두면 좋은 점:** [Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)에서는 이 값이 기본적으로 제공됩니다. 다른 플랫폼에서는 [`X-Forwarded-For`](https://developer.mozilla.org/docs/Web/HTTP/Headers/X-Forwarded-For) 헤더를 사용하여 IP 주소를 제공할 수 있습니다.
 
 ```ts
-// Provided by Vercel
-request.ip
-// Self-hosting
-request.headers.get('X-Forwarded-For')
+// Vercel에서 제공됨
+request.ip;
+// 자체 호스팅
+request.headers.get("X-Forwarded-For");
 ```
 
 ## `geo`
 
-The `geo` property is an object that contains the geographic information of the request. This value can optionally be provided by your hosting platform.
+`geo` 속성은 요청의 지리적 정보를 포함하는 객체입니다. 이 값은 선택적으로 호스팅 플랫폼에서 제공할 수 있습니다.
 
-> **Good to know:** On [Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website), this value is provided by default. On other platforms, you can use the [`X-Forwarded-For`](https://developer.mozilla.org/docs/Web/HTTP/Headers/X-Forwarded-For) header to provide the IP address, then use a [third-party service](https://ip-api.com/) to lookup the geographic information.
+> **알아두면 좋은 점:** [Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)에서는 이 값이 기본적으로 제공됩니다. 다른 플랫폼에서는 [`X-Forwarded-For`](https://developer.mozilla.org/docs/Web/HTTP/Headers/X-Forwarded-For) 헤더를 사용하여 IP 주소를 제공한 다음, [써드파티 서비스](https://ip-api.com/)를 사용하여 지리적 정보를 조회할 수 있습니다.
 
 ```ts
-// Provided by Vercel
-request.geo.city
-request.geo.country
-request.geo.region
-request.geo.latitude
-request.geo.longitude
+// Vercel에서 제공됨
+request.geo.city;
+request.geo.country;
+request.geo.region;
+request.geo.latitude;
+request.geo.longitude;
 
-// Self-hosting
+// 자체 호스팅
 function getGeo(request) {
-  let ip = request.headers.get('X-Forwarded-For')
-  // Use a third-party service to lookup the geographic information
+  let ip = request.headers.get("X-Forwarded-For");
+  // 써드파티 서비스를 사용하여 지리적 정보 조회
 }
 ```

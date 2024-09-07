@@ -1,18 +1,20 @@
 ---
 title: sitemap.xml
-description: API Reference for the sitemap.xml file.
+description: sitemap.xml 파일에 대한 API 참조.
 related:
-  title: Next Steps
-  description: Learn how to use the generateSitemaps function.
+  title: 다음 단계
+  description: generateSitemaps 함수 사용 방법을 알아보세요.
   links:
     - app/api-reference/functions/generate-sitemaps
 ---
 
-`sitemap.(xml|js|ts)` is a special file that matches the [Sitemaps XML format](https://www.sitemaps.org/protocol.html) to help search engine crawlers index your site more efficiently.
+# sitemap.xml
 
-### Sitemap files (.xml)
+`sitemap.(xml|js|ts)`는 검색 엔진 크롤러가 사이트를 더 효율적으로 색인화할 수 있도록 돕는 [Sitemaps XML 형식](https://www.sitemaps.org/protocol.html)과 일치하는 특별한 파일입니다.
 
-For smaller applications, you can create a `sitemap.xml` file and place it in the root of your `app` directory.
+### Sitemap 파일 (.xml)
+
+작은 애플리케이션의 경우, `sitemap.xml` 파일을 생성하여 `app` 디렉토리의 루트에 배치할 수 있습니다.
 
 ```xml filename="app/sitemap.xml"
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -37,36 +39,36 @@ For smaller applications, you can create a `sitemap.xml` file and place it in th
 </urlset>
 ```
 
-### Generating a sitemap using code (.js, .ts)
+### 코드를 사용하여 sitemap 생성하기 (.js, .ts)
 
-You can use the `sitemap.(js|ts)` file convention to programmatically **generate** a sitemap by exporting a default function that returns an array of URLs. If using TypeScript, a [`Sitemap`](#returns) type is available.
+URL 배열을 반환하는 기본 함수를 내보내는 `sitemap.(js|ts)` 파일 규칙을 사용하여 프로그래밍 방식으로 sitemap을 **생성**할 수 있습니다. TypeScript를 사용하는 경우 [`Sitemap`](#returns) 타입을 사용할 수 있습니다.
 
-> **Good to know**: `sitemap.js` is a special Route Handlers that is cached by default unless it uses a [dynamic function](/docs/app/building-your-application/caching#dynamic-functions) or [dynamic config](/docs/app/building-your-application/caching#segment-config-options) option.
+> **알아두면 좋은 점**: `sitemap.js`는 [동적 함수](/docs/app/building-your-application/caching#dynamic-functions)나 [동적 config](/docs/app/building-your-application/caching#segment-config-options) 옵션을 사용하지 않는 한 기본적으로 캐시되는 특별한 Route Handler입니다.
 
 ```ts filename="app/sitemap.ts" switcher
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://acme.com',
+      url: "https://acme.com",
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: 'https://acme.com/about',
+      url: "https://acme.com/about",
       lastModified: new Date(),
-      changeFrequency: 'monthly',
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: 'https://acme.com/blog',
+      url: "https://acme.com/blog",
       lastModified: new Date(),
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.5,
     },
-  ]
+  ];
 }
 ```
 
@@ -74,28 +76,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
 export default function sitemap() {
   return [
     {
-      url: 'https://acme.com',
+      url: "https://acme.com",
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: 'https://acme.com/about',
+      url: "https://acme.com/about",
       lastModified: new Date(),
-      changeFrequency: 'monthly',
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: 'https://acme.com/blog',
+      url: "https://acme.com/blog",
       lastModified: new Date(),
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.5,
     },
-  ]
+  ];
 }
 ```
 
-Output:
+출력:
 
 ```xml filename="acme.com/sitemap.xml"
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -120,27 +122,27 @@ Output:
 </urlset>
 ```
 
-### Image Sitemaps
+### 이미지 Sitemap
 
-You can use `images` property to create image sitemaps. Learn more details in the [Google Developer Docs](https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps).
+`images` 속성을 사용하여 이미지 sitemap을 생성할 수 있습니다. 자세한 내용은 [Google 개발자 문서](https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps)를 참조하세요.
 
 ```ts filename="app/sitemap.ts" switcher
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://example.com',
-      lastModified: '2021-01-01',
-      changeFrequency: 'weekly',
+      url: "https://example.com",
+      lastModified: "2021-01-01",
+      changeFrequency: "weekly",
       priority: 0.5,
-      images: ['https://example.com/image.jpg'],
+      images: ["https://example.com/image.jpg"],
     },
-  ]
+  ];
 }
 ```
 
-Output:
+출력:
 
 ```xml filename="acme.com/sitemap.xml"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -160,48 +162,48 @@ Output:
 </urlset>
 ```
 
-### Generate a localized Sitemap
+### 지역화된 Sitemap 생성하기
 
 ```ts filename="app/sitemap.ts" switcher
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://acme.com',
+      url: "https://acme.com",
       lastModified: new Date(),
       alternates: {
         languages: {
-          es: 'https://acme.com/es',
-          de: 'https://acme.com/de',
+          es: "https://acme.com/es",
+          de: "https://acme.com/de",
         },
       },
     },
     {
-      url: 'https://acme.com/about',
+      url: "https://acme.com/about",
       lastModified: new Date(),
       alternates: {
         languages: {
-          es: 'https://acme.com/es/about',
-          de: 'https://acme.com/de/about',
+          es: "https://acme.com/es/about",
+          de: "https://acme.com/de/about",
         },
       },
     },
     {
-      url: 'https://acme.com/blog',
+      url: "https://acme.com/blog",
       lastModified: new Date(),
       alternates: {
         languages: {
-          es: 'https://acme.com/es/blog',
-          de: 'https://acme.com/de/blog',
+          es: "https://acme.com/es/blog",
+          de: "https://acme.com/de/blog",
         },
       },
     },
-  ]
+  ];
 }
 ```
 
-Output:
+출력:
 
 ```xml filename="acme.com/sitemap.xml"
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -244,97 +246,97 @@ Output:
 </urlset>
 ```
 
-### Generating multiple sitemaps
+### 여러 sitemap 생성하기
 
-While a single sitemap will work for most applications. For large web applications, you may need to split a sitemap into multiple files.
+대부분의 애플리케이션에서는 단일 sitemap으로 충분합니다. 하지만 대규모 웹 애플리케이션의 경우, sitemap을 여러 파일로 분할해야 할 수 있습니다.
 
-There are two ways you can create multiple sitemaps:
+여러 sitemap을 생성하는 방법에는 두 가지가 있습니다:
 
-- By nesting `sitemap.(xml|js|ts)` inside multiple route segments e.g. `app/sitemap.xml` and `app/products/sitemap.xml`.
-- By using the [`generateSitemaps`](/docs/app/api-reference/functions/generate-sitemaps) function.
+- 여러 라우트 세그먼트 내에 `sitemap.(xml|js|ts)`를 중첩하는 방법. 예: `app/sitemap.xml`과 `app/products/sitemap.xml`.
+- [`generateSitemaps`](/docs/app/api-reference/functions/generate-sitemaps) 함수를 사용하는 방법.
 
-For example, to split a sitemap using `generateSitemaps`, return an array of objects with the sitemap `id`. Then, use the `id` to generate the unique sitemaps.
+예를 들어, `generateSitemaps`를 사용하여 sitemap을 분할하려면 sitemap `id`가 있는 객체 배열을 반환합니다. 그런 다음 `id`를 사용하여 고유한 sitemap을 생성합니다.
 
 ```ts filename="app/product/sitemap.ts" switcher
-import type { MetadataRoute } from 'next'
-import { BASE_URL } from '@/app/lib/constants'
+import type { MetadataRoute } from "next";
+import { BASE_URL } from "@/app/lib/constants";
 
 export async function generateSitemaps() {
-  // Fetch the total number of products and calculate the number of sitemaps needed
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]
+  // 총 제품 수를 가져와 필요한 sitemap 수를 계산합니다
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 }
 
 export default async function sitemap({
   id,
 }: {
-  id: number
+  id: number;
 }): Promise<MetadataRoute.Sitemap> {
-  // Google's limit is 50,000 URLs per sitemap
-  const start = id * 50000
-  const end = start + 50000
+  // Google의 제한은 sitemap 당 50,000개의 URL입니다
+  const start = id * 50000;
+  const end = start + 50000;
   const products = await getProducts(
     `SELECT id, date FROM products WHERE id BETWEEN ${start} AND ${end}`
-  )
+  );
   return products.map((product) => ({
     url: `${BASE_URL}/product/${product.id}`,
     lastModified: product.date,
-  }))
+  }));
 }
 ```
 
 ```js filename="app/product/sitemap.js" switcher
-import { BASE_URL } from '@/app/lib/constants'
+import { BASE_URL } from "@/app/lib/constants";
 
 export async function generateSitemaps() {
-  // Fetch the total number of products and calculate the number of sitemaps needed
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]
+  // 총 제품 수를 가져와 필요한 sitemap 수를 계산합니다
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 }
 
 export default async function sitemap({ id }) {
-  // Google's limit is 50,000 URLs per sitemap
-  const start = id * 50000
-  const end = start + 50000
+  // Google의 제한은 sitemap 당 50,000개의 URL입니다
+  const start = id * 50000;
+  const end = start + 50000;
   const products = await getProducts(
     `SELECT id, date FROM products WHERE id BETWEEN ${start} AND ${end}`
-  )
+  );
   return products.map((product) => ({
     url: `${BASE_URL}/product/${product.id}`,
     lastModified: product.date,
-  }))
+  }));
 }
 ```
 
-Your generated sitemaps will be available at `/.../sitemap/[id]`. For example, `/product/sitemap/1.xml`.
+생성된 sitemap은 `/.../sitemap/[id]`에서 사용할 수 있습니다. 예: `/product/sitemap/1.xml`.
 
-See the [`generateSitemaps` API reference](/docs/app/api-reference/functions/generate-sitemaps) for more information.
+자세한 내용은 [`generateSitemaps` API 참조](/docs/app/api-reference/functions/generate-sitemaps)를 참조하세요.
 
-## Returns
+## 반환값
 
-The default function exported from `sitemap.(xml|ts|js)` should return an array of objects with the following properties:
+`sitemap.(xml|ts|js)`에서 내보낸 기본 함수는 다음 속성을 가진 객체 배열을 반환해야 합니다:
 
 ```tsx
 type Sitemap = Array<{
-  url: string
-  lastModified?: string | Date
+  url: string;
+  lastModified?: string | Date;
   changeFrequency?:
-    | 'always'
-    | 'hourly'
-    | 'daily'
-    | 'weekly'
-    | 'monthly'
-    | 'yearly'
-    | 'never'
-  priority?: number
+    | "always"
+    | "hourly"
+    | "daily"
+    | "weekly"
+    | "monthly"
+    | "yearly"
+    | "never";
+  priority?: number;
   alternates?: {
-    languages?: Languages<string>
-  }
-}>
+    languages?: Languages<string>;
+  };
+}>;
 ```
 
-## Version History
+## 버전 기록
 
-| Version    | Changes                                                      |
-| ---------- | ------------------------------------------------------------ |
-| `v14.2.0`  | Add localizations support.                                   |
-| `v13.4.14` | Add `changeFrequency` and `priority` attributes to sitemaps. |
-| `v13.3.0`  | `sitemap` introduced.                                        |
+| 버전       | 변경 사항                                           |
+| ---------- | --------------------------------------------------- |
+| `v14.2.0`  | 지역화 지원 추가.                                   |
+| `v13.4.14` | sitemap에 `changeFrequency`와 `priority` 속성 추가. |
+| `v13.3.0`  | `sitemap` 도입.                                     |

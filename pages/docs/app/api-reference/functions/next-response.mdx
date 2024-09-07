@@ -1,146 +1,148 @@
 ---
 title: NextResponse
-description: API Reference for NextResponse.
+description: NextResponse에 대한 API 참조입니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# NextResponse
 
-NextResponse extends the [Web Response API](https://developer.mozilla.org/docs/Web/API/Response) with additional convenience methods.
+{/* 이 문서의 내용은 app과 pages 라우터 사이에 공유됩니다. Pages 라우터에만 해당하는 내용을 추가하려면 `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유된 모든 내용은 컴포넌트로 감싸지 않아야 합니다. */}
+
+NextResponse는 [Web Response API](https://developer.mozilla.org/docs/Web/API/Response)를 추가적인 편의 메서드로 확장합니다.
 
 ## `cookies`
 
-Read or mutate the [`Set-Cookie`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie) header of the response.
+응답의 [`Set-Cookie`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie) 헤더를 읽거나 변경합니다.
 
 ### `set(name, value)`
 
-Given a name, set a cookie with the given value on the response.
+주어진 이름으로 응답에 주어진 값의 쿠키를 설정합니다.
 
 ```ts
-// Given incoming request /home
-let response = NextResponse.next()
-// Set a cookie to hide the banner
-response.cookies.set('show-banner', 'false')
-// Response will have a `Set-Cookie:show-banner=false;path=/home` header
-return response
+// 들어오는 요청 /home이 주어졌을 때
+let response = NextResponse.next();
+// 배너를 숨기기 위해 쿠키 설정
+response.cookies.set("show-banner", "false");
+// 응답은 `Set-Cookie:show-banner=false;path=/home` 헤더를 가질 것입니다
+return response;
 ```
 
 ### `get(name)`
 
-Given a cookie name, return the value of the cookie. If the cookie is not found, `undefined` is returned. If multiple cookies are found, the first one is returned.
+쿠키 이름이 주어지면 쿠키의 값을 반환합니다. 쿠키를 찾을 수 없으면 `undefined`가 반환됩니다. 여러 쿠키가 발견되면 첫 번째 쿠키가 반환됩니다.
 
 ```ts
-// Given incoming request /home
-let response = NextResponse.next()
+// 들어오는 요청 /home이 주어졌을 때
+let response = NextResponse.next();
 // { name: 'show-banner', value: 'false', Path: '/home' }
-response.cookies.get('show-banner')
+response.cookies.get("show-banner");
 ```
 
 ### `getAll()`
 
-Given a cookie name, return the values of the cookie. If no name is given, return all cookies on the response.
+쿠키 이름이 주어지면 쿠키의 값들을 반환합니다. 이름이 주어지지 않으면 응답의 모든 쿠키를 반환합니다.
 
 ```ts
-// Given incoming request /home
-let response = NextResponse.next()
+// 들어오는 요청 /home이 주어졌을 때
+let response = NextResponse.next();
 // [
 //   { name: 'experiments', value: 'new-pricing-page', Path: '/home' },
 //   { name: 'experiments', value: 'winter-launch', Path: '/home' },
 // ]
-response.cookies.getAll('experiments')
-// Alternatively, get all cookies for the response
-response.cookies.getAll()
+response.cookies.getAll("experiments");
+// 또는 응답의 모든 쿠키 가져오기
+response.cookies.getAll();
 ```
 
 ### `delete(name)`
 
-Given a cookie name, delete the cookie from the response.
+쿠키 이름이 주어지면 응답에서 해당 쿠키를 삭제합니다.
 
 ```ts
-// Given incoming request /home
-let response = NextResponse.next()
-// Returns true for deleted, false is nothing is deleted
-response.cookies.delete('experiments')
+// 들어오는 요청 /home이 주어졌을 때
+let response = NextResponse.next();
+// 삭제되면 true를 반환하고, 아무것도 삭제되지 않으면 false를 반환합니다
+response.cookies.delete("experiments");
 ```
 
 ## `json()`
 
-Produce a response with the given JSON body.
+주어진 JSON 본문으로 응답을 생성합니다.
 
 ```ts filename="app/api/route.ts" switcher
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 }
 ```
 
 ```js filename="app/api/route.js" switcher
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 }
 ```
 
 ## `redirect()`
 
-Produce a response that redirects to a [URL](https://developer.mozilla.org/docs/Web/API/URL).
+[URL](https://developer.mozilla.org/docs/Web/API/URL)로 리다이렉트하는 응답을 생성합니다.
 
 ```ts
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
-return NextResponse.redirect(new URL('/new', request.url))
+return NextResponse.redirect(new URL("/new", request.url));
 ```
 
-The [URL](https://developer.mozilla.org/docs/Web/API/URL) can be created and modified before being used in the `NextResponse.redirect()` method. For example, you can use the `request.nextUrl` property to get the current URL, and then modify it to redirect to a different URL.
+[URL](https://developer.mozilla.org/docs/Web/API/URL)은 `NextResponse.redirect()` 메서드에서 사용되기 전에 생성되고 수정될 수 있습니다. 예를 들어, `request.nextUrl` 속성을 사용하여 현재 URL을 가져온 다음 수정하여 다른 URL로 리다이렉트할 수 있습니다.
 
 ```ts
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
-// Given an incoming request...
-const loginUrl = new URL('/login', request.url)
-// Add ?from=/incoming-url to the /login URL
-loginUrl.searchParams.set('from', request.nextUrl.pathname)
-// And redirect to the new URL
-return NextResponse.redirect(loginUrl)
+// 들어오는 요청이 주어졌을 때...
+const loginUrl = new URL("/login", request.url);
+// /login URL에 ?from=/incoming-url 추가
+loginUrl.searchParams.set("from", request.nextUrl.pathname);
+// 그리고 새 URL로 리다이렉트
+return NextResponse.redirect(loginUrl);
 ```
 
 ## `rewrite()`
 
-Produce a response that rewrites (proxies) the given [URL](https://developer.mozilla.org/docs/Web/API/URL) while preserving the original URL.
+원래 URL을 유지하면서 주어진 [URL](https://developer.mozilla.org/docs/Web/API/URL)을 재작성(프록시)하는 응답을 생성합니다.
 
 ```ts
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
-// Incoming request: /about, browser shows /about
-// Rewritten request: /proxy, browser shows /about
-return NextResponse.rewrite(new URL('/proxy', request.url))
+// 들어오는 요청: /about, 브라우저는 /about을 표시
+// 재작성된 요청: /proxy, 브라우저는 /about을 표시
+return NextResponse.rewrite(new URL("/proxy", request.url));
 ```
 
 ## `next()`
 
-The `next()` method is useful for Middleware, as it allows you to return early and continue routing.
+`next()` 메서드는 미들웨어에서 유용하며, 라우팅을 계속하면서 조기에 반환할 수 있습니다.
 
 ```ts
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
-return NextResponse.next()
+return NextResponse.next();
 ```
 
-You can also forward `headers` when producing the response:
+응답을 생성할 때 `headers`를 전달할 수도 있습니다:
 
 ```ts
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
-// Given an incoming request...
-const newHeaders = new Headers(request.headers)
-// Add a new header
-newHeaders.set('x-version', '123')
-// And produce a response with the new headers
+// 들어오는 요청이 주어졌을 때...
+const newHeaders = new Headers(request.headers);
+// 새 헤더 추가
+newHeaders.set("x-version", "123");
+// 그리고 새 헤더로 응답 생성
 return NextResponse.next({
   request: {
-    // New request headers
+    // 새 요청 헤더
     headers: newHeaders,
   },
-})
+});
 ```

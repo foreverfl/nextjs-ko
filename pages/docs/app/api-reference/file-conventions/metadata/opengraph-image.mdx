@@ -1,24 +1,26 @@
 ---
-title: opengraph-image and twitter-image
-description: API Reference for the Open Graph Image and Twitter Image file conventions.
+title: opengraph-image 및 twitter-image
+description: Open Graph 이미지 및 Twitter 이미지 파일 규칙에 대한 API 참조.
 ---
 
-The `opengraph-image` and `twitter-image` file conventions allow you to set Open Graph and Twitter images for a route segment.
+# 오픈그래프 이미지 및 트위터 이미지
 
-They are useful for setting the images that appear on social networks and messaging apps when a user shares a link to your site.
+`opengraph-image` 및 `twitter-image` 파일 규칙을 사용하면 라우트 세그먼트에 대한 Open Graph 및 Twitter 이미지를 설정할 수 있습니다.
 
-There are two ways to set Open Graph and Twitter images:
+이들은 사용자가 귀하의 사이트 링크를 공유할 때 소셜 네트워크와 메시징 앱에 나타나는 이미지를 설정하는 데 유용합니다.
 
-- [Using image files (.jpg, .png, .gif)](#image-files-jpg-png-gif)
-- [Using code to generate images (.js, .ts, .tsx)](#generate-images-using-code-js-ts-tsx)
+Open Graph 및 Twitter 이미지를 설정하는 두 가지 방법이 있습니다:
 
-## Image files (.jpg, .png, .gif)
+- [이미지 파일 사용하기 (.jpg, .png, .gif)](#image-files-jpg-png-gif)
+- [코드를 사용하여 이미지 생성하기 (.js, .ts, .tsx)](#generate-images-using-code-js-ts-tsx)
 
-Use an image file to set a route segment's shared image by placing an `opengraph-image` or `twitter-image` image file in the segment.
+## 이미지 파일 (.jpg, .png, .gif)
 
-Next.js will evaluate the file and automatically add the appropriate tags to your app's `<head>` element.
+세그먼트에 `opengraph-image` 또는 `twitter-image` 이미지 파일을 배치하여 라우트 세그먼트의 공유 이미지를 설정할 수 있습니다.
 
-| File convention                                 | Supported file types            |
+Next.js는 파일을 평가하고 자동으로 적절한 태그를 앱의 `<head>` 요소에 추가합니다.
+
+| 파일 규칙                                       | 지원되는 파일 형식              |
 | ----------------------------------------------- | ------------------------------- |
 | [`opengraph-image`](#opengraph-image)           | `.jpg`, `.jpeg`, `.png`, `.gif` |
 | [`twitter-image`](#twitter-image)               | `.jpg`, `.jpeg`, `.png`, `.gif` |
@@ -27,7 +29,7 @@ Next.js will evaluate the file and automatically add the appropriate tags to you
 
 ### `opengraph-image`
 
-Add an `opengraph-image.(jpg|jpeg|png|gif)` image file to any route segment.
+모든 라우트 세그먼트에 `opengraph-image.(jpg|jpeg|png|gif)` 이미지 파일을 추가합니다.
 
 ```html filename="<head> output"
 <meta property="og:image" content="<generated>" />
@@ -38,7 +40,7 @@ Add an `opengraph-image.(jpg|jpeg|png|gif)` image file to any route segment.
 
 ### `twitter-image`
 
-Add a `twitter-image.(jpg|jpeg|png|gif)` image file to any route segment.
+모든 라우트 세그먼트에 `twitter-image.(jpg|jpeg|png|gif)` 이미지 파일을 추가합니다.
 
 ```html filename="<head> output"
 <meta name="twitter:image" content="<generated>" />
@@ -49,7 +51,7 @@ Add a `twitter-image.(jpg|jpeg|png|gif)` image file to any route segment.
 
 ### `opengraph-image.alt.txt`
 
-Add an accompanying `opengraph-image.alt.txt` file in the same route segment as the `opengraph-image.(jpg|jpeg|png|gif)` image it's alt text.
+`opengraph-image.(jpg|jpeg|png|gif)` 이미지의 대체 텍스트로 사용될 `opengraph-image.alt.txt` 파일을 동일한 라우트 세그먼트에 추가합니다.
 
 ```txt filename="opengraph-image.alt.txt"
 About Acme
@@ -61,7 +63,7 @@ About Acme
 
 ### `twitter-image.alt.txt`
 
-Add an accompanying `twitter-image.alt.txt` file in the same route segment as the `twitter-image.(jpg|jpeg|png|gif)` image it's alt text.
+`twitter-image.(jpg|jpeg|png|gif)` 이미지의 대체 텍스트로 사용될 `twitter-image.alt.txt` 파일을 동일한 라우트 세그먼트에 추가합니다.
 
 ```txt filename="twitter-image.alt.txt"
 About Acme
@@ -71,134 +73,134 @@ About Acme
 <meta property="twitter:image:alt" content="About Acme" />
 ```
 
-## Generate images using code (.js, .ts, .tsx)
+## 코드를 사용하여 이미지 생성하기 (.js, .ts, .tsx)
 
-In addition to using [literal image files](#image-files-jpg-png-gif), you can programmatically **generate** images using code.
+[실제 이미지 파일](#image-files-jpg-png-gif)을 사용하는 것 외에도, 코드를 사용하여 프로그래밍 방식으로 이미지를 **생성**할 수 있습니다.
 
-Generate a route segment's shared image by creating an `opengraph-image` or `twitter-image` route that default exports a function.
+함수를 기본 내보내는 `opengraph-image` 또는 `twitter-image` 라우트를 생성하여 라우트 세그먼트의 공유 이미지를 생성할 수 있습니다.
 
-| File convention   | Supported file types |
+| 파일 규칙         | 지원되는 파일 형식   |
 | ----------------- | -------------------- |
 | `opengraph-image` | `.js`, `.ts`, `.tsx` |
 | `twitter-image`   | `.js`, `.ts`, `.tsx` |
 
-> **Good to know**
+> **알아두면 좋은 점**
 >
-> - By default, generated images are [**statically optimized**](/docs/app/building-your-application/rendering/server-components#static-rendering-default) (generated at build time and cached) unless they use [dynamic functions](/docs/app/building-your-application/rendering/server-components#server-rendering-strategies#dynamic-functions) or uncached data.
-> - You can generate multiple Images in the same file using [`generateImageMetadata`](/docs/app/api-reference/functions/generate-image-metadata).
-> - `opengraph-image.js` and `twitter-image.js` are special Route Handlers that is cached by default unless it uses a [dynamic function](/docs/app/building-your-application/caching#dynamic-functions) or [dynamic config](/docs/app/building-your-application/caching#segment-config-options) option.
+> - 기본적으로 생성된 이미지는 [동적 함수](/docs/app/building-your-application/rendering/server-components#server-rendering-strategies#dynamic-functions)나 캐시되지 않은 데이터를 사용하지 않는 한 [**정적으로 최적화**](/docs/app/building-your-application/rendering/server-components#static-rendering-default)됩니다(빌드 시 생성되고 캐시됨).
+> - [`generateImageMetadata`](/docs/app/api-reference/functions/generate-image-metadata)를 사용하여 동일한 파일에서 여러 이미지를 생성할 수 있습니다.
+> - `opengraph-image.js` 및 `twitter-image.js`는 [동적 함수](/docs/app/building-your-application/caching#dynamic-functions)나 [동적 config](/docs/app/building-your-application/caching#segment-config-options) 옵션을 사용하지 않는 한 기본적으로 캐시되는 특별한 Route Handler입니다.
 
-The easiest way to generate an image is to use the [ImageResponse](/docs/app/api-reference/functions/image-response) API from `next/og`.
+이미지를 생성하는 가장 쉬운 방법은 `next/og`의 [ImageResponse](/docs/app/api-reference/functions/image-response) API를 사용하는 것입니다.
 
 ```tsx filename="app/about/opengraph-image.tsx" switcher
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
-// Image metadata
-export const alt = 'About Acme'
+// 이미지 메타데이터
+export const alt = "About Acme";
 export const size = {
   width: 1200,
   height: 630,
-}
+};
 
-export const contentType = 'image/png'
+export const contentType = "image/png";
 
-// Image generation
+// 이미지 생성
 export default async function Image() {
-  // Font
+  // 폰트
   const interSemiBold = fetch(
-    new URL('./Inter-SemiBold.ttf', import.meta.url)
-  ).then((res) => res.arrayBuffer())
+    new URL("./Inter-SemiBold.ttf", import.meta.url)
+  ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
-      // ImageResponse JSX element
+      // ImageResponse JSX 요소
       <div
         style={{
           fontSize: 128,
-          background: 'white',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: "white",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         About Acme
       </div>
     ),
-    // ImageResponse options
+    // ImageResponse 옵션
     {
-      // For convenience, we can re-use the exported opengraph-image
-      // size config to also set the ImageResponse's width and height.
+      // 편의를 위해 내보낸 opengraph-image 크기 설정을
+      // ImageResponse의 너비와 높이를 설정하는 데도 재사용할 수 있습니다.
       ...size,
       fonts: [
         {
-          name: 'Inter',
+          name: "Inter",
           data: await interSemiBold,
-          style: 'normal',
+          style: "normal",
           weight: 400,
         },
       ],
     }
-  )
+  );
 }
 ```
 
 ```jsx filename="app/about/opengraph-image.js" switcher
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
-// Image metadata
-export const alt = 'About Acme'
+// 이미지 메타데이터
+export const alt = "About Acme";
 export const size = {
   width: 1200,
   height: 630,
-}
+};
 
-export const contentType = 'image/png'
+export const contentType = "image/png";
 
-// Image generation
+// 이미지 생성
 export default async function Image() {
-  // Font
+  // 폰트
   const interSemiBold = fetch(
-    new URL('./Inter-SemiBold.ttf', import.meta.url)
-  ).then((res) => res.arrayBuffer())
+    new URL("./Inter-SemiBold.ttf", import.meta.url)
+  ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
-      // ImageResponse JSX element
+      // ImageResponse JSX 요소
       <div
         style={{
           fontSize: 128,
-          background: 'white',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: "white",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         About Acme
       </div>
     ),
-    // ImageResponse options
+    // ImageResponse 옵션
     {
-      // For convenience, we can re-use the exported opengraph-image
-      // size config to also set the ImageResponse's width and height.
+      // 편의를 위해 내보낸 opengraph-image 크기 설정을
+      // ImageResponse의 너비와 높이를 설정하는 데도 재사용할 수 있습니다.
       ...size,
       fonts: [
         {
-          name: 'Inter',
+          name: "Inter",
           data: await interSemiBold,
-          style: 'normal',
+          style: "normal",
           weight: 400,
         },
       ],
     }
-  )
+  );
 }
 ```
 
@@ -212,11 +214,11 @@ export default async function Image() {
 
 ### Props
 
-The default export function receives the following props:
+기본 내보내기 함수는 다음과 같은 props를 받습니다:
 
-#### `params` (optional)
+#### `params` (선택사항)
 
-An object containing the [dynamic route parameters](/docs/app/building-your-application/routing/dynamic-routes) object from the root segment down to the segment `opengraph-image` or `twitter-image` is colocated in.
+루트 세그먼트부터 `opengraph-image` 또는 `twitter-image`가 위치한 세그먼트까지의 [동적 라우트 매개변수](/docs/app/building-your-application/routing/dynamic-routes) 객체를 포함하는 객체입니다.
 
 ```tsx filename="app/shop/[slug]/opengraph-image.tsx" switcher
 export default function Image({ params }: { params: { slug: string } }) {
@@ -230,39 +232,39 @@ export default function Image({ params }) {
 }
 ```
 
-| Route                                      | URL         | `params`                  |
+| 라우트                                     | URL         | `params`                  |
 | ------------------------------------------ | ----------- | ------------------------- |
 | `app/shop/opengraph-image.js`              | `/shop`     | `undefined`               |
 | `app/shop/[slug]/opengraph-image.js`       | `/shop/1`   | `{ slug: '1' }`           |
 | `app/shop/[tag]/[item]/opengraph-image.js` | `/shop/1/2` | `{ tag: '1', item: '2' }` |
 | `app/shop/[...slug]/opengraph-image.js`    | `/shop/1/2` | `{ slug: ['1', '2'] }`    |
 
-### Returns
+### 반환
 
-The default export function should return a `Blob` | `ArrayBuffer` | `TypedArray` | `DataView` | `ReadableStream` | `Response`.
+기본 내보내기 함수는 `Blob` | `ArrayBuffer` | `TypedArray` | `DataView` | `ReadableStream` | `Response`를 반환해야 합니다.
 
-> **Good to know**: `ImageResponse` satisfies this return type.
+> **알아두면 좋은 점**: `ImageResponse`는 이 반환 타입을 만족합니다.
 
-### Config exports
+### Config 내보내기
 
-You can optionally configure the image's metadata by exporting `alt`, `size`, and `contentType` variables from `opengraph-image` or `twitter-image` route.
+선택적으로 `opengraph-image` 또는 `twitter-image` 라우트에서 `alt`, `size`, 및 `contentType` 변수를 내보내어 이미지의 메타데이터를 구성할 수 있습니다.
 
-| Option                        | Type                                                                                                            |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [`alt`](#alt)                 | `string`                                                                                                        |
-| [`size`](#size)               | `{ width: number; height: number }`                                                                             |
-| [`contentType`](#contenttype) | `string` - [image MIME type](https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types#image_types) |
+| 옵션                          | 타입                                                                                                             |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| [`alt`](#alt)                 | `string`                                                                                                         |
+| [`size`](#size)               | `{ width: number; height: number }`                                                                              |
+| [`contentType`](#contenttype) | `string` - [이미지 MIME 타입](https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types#image_types) |
 
 #### `alt`
 
 ```tsx filename="opengraph-image.tsx | twitter-image.tsx" switcher
-export const alt = 'My images alt text'
+export const alt = "My images alt text";
 
 export default function Image() {}
 ```
 
 ```jsx filename="opengraph-image.js | twitter-image.js" switcher
-export const alt = 'My images alt text'
+export const alt = "My images alt text";
 
 export default function Image() {}
 ```
@@ -274,13 +276,13 @@ export default function Image() {}
 #### `size`
 
 ```tsx filename="opengraph-image.tsx | twitter-image.tsx" switcher
-export const size = { width: 1200, height: 630 }
+export const size = { width: 1200, height: 630 };
 
 export default function Image() {}
 ```
 
 ```jsx filename="opengraph-image.js | twitter-image.js" switcher
-export const size = { width: 1200, height: 630 }
+export const size = { width: 1200, height: 630 };
 
 export default function Image() {}
 ```
@@ -293,13 +295,13 @@ export default function Image() {}
 #### `contentType`
 
 ```tsx filename="opengraph-image.tsx | twitter-image.tsx" switcher
-export const contentType = 'image/png'
+export const contentType = "image/png";
 
 export default function Image() {}
 ```
 
 ```jsx filename="opengraph-image.js | twitter-image.js" switcher
-export const contentType = 'image/png'
+export const contentType = "image/png";
 
 export default function Image() {}
 ```
@@ -308,45 +310,45 @@ export default function Image() {}
 <meta property="og:image:type" content="image/png" />
 ```
 
-#### Route Segment Config
+#### 라우트 세그먼트 설정
 
-`opengraph-image` and `twitter-image` are specialized [Route Handlers](/docs/app/building-your-application/routing/route-handlers) that can use the same [route segment configuration](/docs/app/api-reference/file-conventions/route-segment-config) options as Pages and Layouts.
+`opengraph-image` 및 `twitter-image`는 Pages와 Layouts와 동일한 [라우트 세그먼트 구성](/docs/app/api-reference/file-conventions/route-segment-config) 옵션을 사용할 수 있는 특수한 [Route Handlers](/docs/app/building-your-application/routing/route-handlers)입니다.
 
-### Examples
+### 예시
 
-#### Using external data
+#### 외부 데이터 사용하기
 
-This example uses the `params` object and external data to generate the image.
+이 예시는 `params` 객체와 외부 데이터를 사용하여 이미지를 생성합니다.
 
-> **Good to know**:
-> By default, this generated image will be [statically optimized](/docs/app/building-your-application/rendering/server-components#static-rendering-default). You can configure the individual `fetch` [`options`](/docs/app/api-reference/functions/fetch) or route segments [options](/docs/app/api-reference/file-conventions/route-segment-config#revalidate) to change this behavior.
+> **알아두면 좋은 점**:
+> 기본적으로 이 생성된 이미지는 [정적으로 최적화](/docs/app/building-your-application/rendering/server-components#static-rendering-default)됩니다. 개별 `fetch` [`options`](/docs/app/api-reference/functions/fetch) 또는 라우트 세그먼트 [옵션](/docs/app/api-reference/file-conventions/route-segment-config#revalidate)을 구성하여 이 동작을 변경할 수 있습니다.
 
 ```tsx filename="app/posts/[slug]/opengraph-image.tsx" switcher
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const alt = 'About Acme'
+export const alt = "About Acme";
 export const size = {
   width: 1200,
   height: 630,
-}
-export const contentType = 'image/png'
+};
+export const contentType = "image/png";
 
 export default async function Image({ params }: { params: { slug: string } }) {
   const post = await fetch(`https://.../posts/${params.slug}`).then((res) =>
     res.json()
-  )
+  );
 
   return new ImageResponse(
     (
       <div
         style={{
           fontSize: 48,
-          background: 'white',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: "white",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         {post.title}
@@ -355,36 +357,36 @@ export default async function Image({ params }: { params: { slug: string } }) {
     {
       ...size,
     }
-  )
+  );
 }
 ```
 
 ```jsx filename="app/posts/[slug]/opengraph-image.js" switcher
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const alt = 'About Acme'
+export const alt = "About Acme";
 export const size = {
   width: 1200,
   height: 630,
-}
-export const contentType = 'image/png'
+};
+export const contentType = "image/png";
 
 export default async function Image({ params }) {
   const post = await fetch(`https://.../posts/${params.slug}`).then((res) =>
     res.json()
-  )
+  );
 
   return new ImageResponse(
     (
       <div
         style={{
           fontSize: 48,
-          background: 'white',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: "white",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         {post.title}
@@ -393,122 +395,122 @@ export default async function Image({ params }) {
     {
       ...size,
     }
-  )
+  );
 }
 ```
 
-#### Using Edge runtime with local assets
+#### 로컬 리소스와 함께 Edge 런타임 사용하기
 
-This example uses the Edge runtime to fetch a local image on the file system and passes it as an `ArrayBuffer` to the `src` attribute of an `<img>` element. The local asset should be placed relative to the example source file location.
+이 예시는 Edge 런타임을 사용하여 파일 시스템의 로컬 이미지를 가져와 `ArrayBuffer`로 `<img>` 요소의 `src` 속성에 전달합니다. 로컬 리소스은 예시 소스 파일 위치에 상대적으로 배치해야 합니다.
 
 ```tsx filename="app/opengraph-image.tsx" switcher
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
 export default async function Image() {
-  const logoSrc = await fetch(new URL('./logo.png', import.meta.url)).then(
+  const logoSrc = await fetch(new URL("./logo.png", import.meta.url)).then(
     (res) => res.arrayBuffer()
-  )
+  );
 
   return new ImageResponse(
     (
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <img src={logoSrc} height="100" />
       </div>
     )
-  )
+  );
 }
 ```
 
 ```jsx filename="app/opengraph-image.js" switcher
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
 export default async function Image() {
-  const logoSrc = await fetch(new URL('./logo.png', import.meta.url)).then(
+  const logoSrc = await fetch(new URL("./logo.png", import.meta.url)).then(
     (res) => res.arrayBuffer()
-  )
+  );
 
   return new ImageResponse(
     (
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <img src={logoSrc} height="100" />
       </div>
     )
-  )
+  );
 }
 ```
 
-#### Using Node.js runtime with local assets
+#### 로컬 리소스과 함께 Node.js 런타임 사용하기
 
-This example uses the Node.js runtime to fetch a local image on the file system and passes it as an `ArrayBuffer` to the `src` attribute of an `<img>` element. The local asset should be placed relative to the root of your project, rather than the location of the example source file.
+이 예시는 Node.js 런타임을 사용하여 파일 시스템의 로컬 이미지를 가져와 `ArrayBuffer`로 `<img>` 요소의 `src` 속성에 전달합니다. 로컬 리소스는 예시 소스 파일의 위치가 아닌 프로젝트의 루트에 상대적으로 배치해야 합니다.
 
 ```tsx filename="app/opengraph-image.tsx" switcher
-import { ImageResponse } from 'next/og'
-import { join } from 'node:path'
-import { readFile } from 'node:fs/promises'
+import { ImageResponse } from "next/og";
+import { join } from "node:path";
+import { readFile } from "node:fs/promises";
 
 export default async function Image() {
-  const logoData = await readFile(join(process.cwd(), 'logo.png'))
-  const logoSrc = Uint8Array.from(logoData).buffer
+  const logoData = await readFile(join(process.cwd(), "logo.png"));
+  const logoSrc = Uint8Array.from(logoData).buffer;
 
   return new ImageResponse(
     (
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <img src={logoSrc} height="100" />
       </div>
     )
-  )
+  );
 }
 ```
 
 ```jsx filename="app/opengraph-image.js" switcher
-import { ImageResponse } from 'next/og'
-import { join } from 'node:path'
-import { readFile } from 'node:fs/promises'
+import { ImageResponse } from "next/og";
+import { join } from "node:path";
+import { readFile } from "node:fs/promises";
 
 export default async function Image() {
-  const logoData = await readFile(join(process.cwd(), 'logo.png'))
-  const logoSrc = Uint8Array.from(logoData).buffer
+  const logoData = await readFile(join(process.cwd(), "logo.png"));
+  const logoSrc = Uint8Array.from(logoData).buffer;
 
   return new ImageResponse(
     (
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <img src={logoSrc} height="100" />
       </div>
     )
-  )
+  );
 }
 ```
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                                           |
-| --------- | ------------------------------------------------- |
-| `v13.3.0` | `opengraph-image` and `twitter-image` introduced. |
+| 버전      | 변경 사항                                  |
+| --------- | ------------------------------------------ |
+| `v13.3.0` | `opengraph-image` 및 `twitter-image` 도입. |

@@ -1,13 +1,15 @@
 ---
 title: logging
-description: Configure how data fetches are logged to the console when running Next.js in development mode.
+description: Next.js를 개발 모드로 실행할 때 데이터 가져오기가 콘솔에 어떻게 기록되는지 구성합니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# logging
 
-You can configure the logging level and whether the full URL is logged to the console when running Next.js in development mode.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 특정한 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-Currently, `logging` only applies to data fetching using the `fetch` API. It does not yet apply to other logs inside of Next.js.
+Next.js를 개발 모드로 실행할 때 로깅 수준과 전체 URL이 콘솔에 기록되는지 여부를 구성할 수 있습니다.
+
+현재 `logging`은 `fetch` API를 사용한 데이터 가져오기에만 적용됩니다. Next.js 내의 다른 로그에는 아직 적용되지 않습니다.
 
 ```js filename="next.config.js"
 module.exports = {
@@ -16,10 +18,10 @@ module.exports = {
       fullUrl: true,
     },
   },
-}
+};
 ```
 
-Any `fetch` requests that are restored from the [Server Components HMR cache](/docs/app/api-reference/next-config-js/serverComponentsHmrCache) are not logged by default. However, this can be enabled by setting `logging.fetches.hmrRefreshes` to `true`.
+[서버 컴포넌트 HMR 캐시](/docs/app/api-reference/next-config-js/serverComponentsHmrCache)에서 복원된 `fetch` 요청은 기본적으로 로깅되지 않습니다. 그러나 `logging.fetches.hmrRefreshes`를 `true`로 설정하여 이를 활성화할 수 있습니다.
 
 ```js filename="next.config.js"
 module.exports = {
@@ -28,13 +30,13 @@ module.exports = {
       hmrRefreshes: true,
     },
   },
-}
+};
 ```
 
-In addition, you can disable the development logging by setting `logging` to `false`.
+또한 `logging`을 `false`로 설정하여 개발 로깅을 비활성화할 수 있습니다.
 
 ```js filename="next.config.js"
 module.exports = {
   logging: false,
-}
+};
 ```

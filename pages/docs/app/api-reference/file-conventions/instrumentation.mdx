@@ -16,15 +16,15 @@ To use it, place the file in the **root** of your application or inside a [`src`
 Instrumentation is currently an experimental feature, to use the `instrumentation.js` file, you must explicitly opt-in by defining [`experimental.instrumentationHook = true;`](/docs/app/api-reference/next-config-js/instrumentationHook) in your `next.config.js`:
 
 ```ts filename="next.config.ts" switcher
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
     instrumentationHook: true,
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ```js filename="next.config.js" switcher
@@ -33,9 +33,9 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
 ## Exports
@@ -45,18 +45,18 @@ module.exports = nextConfig
 The file exports a `register` function that is called **once** when a new Next.js server instance is initiated. `register` can be an async function.
 
 ```ts filename="instrumentation.ts" switcher
-import { registerOTel } from '@vercel/otel'
+import { registerOTel } from "@vercel/otel";
 
 export function register() {
-  registerOTel('next-app')
+  registerOTel("next-app");
 }
 ```
 
 ```js filename="instrumentation.js" switcher
-import { registerOTel } from '@vercel/otel'
+import { registerOTel } from "@vercel/otel";
 
 export function register() {
-  registerOTel('next-app')
+  registerOTel("next-app");
 }
 ```
 
@@ -67,40 +67,40 @@ export function register() {
 You can optionally export an `onRequestError` function to track and send **server** errors to an observability tool.
 
 ```ts filename="instrumentation.ts" switcher
-import { type Instrumentation } from 'next'
+import { type Instrumentation } from "next";
 
 export const onRequestError: Instrumentation.onRequestError = (
   err,
   request,
   context
 ) => {
-  fetch('https://.../write-log', {
-    method: 'POST',
+  fetch("https://.../write-log", {
+    method: "POST",
     body: JSON.stringify({
       message: err.message,
       request,
       context,
     }),
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-  })
-}
+  });
+};
 ```
 
 ```js filename="instrumentation.js" switcher
 export function onRequestError(err, request, context) {
-  fetch('https://.../write-log', {
-    method: 'POST',
+  fetch("https://.../write-log", {
+    method: "POST",
     body: JSON.stringify({
       message: err.message,
       request,
       context,
     }),
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-  })
+  });
 }
 ```
 
@@ -112,22 +112,22 @@ The function accepts three parameters: `error`, `request`, and `context`.
 export function onRequestError(
   error: { digest: string } & Error,
   request: {
-    path: string // resource path, e.g. /blog?name=foo
-    method: string // request method. e.g. GET, POST, etc
-    headers: { [key: string]: string }
+    path: string; // resource path, e.g. /blog?name=foo
+    method: string; // request method. e.g. GET, POST, etc
+    headers: { [key: string]: string };
   },
   context: {
-    routerKind: 'Pages Router' | 'App Router' // the router type
-    routePath: string // the route file path, e.g. /app/blog/[dynamic]
-    routeType: 'render' | 'route' | 'action' | 'middleware' // the context in which the error occurred
+    routerKind: "Pages Router" | "App Router"; // the router type
+    routePath: string; // the route file path, e.g. /app/blog/[dynamic]
+    routeType: "render" | "route" | "action" | "middleware"; // the context in which the error occurred
     renderSource:
-      | 'react-server-components'
-      | 'react-server-components-payload'
-      | 'server-rendering'
-    revalidateReason: 'on-demand' | 'stale' | undefined // undefined is a normal request without revalidation
-    renderType: 'dynamic' | 'dynamic-resume' // 'dynamic-resume' for PPR
+      | "react-server-components"
+      | "react-server-components-payload"
+      | "server-rendering";
+    revalidateReason: "on-demand" | "stale" | undefined; // undefined is a normal request without revalidation
+    renderType: "dynamic" | "dynamic-resume"; // 'dynamic-resume' for PPR
   }
-)
+);
 ```
 
 - `error`: The caught error itself (type is always `Error`), and a `digest` property which is the unique ID of the error.

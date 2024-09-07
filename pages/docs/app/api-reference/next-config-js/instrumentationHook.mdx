@@ -1,21 +1,23 @@
 ---
 title: instrumentationHook
-description: Use the instrumentationHook option to set up instrumentation in your Next.js App.
+description: Next.js 앱에서 계측을 설정하기 위해 instrumentationHook 옵션을 사용하세요.
 related:
-  title: Learn more about Instrumentation
+  title: 계측에 대해 자세히 알아보기
   links:
     - app/api-reference/file-conventions/instrumentation
     - app/building-your-application/optimizing/instrumentation
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# instrumentationHook
 
-The experimental `instrumentationHook` option allows you to set up instrumentation via the [`instrumentation` file](/docs/app/api-reference/file-conventions/instrumentation) in your Next.js App.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 특정한 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
+
+실험적인 `instrumentationHook` 옵션을 사용하면 Next.js 앱에서 [`instrumentation` 파일](/docs/app/api-reference/file-conventions/instrumentation)을 통해 모니터링을 설정할 수 있습니다.
 
 ```js filename="next.config.js"
 module.exports = {
   experimental: {
     instrumentationHook: true,
   },
-}
+};
 ```

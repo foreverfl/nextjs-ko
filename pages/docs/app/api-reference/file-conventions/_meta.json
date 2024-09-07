@@ -7,8 +7,9 @@
   "mdx-components": "mdx-components.js",
   "middleware": "middleware.js",
   "not-found": "not-found.js",
-  "pag": "page.js",
+  "page": "page.js",
   "route": "route.js",
   "route-segment-config": "경로 세그먼트 설정",
-  "template": "template.js"
+  "template": "template.js",
+  "metadata": "메타데이터"
 }

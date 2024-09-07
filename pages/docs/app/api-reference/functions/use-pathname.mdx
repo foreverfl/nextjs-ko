@@ -1,94 +1,96 @@
 ---
 title: usePathname
-description: API Reference for the usePathname hook.
+description: usePathname 훅에 대한 API 참조입니다.
 ---
 
-`usePathname` is a **Client Component** hook that lets you read the current URL's **pathname**.
+# usePathname
+
+`usePathname`은 현재 URL의 **경로명**을 읽을 수 있게 해주는 **클라이언트 컴포넌트** 훅입니다.
 
 ```tsx filename="app/example-client-component.tsx" switcher
-'use client'
+"use client";
 
-import { usePathname } from 'next/navigation'
+import { usePathname } from "next/navigation";
 
 export default function ExampleClientComponent() {
-  const pathname = usePathname()
-  return <p>Current pathname: {pathname}</p>
+  const pathname = usePathname();
+  return <p>Current pathname: {pathname}</p>;
 }
 ```
 
 ```jsx filename="app/example-client-component.js" switcher
-'use client'
+"use client";
 
-import { usePathname } from 'next/navigation'
+import { usePathname } from "next/navigation";
 
 export default function ExampleClientComponent() {
-  const pathname = usePathname()
-  return <p>Current pathname: {pathname}</p>
+  const pathname = usePathname();
+  return <p>Current pathname: {pathname}</p>;
 }
 ```
 
-`usePathname` intentionally requires using a [Client Component](/docs/app/building-your-application/rendering/client-components). It's important to note Client Components are not a de-optimization. They are an integral part of the [Server Components](/docs/app/building-your-application/rendering/server-components) architecture.
+`usePathname`은 의도적으로 [클라이언트 컴포넌트](/docs/app/building-your-application/rendering/client-components) 사용을 요구합니다. 클라이언트 컴포넌트가 성능을 저해하는 요소가 아니라는 점을 주목해야 합니다. 이들은 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components) 아키텍처의 필수적인 부분입니다.
 
-For example, a Client Component with `usePathname` will be rendered into HTML on the initial page load. When navigating to a new route, this component does not need to be re-fetched. Instead, the component is downloaded once (in the client JavaScript bundle), and re-renders based on the current state.
+예를 들어, `usePathname`을 사용하는 클라이언트 컴포넌트는 초기 페이지 로드 시 HTML로 렌더링됩니다. 새 라우트로 이동할 때 이 컴포넌트를 다시 가져올 필요가 없습니다. 대신, 컴포넌트는 한 번 다운로드되고(클라이언트 JavaScript 번들에서) 현재 상태에 따라 다시 렌더링됩니다.
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - Reading the current URL from a [Server Component](/docs/app/building-your-application/rendering/server-components) is not supported. This design is intentional to support layout state being preserved across page navigations.
-> - Compatibility mode:
->   - `usePathname` can return `null` when a [fallback route](/docs/pages/api-reference/functions/get-static-paths#fallback-true) is being rendered or when a `pages` directory page has been [automatically statically optimized](/docs/pages/building-your-application/rendering/automatic-static-optimization) by Next.js and the router is not ready.
->   - Next.js will automatically update your types if it detects both an `app` and `pages` directory in your project.
+> - [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components)에서 현재 URL을 읽는 것은 지원되지 않습니다. 이는 페이지 탐색 간에 레이아웃 상태를 보존하기 위한 의도적인 설계입니다.
+> - 호환성 모드:
+>   - [폴백 라우트](/docs/pages/api-reference/functions/get-static-paths#fallback-true)가 렌더링되고 있거나 `pages` 디렉토리 페이지가 Next.js에 의해 [자동으로 정적 최적화](/docs/pages/building-your-application/rendering/automatic-static-optimization)되었고 라우터가 준비되지 않은 경우 `usePathname`은 `null`을 반환할 수 있습니다.
+>   - Next.js는 프로젝트에 `app`과 `pages` 디렉토리가 모두 있는 것을 감지하면 자동으로 타입을 업데이트합니다.
 
-## Parameters
+## 매개변수
 
 ```tsx
-const pathname = usePathname()
+const pathname = usePathname();
 ```
 
-`usePathname` does not take any parameters.
+`usePathname`은 어떤 매개변수도 받지 않습니다.
 
-## Returns
+## 반환값
 
-`usePathname` returns a string of the current URL's pathname. For example:
+`usePathname`은 현재 URL의 경로명을 나타내는 문자열을 반환합니다. 예를 들어:
 
-| URL                 | Returned value        |
+| URL                 | 반환값                |
 | ------------------- | --------------------- |
 | `/`                 | `'/'`                 |
 | `/dashboard`        | `'/dashboard'`        |
 | `/dashboard?v=2`    | `'/dashboard'`        |
 | `/blog/hello-world` | `'/blog/hello-world'` |
 
-## Examples
+## 예시
 
-### Do something in response to a route change
+### 라우트 변경에 대응하여 작업 수행하기
 
 ```tsx filename="app/example-client-component.tsx" switcher
-'use client'
+"use client";
 
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from "next/navigation";
 
 function ExampleClientComponent() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   useEffect(() => {
-    // Do something here...
-  }, [pathname, searchParams])
+    // 여기에서 무언가를 수행...
+  }, [pathname, searchParams]);
 }
 ```
 
 ```jsx filename="app/example-client-component.js" switcher
-'use client'
+"use client";
 
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from "next/navigation";
 
 function ExampleClientComponent() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   useEffect(() => {
-    // Do something here...
-  }, [pathname, searchParams])
+    // 여기에서 무언가를 수행...
+  }, [pathname, searchParams]);
 }
 ```
 
-| Version   | Changes                   |
-| --------- | ------------------------- |
-| `v13.0.0` | `usePathname` introduced. |
+| 버전      | 변경사항              |
+| --------- | --------------------- |
+| `v13.0.0` | `usePathname` 도입됨. |

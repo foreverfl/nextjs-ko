@@ -1,28 +1,30 @@
 ---
-title: next.config.js Options
-description: Learn how to configure your application with next.config.js.
+title: next.config.js 옵션
+description: next.config.js를 사용하여 애플리케이션을 구성하는 방법을 알아보세요.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# next.config.js Options
 
-Next.js can be configured through a `next.config.js` file in the root of your project directory (for example, by `package.json`) with a default export.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. Pages 라우터에만 해당하는 내용을 추가하려면 `<PagesOnly>내용</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유 내용은 컴포넌트로 감싸지 않아야 합니다. */}
+
+Next.js는 프로젝트 디렉토리의 루트에 있는 `next.config.js` 파일을 통해 구성할 수 있습니다(예: `package.json` 옆에). 기본 내보내기를 사용합니다.
 
 ```js filename="next.config.js"
 // @ts-check
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
-}
+  /* 여기에 구성 옵션 */
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-## ECMAScript Modules
+## ECMAScript 모듈
 
-`next.config.js` is a regular Node.js module, not a JSON file. It gets used by the Next.js server and build phases, and it's not included in the browser build.
+`next.config.js`는 JSON 파일이 아닌 일반 Node.js 모듈입니다. Next.js 서버와 빌드 단계에서 사용되며, 브라우저 빌드에는 포함되지 않습니다.
 
-If you need [ECMAScript modules](https://nodejs.org/api/esm.html), you can use `next.config.mjs`:
+[ECMAScript 모듈](https://nodejs.org/api/esm.html)이 필요한 경우 `next.config.mjs`를 사용할 수 있습니다:
 
 ```js filename="next.config.mjs"
 // @ts-check
@@ -31,15 +33,15 @@ If you need [ECMAScript modules](https://nodejs.org/api/esm.html), you can use `
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  /* config options here */
-}
+  /* 여기에 구성 옵션 */
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
-## Configuration as a Function
+## 함수로서의 구성
 
-You can also use a function:
+함수를 사용할 수도 있습니다:
 
 ```js filename="next.config.mjs"
 // @ts-check
@@ -49,15 +51,15 @@ export default (phase, { defaultConfig }) => {
    * @type {import('next').NextConfig}
    */
   const nextConfig = {
-    /* config options here */
-  }
-  return nextConfig
-}
+    /* 여기에 구성 옵션 */
+  };
+  return nextConfig;
+};
 ```
 
-### Async Configuration
+### 비동기 구성
 
-Since Next.js 12.1.0, you can use an async function:
+Next.js 12.1.0부터는 비동기 함수를 사용할 수 있습니다:
 
 ```js filename="next.config.js"
 // @ts-check
@@ -67,54 +69,54 @@ module.exports = async (phase, { defaultConfig }) => {
    * @type {import('next').NextConfig}
    */
   const nextConfig = {
-    /* config options here */
-  }
-  return nextConfig
-}
+    /* 여기에 구성 옵션 */
+  };
+  return nextConfig;
+};
 ```
 
-### Phase
+### 단계 (phase)
 
-`phase` is the current context in which the configuration is loaded. You can see the [available phases](https://github.com/vercel/next.js/blob/5e6b008b561caf2710ab7be63320a3d549474a5b/packages/next/shared/lib/constants.ts#L19-L23). Phases can be imported from `next/constants`:
+`phase`는 구성이 로드되는 현재 컨텍스트입니다. [사용 가능한 단계](https://github.com/vercel/next.js/blob/5e6b008b561caf2710ab7be63320a3d549474a5b/packages/next/shared/lib/constants.ts#L19-L23)를 볼 수 있습니다. 단계는 `next/constants`에서 가져올 수 있습니다:
 
 ```js filename="next.config.js"
 // @ts-check
 
-const { PHASE_DEVELOPMENT_SERVER } = require('next/constants')
+const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
 
 module.exports = (phase, { defaultConfig }) => {
   if (phase === PHASE_DEVELOPMENT_SERVER) {
     return {
-      /* development only config options here */
-    }
+      /* 개발 전용 구성 옵션은 여기에 */
+    };
   }
 
   return {
-    /* config options for all phases except development here */
-  }
-}
+    /* 개발을 제외한 모든 단계에 대한 구성 옵션은 여기에 */
+  };
+};
 ```
 
 ## TypeScript
 
-> This feature is available from Next.js canary.
+> 이 기능은 Next.js canary에서 사용할 수 있습니다.
 
-If you are using TypeScript in your project, you can use [`next.config.ts`](/docs/app/building-your-application/configuring/typescript#type-checking-nextconfigts) to use TypeScript in your configuration:
+프로젝트에서 TypeScript를 사용하는 경우 [`next.config.ts`](/docs/app/building-your-application/configuring/typescript#type-checking-nextconfigts)를 사용하여 구성에서 TypeScript를 사용할 수 있습니다:
 
 ```ts filename="next.config.ts"
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-}
+  /* 여기에 구성 옵션 */
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
-The commented lines are the place where you can put the configs allowed by `next.config.js`, which are [defined in this file](https://github.com/vercel/next.js/blob/canary/packages/next/src/server/config-shared.ts).
+주석 처리된 줄은 `next.config.js`에서 허용하는 구성을 넣을 수 있는 위치입니다. 이 구성들은 [이 파일에 정의](https://github.com/vercel/next.js/blob/canary/packages/next/src/server/config-shared.ts)되어 있습니다.
 
-However, none of the configs are required, and it's not necessary to understand what each config does. Instead, search for the features you need to enable or modify in this section and they will show you what to do.
+그러나 어떤 구성도 필수는 아니며, 각 구성이 무엇을 하는지 이해할 필요는 없습니다. 대신 이 섹션에서 활성화하거나 수정해야 하는 기능을 검색하면 무엇을 해야 하는지 알려줄 것입니다.
 
-> Avoid using new JavaScript features not available in your target Node.js version. `next.config.js` will not be parsed by Webpack or Babel.
+> 대상 Node.js 버전에서 사용할 수 없는 새로운 JavaScript 기능을 사용하지 마세요. `next.config.js`는 Webpack이나 Babel에 의해 파싱되지 않습니다.
 
-This page documents all the available configuration options:
+이 페이지는 사용 가능한 모든 구성 옵션을 문서화합니다:

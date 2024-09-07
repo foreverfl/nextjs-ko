@@ -1,23 +1,51 @@
 ---
 title: mdx-components.js
-description: API reference for the mdx-components.js file.
+description: mdx-components.js 파일에 대한 API 참조.
 related:
-  title: Learn more about MDX Components
+  title: MDX 컴포넌트에 대해 자세히 알아보기
   links:
     - app/building-your-application/configuring/mdx
 ---
 
-The `mdx-components.js|tsx` file is **required** to use [`@next/mdx` with App Router](/docs/app/building-your-application/configuring/mdx) and will not work without it. Additionally, you can use it to [customize styles](/docs/app/building-your-application/configuring/mdx#using-custom-styles-and-components).
+# mdx-components.js
 
-Use the file `mdx-components.tsx` (or `.js`) in the root of your project to define MDX Components. For example, at the same level as `pages` or `app`, or inside `src` if applicable.
+`mdx-components.js|tsx` 파일은 [App Router에서 `@next/mdx`를 사용](/docs/app/building-your-application/configuring/mdx)하기 위해 **필수**이며, 이 파일 없이는 작동하지 않습니다. 또한, [사용자 정의 스타일 적용](/docs/app/building-your-application/configuring/mdx#using-custom-styles-and-components)에도 사용할 수 있습니다.
+
+MDX 컴포넌트를 정의하려면 프로젝트의 루트에 `mdx-components.tsx` (또는 `.js`) 파일을 사용하세요. 예를 들어, `pages`나 `app`과 같은 레벨, 또는 해당되는 경우 `src` 내부에 위치시킵니다.
 
 ```tsx filename="mdx-components.tsx" switcher
-import type { MDXComponents } from 'mdx/types'
+import type { MDXComponents } from "mdx/types";
+
+// MDX 컴포넌트를 사용하기 위한 함수
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...components,
+  };
+}
+```
+
+```js filename="mdx-components.js" switcher
+// MDX 컴포넌트를 사용하기 위한 함수
+export function useMDXComponents(components) {
+  return {
+    ...components,
+  };
+}
+```
+
+## 내보내기
+
+### `useMDXComponents` 함수
+
+이 파일은 단일 함수를 내보내야 하며, 기본 내보내기나 `useMDXComponents`라는 이름으로 내보내야 합니다.
+
+```tsx filename="mdx-components.tsx" switcher
+import type { MDXComponents } from "mdx/types";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...components,
-  }
+  };
 }
 ```
 
@@ -25,47 +53,23 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 export function useMDXComponents(components) {
   return {
     ...components,
-  }
+  };
 }
 ```
 
-## Exports
-
-### `useMDXComponents` function
-
-The file must export a single function, either as a default export or named `useMDXComponents`.
-
-```tsx filename="mdx-components.tsx" switcher
-import type { MDXComponents } from 'mdx/types'
-
-export function useMDXComponents(components: MDXComponents): MDXComponents {
-  return {
-    ...components,
-  }
-}
-```
-
-```js filename="mdx-components.js" switcher
-export function useMDXComponents(components) {
-  return {
-    ...components,
-  }
-}
-```
-
-## Params
+## 매개변수
 
 ### `components`
 
-When defining MDX Components, the export function accepts a single parameter, `components`. This parameter is an instance of `MDXComponents`.
+MDX 컴포넌트를 정의할 때, 내보내기 함수는 `components`라는 단일 매개변수를 받습니다. 이 매개변수는 `MDXComponents`의 인스턴스입니다.
 
-- The key is the name of the HTML element to override.
-- The value is the component to render instead.
+- 키는 오버라이드할 HTML 요소의 이름입니다.
+- 값은 대신 렌더링할 컴포넌트입니다.
 
-> **Good to know**: Remember to pass all other components (i.e. `...components`) that do not have overrides.
+> **참고**: 오버라이드하지 않은 다른 모든 컴포넌트(즉, `...components`)도 전달해야 합니다.
 
-## Version History
+## 버전 기록
 
-| Version   | Changes              |
-| --------- | -------------------- |
-| `v13.1.2` | MDX Components added |
+| 버전      | 변경 사항           |
+| --------- | ------------------- |
+| `v13.1.2` | MDX 컴포넌트 추가됨 |

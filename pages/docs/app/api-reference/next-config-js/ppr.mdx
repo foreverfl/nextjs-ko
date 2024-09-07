@@ -1,42 +1,44 @@
 ---
 title: ppr
-description: Learn how to enable Partial Prerendering in Next.js.
+description: Next.js에서 부분 사전 렌더링을 활성화하는 방법을 알아보세요.
 version: experimental
 related:
-  title: Learn more about Partial Prerendering
+  title: 부분 사전 렌더링에 대해 자세히 알아보기
   links:
     - app/building-your-application/rendering/partial-prerendering
 ---
 
-Partial Prerendering (PPR) enables you to combine static and dynamic components together in the same route. Learn more about [PPR](/docs/app/building-your-application/rendering/partial-prerendering).
+# ppr
 
-## Using Partial Prerendering
+부분 사전 렌더링(PPR)을 사용하면 동일한 라우트에서 정적 및 동적 컴포넌트를 함께 결합할 수 있습니다. [PPR](/docs/app/building-your-application/rendering/partial-prerendering)에 대해 자세히 알아보세요.
 
-### Incremental Adoption (Version 15)
+## 부분 사전 렌더링 사용하기
 
-In Next.js 15, you can incrementally adopt Partial Prerendering in [layouts](/docs/app/building-your-application/routing/layouts-and-templates) and [pages](/docs/app/building-your-application/routing/pages) by setting the [`ppr`](/docs/app/api-reference/next-config-js/ppr) option in `next.config.js` to `incremental`, and exporting the `experimental_ppr` [route config option](/docs/app/api-reference/file-conventions/route-segment-config) at the top of the file:
+### 점진적 도입 (버전 15)
+
+Next.js 15에서는 `next.config.js`에서 [`ppr`](/docs/app/api-reference/next-config-js/ppr) 옵션을 `incremental`로 설정하고, 파일 상단에 `experimental_ppr` [라우트 구성 옵션](/docs/app/api-reference/file-conventions/route-segment-config)을 내보내어 [레이아웃](/docs/app/building-your-application/routing/layouts-and-templates)과 [페이지](/docs/app/building-your-application/routing/pages)에서 부분 사전 렌더링을 점진적으로 도입할 수 있습니다:
 
 ```ts filename="next.config.ts" switcher
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    ppr: 'incremental',
+    ppr: "incremental",
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ```js filename="next.config.js" switcher
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    ppr: 'incremental',
+    ppr: "incremental",
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
 ```tsx filename="app/page.tsx" switcher
@@ -75,26 +77,26 @@ export default function Page() {
 }
 ```
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - Routes that don't have `experimental_ppr` will default to `false` and will not be prerendered using PPR. You need to explicitly opt-in to PPR for each route.
-> - `experimental_ppr` will apply to all children of the route segment, including nested layouts and pages. You don't have to add it to every file, only the top segment of a route.
-> - To disable PPR for children segments, you can set `experimental_ppr` to `false` in the child segment.
+> - `experimental_ppr`이 없는 라우트는 기본적으로 `false`로 설정되며 PPR을 사용하여 사전 렌더링되지 않습니다. 각 라우트에 대해 PPR을 명시적으로 설정해야 합니다.
+> - `experimental_ppr`은 중첩된 레이아웃과 페이지를 포함하여 라우트 세그먼트의 모든 자식에 적용됩니다. 모든 파일에 추가할 필요 없이 라우트의 최상위 세그먼트에만 추가하면 됩니다.
+> - 자식 세그먼트에 대해 PPR을 비활성화하려면 해당 자식 세그먼트에서 `experimental_ppr`을 `false`로 설정할 수 있습니다.
 
-### Enabling PPR (Version 14)
+### PPR 활성화하기 (버전 14)
 
-For version 14, you can enable it by adding the [`ppr`](/docs/app/api-reference/next-config-js/ppr) option to your `next.config.js` file. This will apply to all routes in your application:
+버전 14의 경우, `next.config.js` 파일에 [`ppr`](/docs/app/api-reference/next-config-js/ppr) 옵션을 추가하여 활성화할 수 있습니다. 이는 애플리케이션의 모든 라우트에 적용됩니다:
 
 ```ts filename="next.config.ts" switcher
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ```js filename="next.config.js" switcher
@@ -103,12 +105,12 @@ const nextConfig = {
   experimental: {
     ppr: true,
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-| Version   | Changes                        |
-| --------- | ------------------------------ |
-| `v15.0.0` | `incremental` value introduced |
-| `v14.0.0` | experimental `ppr` introduced  |
+| 버전      | 변경 사항             |
+| --------- | --------------------- |
+| `v15.0.0` | `incremental` 값 도입 |
+| `v14.0.0` | 실험적 `ppr` 도입     |

@@ -1,0 +1,63 @@
+---
+title: Sass
+description: Sass를 사용하여 Next.js 애플리케이션 스타일링
+---
+
+# Sass
+
+{/* 이 문서의 내용은 app과 pages 라우터 간에 공유됩니다. Pages 라우터에만 특정된 콘텐츠를 추가하려면 `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유되는 콘텐츠는 컴포넌트로 감싸지 않아야 합니다. */}
+
+Next.js는 패키지를 설치한 후 `.scss`와 `.sass` 확장자를 사용하여 Sass와의 통합을 기본적으로 지원합니다. CSS Modules 및 `.module.scss` 또는 `.module.sass` 확장자를 통해 컴포넌트 수준의 Sass를 사용할 수 있습니다.
+
+먼저, [`sass`](https://github.com/sass/sass)를 설치하세요:
+
+```bash filename="Terminal"
+npm install --save-dev sass
+```
+
+> **알아두면 좋은 점**:
+>
+> Sass는 각기 다른 두 가지 문법을 [지원](https://sass-lang.com/documentation/syntax)하며, 각 문법에는 고유한 확장자가 있습니다.
+> `.scss` 확장자는 [SCSS 문법](https://sass-lang.com/documentation/syntax#scss)을 사용해야 하며,
+> `.sass` 확장자는 [들여쓰기 문법 ("Sass")](https://sass-lang.com/documentation/syntax#the-indented-syntax)을 사용해야 합니다.
+>
+> 어느 것을 선택해야 할지 확신이 없다면, CSS의 상위 집합이며 들여쓰기 문법을 배우지 않아도 되는
+> `.scss` 확장자를 사용하는 것이 좋습니다.
+
+### Sass 옵션 커스터마이징
+
+Sass 컴파일러를 구성하려면 `next.config.js`에서 `sassOptions`를 사용하세요.
+
+```js filename="next.config.js"
+const path = require("path");
+
+module.exports = {
+  sassOptions: {
+    includePaths: [path.join(__dirname, "styles")],
+  },
+};
+```
+
+### Sass 변수
+
+Next.js는 CSS Module 파일에서 내보낸 Sass 변수를 지원합니다.
+
+예를 들어, 내보낸 `primaryColor` Sass 변수를 사용하는 경우:
+
+```scss filename="app/variables.module.scss"
+$primary-color: #64ff00;
+
+:export {
+  primaryColor: $primary-color;
+}
+```
+
+```jsx filename="app/page.js"
+// 루트 `/` URL에 매핑됩니다
+
+import variables from "./variables.module.scss";
+
+export default function Page() {
+  return <h1 style={{ color: variables.primaryColor }}>Hello, Next.js!</h1>;
+}
+```

@@ -1,99 +1,101 @@
 ---
 title: useRouter
-description: API reference for the useRouter hook.
+description: useRouter 훅에 대한 API 참조입니다.
 ---
 
-The `useRouter` hook allows you to programmatically change routes inside [Client Components](/docs/app/building-your-application/rendering/client-components).
+# useRouter
 
-> **Recommendation:** Use the [`<Link>` component](/docs/app/building-your-application/routing/linking-and-navigating#link-component) for navigation unless you have a specific requirement for using `useRouter`.
+`useRouter` 훅을 사용하면 [클라이언트 컴포넌트](/docs/app/building-your-application/rendering/client-components) 내에서 프로그래밍 방식으로 라우트를 변경할 수 있습니다.
+
+> **추천:** `useRouter`를 사용해야 하는 특정 요구사항이 없다면 내비게이션에는 [`<Link>` 컴포넌트](/docs/app/building-your-application/routing/linking-and-navigating#link-component)를 사용하세요.
 
 ```tsx filename="app/example-client-component.tsx" switcher
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <button type="button" onClick={() => router.push('/dashboard')}>
+    <button type="button" onClick={() => router.push("/dashboard")}>
       Dashboard
     </button>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/example-client-component.js" switcher
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <button type="button" onClick={() => router.push('/dashboard')}>
+    <button type="button" onClick={() => router.push("/dashboard")}>
       Dashboard
     </button>
-  )
+  );
 }
 ```
 
 ## `useRouter()`
 
-- `router.push(href: string, { scroll: boolean })`: Perform a client-side navigation to the provided route. Adds a new entry into the [browser’s history](https://developer.mozilla.org/docs/Web/API/History_API) stack.
-- `router.replace(href: string, { scroll: boolean })`: Perform a client-side navigation to the provided route without adding a new entry into the [browser’s history stack](https://developer.mozilla.org/docs/Web/API/History_API).
-- `router.refresh()`: Refresh the current route. Making a new request to the server, re-fetching data requests, and re-rendering Server Components. The client will merge the updated React Server Component payload without losing unaffected client-side React (e.g. `useState`) or browser state (e.g. scroll position).
-- `router.prefetch(href: string)`: [Prefetch](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching) the provided route for faster client-side transitions.
-- `router.back()`: Navigate back to the previous route in the browser’s history stack.
-- `router.forward()`: Navigate forwards to the next page in the browser’s history stack.
+- `router.push(href: string, { scroll: boolean })`: 제공된 라우트로 클라이언트 사이드 내비게이션을 수행합니다. [브라우저의 히스토리](https://developer.mozilla.org/docs/Web/API/History_API) 스택에 새 항목을 추가합니다.
+- `router.replace(href: string, { scroll: boolean })`: [브라우저의 히스토리 스택](https://developer.mozilla.org/docs/Web/API/History_API)에 새 항목을 추가하지 않고 제공된 라우트로 클라이언트 사이드 내비게이션을 수행합니다.
+- `router.refresh()`: 현재 라우트를 새로고침합니다. 서버에 새 요청을 보내고, 데이터 요청을 다시 가져오며, 서버 컴포넌트를 다시 렌더링합니다. 클라이언트는 영향을 받지 않는 클라이언트 사이드 React (예: `useState`) 또는 브라우저 상태 (예: 스크롤 위치)를 잃지 않고 업데이트된 React 서버 컴포넌트 페이로드를 병합합니다.
+- `router.prefetch(href: string)`: 더 빠른 클라이언트 사이드 전환을 위해 제공된 라우트를 [프리페치](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching)합니다.
+- `router.back()`: 브라우저의 히스토리 스택에서 이전 라우트로 이동합니다.
+- `router.forward()`: 브라우저의 히스토리 스택에서 다음 페이지로 이동합니다.
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - The `<Link>` component automatically prefetch routes as they become visible in the viewport.
-> - `refresh()` could re-produce the same result if fetch requests are cached. Other dynamic functions like `cookies` and `headers` could also change the response.
+> - `<Link>` 컴포넌트는 뷰포트에 보이게 되면 자동으로 라우트를 프리페치합니다.
+> - `refresh()`는 fetch 요청이 캐시된 경우 동일한 결과를 다시 생성할 수 있습니다. `cookies`와 `headers`와 같은 다른 동적 함수도 응답을 변경할 수 있습니다.
 
-### Migrating from `next/router`
+### `next/router`에서 마이그레이션
 
-- The `useRouter` hook should be imported from `next/navigation` and not `next/router` when using the App Router
-- The `pathname` string has been removed and is replaced by [`usePathname()`](/docs/app/api-reference/functions/use-pathname)
-- The `query` object has been removed and is replaced by [`useSearchParams()`](/docs/app/api-reference/functions/use-search-params)
-- `router.events` has been replaced. [See below.](#router-events)
+- App Router를 사용할 때 `useRouter` 훅은 `next/router`가 아닌 `next/navigation`에서 가져와야 합니다.
+- `pathname` 문자열이 제거되고 [`usePathname()`](/docs/app/api-reference/functions/use-pathname)으로 대체되었습니다.
+- `query` 객체가 제거되고 [`useSearchParams()`](/docs/app/api-reference/functions/use-search-params)로 대체되었습니다.
+- `router.events`가 대체되었습니다. [아래를 참조하세요.](#router-events)
 
-[View the full migration guide](/docs/app/building-your-application/upgrading/app-router-migration).
+[전체 마이그레이션 가이드 보기](/docs/app/building-your-application/upgrading/app-router-migration).
 
-## Examples
+## 예시
 
-### Router events
+### 라우터 이벤트
 
-You can listen for page changes by composing other Client Component hooks like `usePathname` and `useSearchParams`.
+`usePathname`과 `useSearchParams`와 같은 다른 클라이언트 컴포넌트 훅을 구성하여 페이지 변경을 감지할 수 있습니다.
 
 ```jsx filename="app/components/navigation-events.js"
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function NavigationEvents() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const url = `${pathname}?${searchParams}`
-    console.log(url)
-    // You can now use the current URL
+    const url = `${pathname}?${searchParams}`;
+    console.log(url);
+    // 이제 현재 URL을 사용할 수 있습니다
     // ...
-  }, [pathname, searchParams])
+  }, [pathname, searchParams]);
 
-  return '...'
+  return "...";
 }
 ```
 
-Which can be imported into a layout.
+이를 레이아웃에 가져올 수 있습니다.
 
 ```jsx filename="app/layout.js" highlight={2,10-12}
-import { Suspense } from 'react'
-import { NavigationEvents } from './components/navigation-events'
+import { Suspense } from "react";
+import { NavigationEvents } from "./components/navigation-events";
 
 export default function Layout({ children }) {
   return (
@@ -106,56 +108,56 @@ export default function Layout({ children }) {
         </Suspense>
       </body>
     </html>
-  )
+  );
 }
 ```
 
-> **Good to know**: `<NavigationEvents>` is wrapped in a [`Suspense` boundary](/docs/app/building-your-application/routing/loading-ui-and-streaming#example) because[`useSearchParams()`](/docs/app/api-reference/functions/use-search-params) causes client-side rendering up to the closest `Suspense` boundary during [static rendering](/docs/app/building-your-application/rendering/server-components#static-rendering-default). [Learn more](/docs/app/api-reference/functions/use-search-params#behavior).
+> **알아두면 좋은 점**: `<NavigationEvents>`는 [`Suspense` 경계](/docs/app/building-your-application/routing/loading-ui-and-streaming#example)로 감싸져 있습니다. 이는 [`useSearchParams()`](/docs/app/api-reference/functions/use-search-params)가 [정적 렌더링](/docs/app/building-your-application/rendering/server-components#static-rendering-default) 중에 가장 가까운 `Suspense` 경계까지 클라이언트 사이드 렌더링을 유발하기 때문입니다. [자세히 알아보기](/docs/app/api-reference/functions/use-search-params#behavior).
 
-### Disabling scroll restoration
+### 스크롤 복원 비활성화
 
-By default, Next.js will scroll to the top of the page when navigating to a new route. You can disable this behavior by passing `scroll: false` to `router.push()` or `router.replace()`.
+기본적으로 Next.js는 새 라우트로 이동할 때 페이지의 맨 위로 스크롤합니다. `router.push()` 또는 `router.replace()`에 `scroll: false`를 전달하여 이 동작을 비활성화할 수 있습니다.
 
 ```tsx filename="app/example-client-component.tsx" switcher
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <button
       type="button"
-      onClick={() => router.push('/dashboard', { scroll: false })}
+      onClick={() => router.push("/dashboard", { scroll: false })}
     >
       Dashboard
     </button>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/example-client-component.jsx" switcher
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <button
       type="button"
-      onClick={() => router.push('/dashboard', { scroll: false })}
+      onClick={() => router.push("/dashboard", { scroll: false })}
     >
       Dashboard
     </button>
-  )
+  );
 }
 ```
 
-## Version History
+## 버전 기록
 
-| Version   | Changes                                        |
-| --------- | ---------------------------------------------- |
-| `v13.0.0` | `useRouter` from `next/navigation` introduced. |
+| 버전      | 변경사항                                |
+| --------- | --------------------------------------- |
+| `v13.0.0` | `next/navigation`의 `useRouter` 도입됨. |

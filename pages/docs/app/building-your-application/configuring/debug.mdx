@@ -1,0 +1,126 @@
+---
+title: 디버깅
+description: VS Code 또는 Chrome DevTools를 사용하여 Next.js 애플리케이션을 디버그하는 방법을 알아보세요.
+---
+
+# 디버깅
+
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 해당하는 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
+
+이 문서는 [VS Code 디버거](https://code.visualstudio.com/docs/editor/debugging) 또는 [Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools)를 사용하여 전체 소스 맵 지원으로 Next.js 프론트엔드 및 백엔드 코드를 디버그하는 방법을 설명합니다.
+
+Node.js에 연결할 수 있는 모든 디버거는 Next.js 애플리케이션을 디버그하는 데 사용할 수 있습니다. 자세한 내용은 Node.js [디버깅 가이드](https://nodejs.org/en/docs/guides/debugging-getting-started/)에서 확인할 수 있습니다.
+
+## VS Code로 디버깅하기
+
+프로젝트 루트에 다음 내용으로 `.vscode/launch.json` 파일을 생성하세요:
+
+```json filename="launch.json"
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: debug server-side",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev"
+    },
+    {
+      "name": "Next.js: debug client-side",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000"
+    },
+    {
+      "name": "Next.js: debug full stack",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "action": "debugWithEdge",
+        "killOnServerStop": true,
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}"
+      }
+    }
+  ]
+}
+```
+
+Yarn을 사용하는 경우 `npm run dev`를 `yarn dev`로 대체할 수 있으며, pnpm을 사용하는 경우 `pnpm dev`로 대체할 수 있습니다.
+
+애플리케이션이 시작되는 [포트 번호를 변경](/docs/pages/api-reference/cli/next#next-dev-options)하는 경우, `http://localhost:3000`의 `3000`을 사용하는 포트로 대체하세요.
+
+루트 디렉토리가 아닌 다른 디렉토리에서 Next.js를 실행하는 경우(예: Turborepo를 사용하는 경우) 서버 측 및 전체 스택 디버깅 작업에 `cwd`를 추가해야 합니다. 예를 들어, `"cwd": "${workspaceFolder}/apps/web"`와 같이 추가합니다.
+
+이제 디버그 패널로 이동하여(`Ctrl+Shift+D` - Windows/Linux, `⇧+⌘+D` - macOS) 실행 구성을 선택한 다음 `F5`를 누르거나 명령 팔레트에서 **Debug: Start Debugging**을 선택하여 디버깅 세션을 시작하세요.
+
+## Jetbrains WebStorm에서 디버거 사용하기
+
+런타임 구성을 나열하는 드롭다운 메뉴를 클릭하고 `Edit Configurations...`을 클릭하세요. URL이 `http://localhost:3000`인 `Javascript Debug` 디버그 구성을 생성하세요. 원하는 대로 사용자 정의하고(예: 디버깅을 위한 브라우저, 프로젝트 파일로 저장) `OK`를 클릭하세요. 이 디버그 구성을 실행하면 선택한 브라우저가 자동으로 열립니다. 이 시점에서 디버그 모드에서 두 개의 애플리케이션이 실행되어야 합니다: NextJS 노드 애플리케이션과 클라이언트/브라우저 애플리케이션입니다.
+
+## Chrome DevTools로 디버깅하기
+
+### 클라이언트 측 코드
+
+평소와 같이 `next dev`, `npm run dev` 또는 `yarn dev`를 실행하여 개발 서버를 시작하세요. 서버가 시작되면 Chrome에서 `http://localhost:3000`(또는 대체 URL)을 여세요. 그런 다음 Chrome의 개발자 도구를 열고(`Ctrl+Shift+J` - Windows/Linux, `⌥+⌘+I` - macOS) **Sources** 탭으로 이동하세요.
+
+이제 클라이언트 측 코드가 [`debugger`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/debugger) 문에 도달할 때마다 코드 실행이 일시 중지되고 해당 파일이 디버그 영역에 나타납니다. Windows/Linux에서는 `Ctrl+P`, macOS에서는 `⌘+P`를 눌러 파일을 검색하고 수동으로 중단점을 설정할 수도 있습니다. 여기서 검색할 때 소스 파일의 경로가 `webpack://_N_E/./`로 시작한다는 점에 유의하세요.
+
+### 서버 측 코드
+
+Chrome DevTools로 서버 측 Next.js 코드를 디버그하려면 기본 Node.js 프로세스에 [`--inspect`](https://nodejs.org/api/cli.html#cli_inspect_host_port) 플래그를 전달해야 합니다:
+
+```bash filename="Terminal"
+NODE_OPTIONS='--inspect' next dev
+```
+
+`npm run dev` 또는 `yarn dev`를 사용하는 경우 `package.json`의 `dev` 스크립트를 업데이트해야 합니다:
+
+```json filename="package.json"
+{
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' next dev"
+  }
+}
+```
+
+`--inspect` 플래그로 Next.js 개발 서버를 실행하면 다음과 같이 나타납니다:
+
+```bash filename="Terminal"
+Debugger listening on ws://127.0.0.1:9229/0cf90313-350d-4466-a748-cd60f4e47c95
+For help, see: https://nodejs.org/en/docs/inspector
+ready - started server on 0.0.0.0:3000, url: http://localhost:3000
+```
+
+> `NODE_OPTIONS='--inspect' npm run dev` 또는 `NODE_OPTIONS='--inspect' yarn dev`를 실행하는 것은 작동하지 않습니다. 이는 동일한 포트에서 여러 디버거를 시작하려고 시도합니다: npm/yarn 프로세스용 하나와 Next.js용 하나입니다. 그러면 콘솔에 `Starting inspector on 127.0.0.1:9229 failed: address already in use`와 같은 오류가 발생합니다.
+
+서버가 시작되면 Chrome에서 새 탭을 열고 `chrome://inspect`를 방문하세요. 여기서 **Remote Target** 섹션 내에 Next.js 애플리케이션이 표시되어야 합니다. 애플리케이션 아래의 **inspect**를 클릭하여 별도의 DevTools 창을 열고 **Sources** 탭으로 이동하세요.
+
+여기서 서버 측 코드를 디버그하는 것은 Chrome DevTools로 클라이언트 측 코드를 디버그하는 것과 매우 유사하게 작동합니다. 단, 여기서 `Ctrl+P` 또는 `⌘+P`로 파일을 검색할 때 소스 파일의 경로가 `webpack://{application-name}/./`로 시작한다는 점이 다릅니다(`{application-name}`은 `package.json` 파일에 따른 애플리케이션 이름으로 대체됩니다).
+
+### Windows에서 디버깅하기
+
+Windows 사용자는 `NODE_OPTIONS='--inspect'`를 사용할 때 문제가 발생할 수 있습니다. 이 구문은 Windows 플랫폼에서 지원되지 않기 때문입니다. 이를 해결하기 위해 [`cross-env`](https://www.npmjs.com/package/cross-env) 패키지를 개발 의존성으로 설치하고(`npm`과 `yarn`에서 `-D`) `dev` 스크립트를 다음과 같이 대체하세요.
+
+```json filename="package.json"
+{
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS='--inspect' next dev"
+  }
+}
+```
+
+`cross-env`는 플랫폼에 관계없이(Mac, Linux, Windows 포함) `NODE_OPTIONS` 환경 변수를 설정하여 장치와 운영 체제에 관계없이 일관되게 디버그할 수 있게 해줍니다.
+
+> **알아두면 좋은 점**: 기기에서 Windows Defender가 비활성화되어 있는지 확인하세요. 이 외부 서비스는 *읽는 모든 파일을 확인*하며, 이는 `next dev`로 Fast Refresh 시간을 크게 증가시키는 것으로 보고되었습니다. 이는 Next.js와 관련이 없는 알려진 문제이지만 Next.js 개발에 영향을 미칩니다.
+
+## 추가 정보
+
+JavaScript 디버거 사용 방법에 대해 자세히 알아보려면 다음 문서를 참조하세요:
+
+- [VS Code에서 Node.js 디버깅하기: 중단점](https://code.visualstudio.com/docs/nodejs/nodejs-debugging#_breakpoints)
+- [Chrome DevTools: JavaScript 디버그하기](https://developers.google.com/web/tools/chrome-devtools/javascript)

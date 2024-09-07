@@ -1,123 +1,125 @@
 ---
 title: revalidatePath
-description: API Reference for the revalidatePath function.
+description: revalidatePath 함수에 대한 API 참조입니다.
 ---
 
-`revalidatePath` allows you to purge [cached data](/docs/app/building-your-application/caching) on-demand for a specific path.
+# revalidatePath
 
-> **Good to know**:
+`revalidatePath`를 사용하면 특정 경로에 대한 [캐시된 데이터](/docs/app/building-your-application/caching)를 필요에 따라 제거할 수 있습니다.
+
+> **알아두면 좋은 점**:
 >
-> - `revalidatePath` is available in both [Node.js and Edge runtimes](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes).
-> - `revalidatePath` only invalidates the cache when the included path is next visited. This means calling `revalidatePath` with a dynamic route segment will not immediately trigger many revalidations at once. The invalidation only happens when the path is next visited.
-> - Currently, `revalidatePath` invalidates all the routes in the [client-side Router Cache](/docs/app/building-your-application/caching#client-side-router-cache). This behavior is temporary and will be updated in the future to apply only to the specific path.
-> - Using `revalidatePath` invalidates **only the specific path** in the [server-side Route Cache](/docs/app/building-your-application/caching#full-route-cache).
+> - `revalidatePath`는 [Node.js 및 Edge 런타임](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes) 모두에서 사용 가능합니다.
+> - `revalidatePath`는 포함된 경로가 다음에 방문될 때만 캐시를 무효화합니다. 이는 동적 라우트 세그먼트로 `revalidatePath`를 호출해도 한 번에 많은 재검증을 즉시 트리거하지 않는다는 의미입니다. 무효화는 경로가 다음에 방문될 때만 발생합니다.
+> - 현재 `revalidatePath`는 [클라이언트 측 라우터 캐시](/docs/app/building-your-application/caching#client-side-router-cache)의 모든 라우트를 무효화합니다. 이 동작은 임시적이며 향후 특정 경로에만 적용되도록 업데이트될 예정입니다.
+> - `revalidatePath`를 사용하면 [서버 측 라우트 캐시](/docs/app/building-your-application/caching#full-route-cache)에서 **특정 경로만** 무효화됩니다.
 
-## Parameters
+## 매개변수
 
 ```tsx
 revalidatePath(path: string, type?: 'page' | 'layout'): void;
 ```
 
-- `path`: Either a string representing the filesystem path associated with the data you want to revalidate (for example, `/product/[slug]/page`), or the literal route segment (for example, `/product/123`). Must be less than 1024 characters. This value is case-sensitive.
-- `type`: (optional) `'page'` or `'layout'` string to change the type of path to revalidate. If `path` contains a dynamic segment (for example, `/product/[slug]/page`), this parameter is required. If path refers to the literal route segment, e.g., `/product/1` for a dynamic page (e.g., `/product/[slug]/page`), you should not provide `type`.
+- `path`: 재검증하려는 데이터와 관련된 파일 시스템 경로를 나타내는 문자열(예: `/product/[slug]/page`) 또는 실제 라우트 세그먼트(예: `/product/123`)입니다. 1024자 미만이어야 합니다. 이 값은 대소문자를 구분합니다.
+- `type`: (선택 사항) 재검증할 경로의 유형을 변경하는 `'page'` 또는 `'layout'` 문자열입니다. `path`에 동적 세그먼트가 포함된 경우(예: `/product/[slug]/page`) 이 매개변수는 필수입니다. 경로가 동적 페이지(예: `/product/[slug]/page`)의 실제 라우트 세그먼트(예: `/product/1`)를 참조하는 경우 `type`을 제공하지 않아야 합니다.
 
-## Returns
+## 반환값
 
-`revalidatePath` does not return a value.
+`revalidatePath`는 값을 반환하지 않습니다.
 
-## Examples
+## 예시
 
-### Revalidating A Specific URL
-
-```ts
-import { revalidatePath } from 'next/cache'
-revalidatePath('/blog/post-1')
-```
-
-This will revalidate one specific URL on the next page visit.
-
-### Revalidating A Page Path
+### 특정 URL 재검증하기
 
 ```ts
-import { revalidatePath } from 'next/cache'
-revalidatePath('/blog/[slug]', 'page')
-// or with route groups
-revalidatePath('/(main)/blog/[slug]', 'page')
+import { revalidatePath } from "next/cache";
+revalidatePath("/blog/post-1");
 ```
 
-This will revalidate any URL that matches the provided `page` file on the next page visit. This will _not_ invalidate pages beneath the specific page. For example, `/blog/[slug]` won't invalidate `/blog/[slug]/[author]`.
+이는 다음 페이지 방문 시 하나의 특정 URL을 재검증합니다.
 
-### Revalidating A Layout Path
+### 페이지 경로 재검증하기
 
 ```ts
-import { revalidatePath } from 'next/cache'
-revalidatePath('/blog/[slug]', 'layout')
-// or with route groups
-revalidatePath('/(main)/post/[slug]', 'layout')
+import { revalidatePath } from "next/cache";
+revalidatePath("/blog/[slug]", "page");
+// 또는 라우트 그룹 사용
+revalidatePath("/(main)/blog/[slug]", "page");
 ```
 
-This will revalidate any URL that matches the provided `layout` file on the next page visit. This will cause pages beneath with the same layout to revalidate on the next visit. For example, in the above case, `/blog/[slug]/[another]` would also revalidate on the next visit.
+이는 다음 페이지 방문 시 제공된 `page` 파일과 일치하는 모든 URL을 재검증합니다. 이는 특정 페이지 아래의 페이지를 무효화하지 _않습니다_. 예를 들어, `/blog/[slug]`는 `/blog/[slug]/[author]`를 무효화하지 않습니다.
 
-### Revalidating All Data
+### 레이아웃 경로 재검증하기
 
 ```ts
-import { revalidatePath } from 'next/cache'
-
-revalidatePath('/', 'layout')
+import { revalidatePath } from "next/cache";
+revalidatePath("/blog/[slug]", "layout");
+// 또는 라우트 그룹 사용
+revalidatePath("/(main)/post/[slug]", "layout");
 ```
 
-This will purge the Client-side Router Cache, and revalidate the Data Cache on the next page visit.
+이는 다음 페이지 방문 시 제공된 `layout` 파일과 일치하는 모든 URL을 재검증합니다. 이로 인해 동일한 레이아웃을 가진 아래의 페이지들도 다음 방문 시 재검증됩니다. 예를 들어, 위의 경우 `/blog/[slug]/[another]`도 다음 방문 시 재검증됩니다.
 
-### Server Action
+### 모든 데이터 재검증하기
+
+```ts
+import { revalidatePath } from "next/cache";
+
+revalidatePath("/", "layout");
+```
+
+이는 클라이언트 측 라우터 캐시를 제거하고, 다음 페이지 방문 시 데이터 캐시를 재검증합니다.
+
+### 서버 액션
 
 ```ts filename="app/actions.ts" switcher
-'use server'
+"use server";
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from "next/cache";
 
 export default async function submit() {
-  await submitForm()
-  revalidatePath('/')
+  await submitForm();
+  revalidatePath("/");
 }
 ```
 
-### Route Handler
+### 라우트 핸들러
 
 ```ts filename="app/api/revalidate/route.ts" switcher
-import { revalidatePath } from 'next/cache'
-import type { NextRequest } from 'next/server'
+import { revalidatePath } from "next/cache";
+import type { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const path = request.nextUrl.searchParams.get('path')
+  const path = request.nextUrl.searchParams.get("path");
 
   if (path) {
-    revalidatePath(path)
-    return Response.json({ revalidated: true, now: Date.now() })
+    revalidatePath(path);
+    return Response.json({ revalidated: true, now: Date.now() });
   }
 
   return Response.json({
     revalidated: false,
     now: Date.now(),
-    message: 'Missing path to revalidate',
-  })
+    message: "Missing path to revalidate",
+  });
 }
 ```
 
 ```js filename="app/api/revalidate/route.js" switcher
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from "next/cache";
 
 export async function GET(request) {
-  const path = request.nextUrl.searchParams.get('path')
+  const path = request.nextUrl.searchParams.get("path");
 
   if (path) {
-    revalidatePath(path)
-    return Response.json({ revalidated: true, now: Date.now() })
+    revalidatePath(path);
+    return Response.json({ revalidated: true, now: Date.now() });
   }
 
   return Response.json({
     revalidated: false,
     now: Date.now(),
-    message: 'Missing path to revalidate',
-  })
+    message: "Missing path to revalidate",
+  });
 }
 ```

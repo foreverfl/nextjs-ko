@@ -1,61 +1,63 @@
 ---
 title: permanentRedirect
-description: API Reference for the permanentRedirect function.
+description: permanentRedirect 함수에 대한 API 참조입니다.
 related:
   links:
     - app/api-reference/functions/redirect
 ---
 
-The `permanentRedirect` function allows you to redirect the user to another URL. `permanentRedirect` can be used in Server Components, Client Components, [Route Handlers](/docs/app/building-your-application/routing/route-handlers), and [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations).
+# permanentRedirect
 
-When used in a streaming context, this will insert a meta tag to emit the redirect on the client side. When used in a server action, it will serve a 303 HTTP redirect response to the caller. Otherwise, it will serve a 308 (Permanent) HTTP redirect response to the caller.
+`permanentRedirect` 함수를 사용하면 사용자를 다른 URL로 리다이렉트할 수 있습니다. `permanentRedirect`는 서버 컴포넌트, 클라이언트 컴포넌트, [라우트 핸들러](/docs/app/building-your-application/routing/route-handlers), 그리고 [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)에서 사용할 수 있습니다.
 
-If a resource doesn't exist, you can use the [`notFound` function](/docs/app/api-reference/functions/not-found) instead.
+스트리밍 컨텍스트에서 사용될 때, 이는 클라이언트 측에서 리다이렉트를 수행하기 위한 메타 태그를 삽입합니다. 서버 액션에서 사용될 때는 호출자에게 303 HTTP 리다이렉트 응답을 제공합니다. 그 외의 경우에는 호출자에게 308(영구) HTTP 리다이렉트 응답을 제공합니다.
 
-> **Good to know**: If you prefer to return a 307 (Temporary) HTTP redirect instead of 308 (Permanent), you can use the [`redirect` function](/docs/app/api-reference/functions/redirect) instead.
+리소스가 존재하지 않는 경우, 대신 [`notFound` 함수](/docs/app/api-reference/functions/not-found)를 사용할 수 있습니다.
 
-## Parameters
+> **알아두면 좋은 점**: 308(영구) HTTP 리다이렉트 대신 307(임시) HTTP 리다이렉트를 반환하고 싶다면, 대신 [`redirect` 함수](/docs/app/api-reference/functions/redirect)를 사용할 수 있습니다.
 
-The `permanentRedirect` function accepts two arguments:
+## 매개변수
+
+`permanentRedirect` 함수는 두 개의 인수를 받습니다:
 
 ```js
-permanentRedirect(path, type)
+permanentRedirect(path, type);
 ```
 
-| Parameter | Type                                                          | Description                                                 |
-| --------- | ------------------------------------------------------------- | ----------------------------------------------------------- |
-| `path`    | `string`                                                      | The URL to redirect to. Can be a relative or absolute path. |
-| `type`    | `'replace'` (default) or `'push'` (default in Server Actions) | The type of redirect to perform.                            |
+| 매개변수 | 타입                                                        | 설명                                                      |
+| -------- | ----------------------------------------------------------- | --------------------------------------------------------- |
+| `path`   | `string`                                                    | 리다이렉트할 URL. 상대 경로나 절대 경로가 될 수 있습니다. |
+| `type`   | `'replace'` (기본값) 또는 `'push'` (서버 액션에서의 기본값) | 수행할 리다이렉트의 타입.                                 |
 
-By default, `permanentRedirect` will use `push` (adding a new entry to the browser history stack) in [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) and `replace` (replacing the current URL in the browser history stack) everywhere else. You can override this behavior by specifying the `type` parameter.
+기본적으로 `permanentRedirect`는 [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)에서는 `push`(브라우저 히스토리 스택에 새 항목 추가)를 사용하고, 그 외의 곳에서는 `replace`(브라우저 히스토리 스택에서 현재 URL 대체)를 사용합니다. `type` 매개변수를 지정하여 이 동작을 재정의할 수 있습니다.
 
-The `type` parameter has no effect when used in Server Components.
+서버 컴포넌트에서 사용할 때는 `type` 매개변수가 효과가 없습니다.
 
-## Returns
+## 반환값
 
-`permanentRedirect` does not return a value.
+`permanentRedirect`는 값을 반환하지 않습니다.
 
-## Example
+## 예시
 
-Invoking the `permanentRedirect()` function throws a `NEXT_REDIRECT` error and terminates rendering of the route segment in which it was thrown.
+`permanentRedirect()` 함수를 호출하면 `NEXT_REDIRECT` 오류가 발생하고 해당 함수가 호출된 라우트 세그먼트의 렌더링이 종료됩니다.
 
 ```jsx filename="app/team/[id]/page.js"
-import { permanentRedirect } from 'next/navigation'
+import { permanentRedirect } from "next/navigation";
 
 async function fetchTeam(id) {
-  const res = await fetch('https://...')
-  if (!res.ok) return undefined
-  return res.json()
+  const res = await fetch("https://...");
+  if (!res.ok) return undefined;
+  return res.json();
 }
 
 export default async function Profile({ params }) {
-  const team = await fetchTeam(params.id)
+  const team = await fetchTeam(params.id);
   if (!team) {
-    permanentRedirect('/login')
+    permanentRedirect("/login");
   }
 
   // ...
 }
 ```
 
-> **Good to know**: `permanentRedirect` does not require you to use `return permanentRedirect()` as it uses the TypeScript [`never`](https://www.typescriptlang.org/docs/handbook/2/functions.html#never) type.
+> **알아두면 좋은 점**: `permanentRedirect`는 TypeScript [`never`](https://www.typescriptlang.org/docs/handbook/2/functions.html#never) 타입을 사용하기 때문에 `return permanentRedirect()`를 사용할 필요가 없습니다.

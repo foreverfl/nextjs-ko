@@ -1,23 +1,25 @@
 ---
 title: optimizePackageImports
-description: API Reference for optimizePackageImports Next.js Config Option
+description: Next.js 설정 옵션 optimizePackageImports에 대한 API 참조
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# optimizePackageImports
 
-Some packages can export hundreds or thousands of modules, which can cause performance issues in development and production.
+{/* 이 문서의 내용은 app 라우터와 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 특정한 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-Adding a package to `experimental.optimizePackageImports` will only load the modules you are actually using, while still giving you the convenience of writing import statements with many named exports.
+일부 패키지는 수백 또는 수천 개의 모듈을 내보낼 수 있어 개발 및 프로덕션에서 성능 문제를 일으킬 수 있습니다.
+
+`experimental.optimizePackageImports`에 패키지를 추가하면 실제로 사용하는 모듈만 로드하면서도 여러 명명된 내보내기가 있는 import 문을 작성하는 편의성을 유지할 수 있습니다.
 
 ```js filename="next.config.js"
 module.exports = {
   experimental: {
-    optimizePackageImports: ['package-name'],
+    optimizePackageImports: ["package-name"],
   },
-}
+};
 ```
 
-The following libraries are optimized by default:
+다음 라이브러리는 기본적으로 최적화되어 있습니다:
 
 - `lucide-react`
 - `date-fns`

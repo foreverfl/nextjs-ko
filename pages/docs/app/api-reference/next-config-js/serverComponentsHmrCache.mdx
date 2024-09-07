@@ -1,36 +1,38 @@
 ---
 title: serverComponentsHmrCache
-description: Configure whether fetch responses in Server Components are cached across HMR refresh requests.
+description: 서버 컴포넌트의 fetch 응답이 HMR 새로고침 요청 간에 캐시되는지 여부를 구성합니다.
 version: RC
 ---
 
-The experimental `serverComponentsHmrCache` option allows you to cache `fetch` responses in Server Components across Hot Module Replacement (HMR) refreshes in local development. This results in faster responses and reduced costs for billed API calls.
+# serverComponentsHmrCache
 
-By default, the HMR cache applies to all `fetch` requests, including those with the `cache: 'no-store'` option. This means uncached requests will not show fresh data between HMR refreshes. However, the cache will be cleared on navigation or full-page reloads.
+실험적인 `serverComponentsHmrCache` 옵션을 사용하면 로컬 개발 환경에서 Hot Module Replacement (HMR) 새로고침 간에 서버 컴포넌트의 `fetch` 응답을 캐시할 수 있습니다. 이는 더 빠른 응답과 과금되는 API 호출 비용 감소로 이어집니다.
 
-You can disable the HMR cache by setting `serverComponentsHmrCache` to `false` in your `next.config.js` file:
+기본적으로 HMR 캐시는 `cache: 'no-store'` 옵션이 있는 요청을 포함한 모든 `fetch` 요청에 적용됩니다. 이는 캐시되지 않은 요청이 HMR 새로고침 간에 새로운 데이터를 표시하지 않음을 의미합니다. 그러나 캐시는 탐색이나 전체 페이지 새로고침 시 지워집니다.
+
+`next.config.js` 파일에서 `serverComponentsHmrCache`를 `false`로 설정하여 HMR 캐시를 비활성화할 수 있습니다:
 
 ```ts filename="next.config.ts" switcher
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    serverComponentsHmrCache: false, // defaults to true
+    serverComponentsHmrCache: false, // 기본값은 true입니다
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ```js filename="next.config.js" switcher
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsHmrCache: false, // defaults to true
+    serverComponentsHmrCache: false, // 기본값은 true입니다
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-> **Good to know:** For better observability, we recommend using the [`logging.fetches`](/docs/app/api-reference/next-config-js/logging) option which logs fetch cache hits and misses in the console during development.
+> **알아두면 좋은 점:** 개발 중 콘솔에서 fetch 캐시 적용고 누락을 로깅하여 더 잘 모니터링할 수 있도록 [`logging.fetches`](/docs/app/api-reference/next-config-js/logging) 옵션을 사용하는 것을 권장합니다.
