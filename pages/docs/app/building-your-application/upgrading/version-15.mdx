@@ -1,13 +1,15 @@
 ---
-title: Version 15
-description: Upgrade your Next.js Application from Version 14 to 15.
+title: 버전 15
+description: Next.js 애플리케이션을 버전 14에서 15로 업그레이드하세요.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# 버전 15
 
-## Upgrading from 14 to 15
+{/* 이 문서의 내용은 app과 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 특정한 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-To update to Next.js version 15, run the following command using your preferred package manager:
+## 14에서 15로 업그레이드
+
+Next.js 버전 15로 업데이트하려면 선호하는 패키지 관리자를 사용하여 다음 명령을 실행하세요:
 
 ```bash filename="Terminal"
 npm i next@rc react@rc react-dom@rc eslint-config-next@rc
@@ -25,60 +27,60 @@ pnpm up next@rc react@rc react-dom@rc eslint-config-next@rc
 bun add next@rc react@rc react-dom@rc eslint-config-next@rc
 ```
 
-> **Good to know:**
+> **알아두면 좋은 점:**
 >
-> - If you see a peer dependencies warning, you may need to update `react` and `react-dom` to the suggested versions, or you use the `--force` or `--legacy-peer-deps` flag to ignore the warning. This won't be necessary once both Next.js 15 and React 19 are stable.
-> - If you are using TypeScript, you'll need to temporarily override the React types. See the [React 19 RC upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide#installing) for more information.
+> - 상호 종속성 경고가 표시되면 제안된 버전으로 `react`와 `react-dom`을 업데이트하거나 `--force` 또는 `--legacy-peer-deps` 플래그를 사용하여 경고를 무시해야 할 수 있습니다. Next.js 15와 React 19가 모두 안정화되면 이는 필요하지 않을 것입니다.
+> - TypeScript를 사용하고 있다면 React 타입을 일시적으로 재정의해야 할 수 있습니다. 자세한 내용은 [React 19 RC 업그레이드 가이드](https://react.dev/blog/2024/04/25/react-19-upgrade-guide#installing)를 참조하세요.
 
-## Minimum React version
+## 최소 React 버전
 
-- The minimum `react` and `react-dom` is now 19.
+- 이제 최소 `react`와 `react-dom` 버전은 19입니다.
 
-## `fetch` requests
+## `fetch` 요청
 
-[`fetch` requests](/docs/app/api-reference/functions/fetch) are no longer cached by default.
+[`fetch` 요청](/docs/app/api-reference/functions/fetch)은 더 이상 기본적으로 캐시되지 않습니다.
 
-To opt specific `fetch` requests into caching, you can pass the `cache: 'force-cache'` option.
+특정 `fetch` 요청을 캐싱하도록 설정하려면 `cache: 'force-cache'` 옵션을 전달할 수 있습니다.
 
 ```js filename="app/layout.js"
 export default async function RootLayout() {
-  const a = await fetch('https://...') // Not Cached
-  const b = await fetch('https://...', { cache: 'force-cache' }) // Cached
+  const a = await fetch("https://..."); // 캐시되지 않음
+  const b = await fetch("https://...", { cache: "force-cache" }); // 캐시됨
 
   // ...
 }
 ```
 
-To opt all `fetch` requests in a layout or page into caching, you can use the `export const fetchCache = 'default-cache'` [segment config option](/docs/app/api-reference/file-conventions/route-segment-config). If individual `fetch` requests specify a `cache` option, that will be used instead.
+레이아웃이나 페이지의 모든 `fetch` 요청을 캐싱하도록 설정하려면 [`export const fetchCache = 'default-cache'` 세그먼트 구성 옵션](/docs/app/api-reference/file-conventions/route-segment-config)을 사용할 수 있습니다. 개별 `fetch` 요청이 `cache` 옵션을 지정하면 해당 옵션이 대신 사용됩니다.
 
 ```js filename="app/layout.js"
-// Since this is the root layout, all fetch requests in the app
-// that don't set their own cache option will be cached.
-export const fetchCache = 'default-cache'
+// 이것이 루트 레이아웃이므로 앱의 모든 fetch 요청 중
+// 자체 캐시 옵션을 설정하지 않은 요청은 캐시됩니다.
+export const fetchCache = "default-cache";
 
 export default async function RootLayout() {
-  const a = await fetch('https://...') // Cached
-  const b = await fetch('https://...', { cache: 'no-store' }) // Not cached
+  const a = await fetch("https://..."); // 캐시됨
+  const b = await fetch("https://...", { cache: "no-store" }); // 캐시되지 않음
 
   // ...
 }
 ```
 
-## Route Handlers
+## 라우트 핸들러
 
-`GET` functions in [Route Handlers](/docs/app/api-reference/file-conventions/route) are no longer cached by default. To opt `GET` methods into caching, you can use a [route config option](/docs/app/api-reference/file-conventions/route-segment-config) such as `export const dynamic = 'force-static'` in your Route Handler file.
+[라우트 핸들러](/docs/app/api-reference/file-conventions/route)의 `GET` 함수는 더 이상 기본적으로 캐시되지 않습니다. `GET` 메서드를 캐싱하도록 설정하려면 라우트 핸들러 파일에서 `export const dynamic = 'force-static'`과 같은 [라우트 구성 옵션](/docs/app/api-reference/file-conventions/route-segment-config)을 사용할 수 있습니다.
 
 ```js filename="app/api/route.js"
-export const dynamic = 'force-static'
+export const dynamic = "force-static";
 
 export async function GET() {}
 ```
 
-## Client-side Router Cache
+## 클라이언트 측 라우터 캐시
 
-When navigating between pages via `<Link>` or `useRouter`, [page](/docs/app/api-reference/file-conventions/page) segments are no longer reused from the client-side router cache. However, they are still reused during browser backward and forward navigation and for shared layouts.
+`<Link>` 또는 `useRouter`를 통해 페이지 간 이동할 때 [페이지](/docs/app/api-reference/file-conventions/page) 세그먼트는 더 이상 클라이언트 측 라우터 캐시에서 재사용되지 않습니다. 그러나 브라우저의 뒤로 가기 및 앞으로 가기 탐색과 공유 레이아웃에 대해서는 여전히 재사용됩니다.
 
-To opt page segments into caching, you can use the [`staleTimes`](/docs/app/api-reference/next-config-js/staleTimes) config option:
+페이지 세그먼트를 캐싱하도록 설정하려면 [`staleTimes`](/docs/app/api-reference/next-config-js/staleTimes) 구성 옵션을 사용할 수 있습니다:
 
 ```js filename="next.config.js"
 /** @type {import('next').NextConfig} */
@@ -89,65 +91,65 @@ const nextConfig = {
       static: 180,
     },
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-[Layouts](/docs/app/api-reference/file-conventions/layout) and [loading states](/docs/app/api-reference/file-conventions/loading) are still cached and reused on navigation.
+[레이아웃](/docs/app/api-reference/file-conventions/layout)과 [로딩 상태](/docs/app/api-reference/file-conventions/loading)는 여전히 캐시되고 탐색 시 재사용됩니다.
 
 ## `next/font`
 
-The `@next/font` package has been removed in favor of the built-in [`next/font`](/docs/app/api-reference/components/font). A [codemod is available](/docs/app/building-your-application/upgrading/codemods#built-in-next-font) to safely and automatically rename your imports.
+내장된 [`next/font`](/docs/app/api-reference/components/font)를 선호하여 `@next/font` 패키지가 제거되었습니다. 임포트를 안전하고 자동으로 이름을 바꾸기 위한 [코드모드가 제공됩니다](/docs/app/building-your-application/upgrading/codemods#built-in-next-font).
 
 ```js filename="app/layout.js"
-// Before
-import { Inter } from '@next/font/google'
+// 이전
+import { Inter } from "@next/font/google";
 
-// After
-import { Inter } from 'next/font/google'
+// 이후
+import { Inter } from "next/font/google";
 ```
 
 ## bundlePagesRouterDependencies
 
-`experimental.bundlePagesExternals` is now stable and renamed to `bundlePagesRouterDependencies`.
+`experimental.bundlePagesExternals`은 이제 안정화되었으며 `bundlePagesRouterDependencies`로 이름이 변경되었습니다.
 
 ```js filename="next.config.js"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Before
+  // 이전
   experimental: {
     bundlePagesExternals: true,
   },
 
-  // After
+  // 이후
   bundlePagesRouterDependencies: true,
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
 ## serverExternalPackages
 
-`experimental.serverComponentsExternalPackages` is now stable and renamed to `serverExternalPackages`.
+`experimental.serverComponentsExternalPackages`는 이제 안정화되었으며 `serverExternalPackages`로 이름이 변경되었습니다.
 
 ```js filename="next.config.js"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Before
+  // 이전
   experimental: {
-    serverComponentsExternalPackages: ['package-name'],
+    serverComponentsExternalPackages: ["package-name"],
   },
 
-  // After
-  serverExternalPackages: ['package-name'],
-}
+  // 이후
+  serverExternalPackages: ["package-name"],
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
 ## Speed Insights
 
-Auto instrumentation for Speed Insights was removed in Next.js 15.
+Next.js 15에서 Speed Insights를 위한 자동 계측이 제거되었습니다.
 
-To continue using Speed Insights, follow the [Vercel Speed Insights Quickstart](https://vercel.com/docs/speed-insights/quickstart) guide.
+Speed Insights를 계속 사용하려면 [Vercel Speed Insights 퀵스타트](https://vercel.com/docs/speed-insights/quickstart) 가이드를 따르세요.
