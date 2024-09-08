@@ -1,64 +1,66 @@
 ---
-title: Setting up Vitest with Next.js
+title: Next.js와 Vitest 설정하기
 nav_title: Vitest
-description: Learn how to set up Vitest with Next.js for Unit Testing.
+description: Next.js와 함께 단위 테스트를 위한 Vitest를 설정하는 방법을 알아보세요.
 ---
 
-Vite and React Testing Library are frequently used together for **Unit Testing**. This guide will show you how to setup Vitest with Next.js and write your first tests.
+# Next.js와 Vitest 설정하기
 
-> **Good to know:** Since `async` Server Components are new to the React ecosystem, Vitest currently does not support them. While you can still run **unit tests** for synchronous Server and Client Components, we recommend using an **E2E tests** for `async` components.
+Vite와 React Testing Library는 **단위 테스트**를 위해 자주 함께 사용됩니다. 이 가이드에서는 Next.js와 Vitest를 설정하고 첫 번째 테스트를 작성하는 방법을 보여드리겠습니다.
 
-## Quickstart
+> **알아두면 좋은 점:** `async` 서버 컴포넌트는 React 생태계에 새로 도입되었기 때문에 Vitest는 현재 이를 지원하지 않습니다. 동기식 서버 및 클라이언트 컴포넌트에 대한 **단위 테스트**는 여전히 실행할 수 있지만, `async` 컴포넌트에 대해서는 **E2E 테스트**를 사용하는 것을 권장합니다.
 
-You can use `create-next-app` with the Next.js [with-vitest](https://github.com/vercel/next.js/tree/canary/examples/with-vitest) example to quickly get started:
+## 빠른 시작
+
+Next.js [with-vitest](https://github.com/vercel/next.js/tree/canary/examples/with-vitest) 예제와 함께 `create-next-app`을 사용하여 빠르게 시작할 수 있습니다:
 
 ```bash filename="Terminal"
 npx create-next-app@latest --example with-vitest with-vitest-app
 ```
 
-## Manual Setup
+## 수동 설정
 
-To manually set up Vitest, install `vitest` and the following packages as dev dependencies:
+Vitest를 수동으로 설정하려면 `vitest`와 다음 패키지들을 개발 의존성으로 설치하세요:
 
 ```bash filename="Terminal"
 npm install -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom
-# or
+# 또는
 yarn add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom
-# or
+# 또는
 pnpm install -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom
-# or
+# 또는
 bun add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom
 ```
 
-Create a `vitest.config.ts|js` file in the root of your project, and add the following options:
+프로젝트의 루트에 `vitest.config.ts|js` 파일을 생성하고 다음 옵션을 추가하세요:
 
 ```ts filename="vitest.config.ts" switcher
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
   },
-})
+});
 ```
 
 ```js filename="vitest.config.js" switcher
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
   },
-})
+});
 ```
 
-For more information on configuring Vitest, please refer to the [Vitest Configuration](https://vitest.dev/config/#configuration) docs.
+Vitest 구성에 대한 자세한 정보는 [Vitest Configuration](https://vitest.dev/config/#configuration) 문서를 참조하세요.
 
-Then, add a `test` script to your `package.json`:
+그런 다음 `package.json`에 `test` 스크립트를 추가하세요:
 
 ```json filename="package.json"
 {
@@ -71,16 +73,14 @@ Then, add a `test` script to your `package.json`:
 }
 ```
 
-When you run `npm run test`, Vitest will **watch** for changes in your project by default.
+`npm run test`를 실행하면 Vitest는 기본적으로 프로젝트의 변경 사항을 **감시**합니다.
 
-## Creating your first Vitest Unit Test
+## 첫 번째 Vitest 단위 테스트 만들기
 
-Check that everything is working by creating a test to check if the `<Page />` component successfully renders a heading:
-
-<AppOnly>
+모든 것이 제대로 작동하는지 확인하기 위해 `<Page />` 컴포넌트가 제목을 성공적으로 렌더링하는지 확인하는 테스트를 만들어 보겠습니다:
 
 ```tsx filename="app/page.tsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -88,12 +88,12 @@ export default function Page() {
       <h1>Home</h1>
       <Link href="/about">About</Link>
     </div>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.jsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -101,106 +101,52 @@ export default function Page() {
       <h1>Home</h1>
       <Link href="/about">About</Link>
     </div>
-  )
+  );
 }
 ```
 
 ```tsx filename="__tests__/page.test.tsx" switcher
-import { expect, test } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import Page from '../app/page'
+import { expect, test } from "vitest";
+import { render, screen } from "@testing-library/react";
+import Page from "../app/page";
 
-test('Page', () => {
-  render(<Page />)
-  expect(screen.getByRole('heading', { level: 1, name: 'Home' })).toBeDefined()
-})
+test("Page", () => {
+  render(<Page />);
+  expect(screen.getByRole("heading", { level: 1, name: "Home" })).toBeDefined();
+});
 ```
 
 ```jsx filename="__tests__/page.test.jsx" switcher
-import { expect, test } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import Page from '../app/page'
+import { expect, test } from "vitest";
+import { render, screen } from "@testing-library/react";
+import Page from "../app/page";
 
-test('Page', () => {
-  render(<Page />)
-  expect(screen.getByRole('heading', { level: 1, name: 'Home' })).toBeDefined()
-})
+test("Page", () => {
+  render(<Page />);
+  expect(screen.getByRole("heading", { level: 1, name: "Home" })).toBeDefined();
+});
 ```
 
-> **Good to know**: The example above uses the common `__tests__` convention, but test files can also be colocated inside the `app` router.
+> **알아두면 좋은 점**: 위의 예제는 일반적인 `__tests__` 규칙을 사용하지만, 테스트 파일은 `app` 라우터 내부에 함께 위치할 수도 있습니다.
 
-</AppOnly>
+## 테스트 실행하기
 
-<PagesOnly>
-
-```tsx filename="pages/index.tsx" switcher
-import Link from 'next/link'
-
-export default function Page() {
-  return (
-    <div>
-      <h1>Home</h1>
-      <Link href="/about">About</Link>
-    </div>
-  )
-}
-```
-
-```jsx filename="pages/index.jsx" switcher
-import Link from 'next/link'
-
-export default function Page() {
-  return (
-    <div>
-      <h1>Home</h1>
-      <Link href="/about">About</Link>
-    </div>
-  )
-}
-```
-
-```tsx filename="__tests__/index.test.tsx" switcher
-import { expect, test } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import Page from '../pages/index'
-
-test('Page', () => {
-  render(<Page />)
-  expect(screen.getByRole('heading', { level: 1, name: 'Home' })).toBeDefined()
-})
-```
-
-```jsx filename="__tests__/index.test.jsx" switcher
-import { expect, test } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import Page from '../pages/index'
-
-test('Page', () => {
-  render(<Page />)
-  expect(screen.getByRole('heading', { level: 1, name: 'Home' })).toBeDefined()
-})
-```
-
-</PagesOnly>
-
-## Running your tests
-
-Then, run the following command to run your tests:
+그런 다음 다음 명령을 실행하여 테스트를 실행하세요:
 
 ```bash filename="Terminal"
 npm run test
-# or
+# 또는
 yarn test
-# or
+# 또는
 pnpm test
-# or
+# 또는
 bun test
 ```
 
-## Additional Resources
+## 추가 자료
 
-You may find these resources helpful:
+다음 자료들이 도움이 될 수 있습니다:
 
-- [Next.js with Vitest example](https://github.com/vercel/next.js/tree/canary/examples/with-vitest)
-- [Vitest Docs](https://vitest.dev/guide/)
-- [React Testing Library Docs](https://testing-library.com/docs/react-testing-library/intro/)
+- [Next.js와 Vitest 예제](https://github.com/vercel/next.js/tree/canary/examples/with-vitest)
+- [Vitest 문서](https://vitest.dev/guide/)
+- [React Testing Library 문서](https://testing-library.com/docs/react-testing-library/intro/)

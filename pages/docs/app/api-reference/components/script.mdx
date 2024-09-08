@@ -1,98 +1,88 @@
 ---
 title: <Script>
-description: Optimize third-party scripts in your Next.js application using the built-in `next/script` Component.
+description: Next.js 애플리케이션에서 내장된 `next/script` 컴포넌트를 사용하여 서드파티 스크립트를 최적화합니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# \<Script\>
 
-This API reference will help you understand how to use [props](#props) available for the Script Component. For features and usage, please see the [Optimizing Scripts](/docs/app/building-your-application/optimizing/scripts) page.
+{/* 이 문서의 내용은 앱 라우터와 페이지 라우터 간에 공유됩니다. 페이지 라우터에만 해당하는 내용을 추가하려면 `<PagesOnly>내용</PagesOnly>` 컴포넌트를 사용할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
+
+이 API 참조는 Script 컴포넌트에 사용 가능한 [props](#props)를 이해하는 데 도움이 될 것입니다. 기능과 사용법에 대해서는 [스크립트 최적화](/docs/app/building-your-application/optimizing/scripts) 페이지를 참조하세요.
 
 ```tsx filename="app/dashboard/page.tsx" switcher
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Dashboard() {
   return (
     <>
       <Script src="https://example.com/script.js" />
     </>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/dashboard/page.js" switcher
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Dashboard() {
   return (
     <>
       <Script src="https://example.com/script.js" />
     </>
-  )
+  );
 }
 ```
 
 ## Props
 
-Here's a summary of the props available for the Script Component:
+Script 컴포넌트에 사용 가능한 props의 요약입니다:
 
-| Prop                    | Example                           | Type     | Required                              |
-| ----------------------- | --------------------------------- | -------- | ------------------------------------- |
-| [`src`](#src)           | `src="http://example.com/script"` | String   | Required unless inline script is used |
-| [`strategy`](#strategy) | `strategy="lazyOnload"`           | String   | -                                     |
-| [`onLoad`](#onload)     | `onLoad={onLoadFunc}`             | Function | -                                     |
-| [`onReady`](#onready)   | `onReady={onReadyFunc}`           | Function | -                                     |
-| [`onError`](#onerror)   | `onError={onErrorFunc}`           | Function | -                                     |
+| Prop                    | 예시                              | 타입     | 필수                                    |
+| ----------------------- | --------------------------------- | -------- | --------------------------------------- |
+| [`src`](#src)           | `src="http://example.com/script"` | String   | 인라인 스크립트를 사용하지 않는 한 필수 |
+| [`strategy`](#strategy) | `strategy="lazyOnload"`           | String   | -                                       |
+| [`onLoad`](#onload)     | `onLoad={onLoadFunc}`             | Function | -                                       |
+| [`onReady`](#onready)   | `onReady={onReadyFunc}`           | Function | -                                       |
+| [`onError`](#onerror)   | `onError={onErrorFunc}`           | Function | -                                       |
 
-## Required Props
+## 필수 Props
 
-The `<Script />` component requires the following properties.
+`<Script />` 컴포넌트는 다음 속성을 필요로 합니다.
 
 ### `src`
 
-A path string specifying the URL of an external script. This can be either an absolute external URL or an internal path. The `src` property is required unless an inline script is used.
+외부 스크립트의 URL을 지정하는 경로 문자열입니다. 이는 절대 외부 URL이거나 내부 경로일 수 있습니다. 인라인 스크립트를 사용하지 않는 한 `src` 속성은 필수입니다.
 
-## Optional Props
+## 선택적 Props
 
-The `<Script />` component accepts a number of additional properties beyond those which are required.
+`<Script />` 컴포넌트는 필수 속성 외에도 여러 추가 속성을 받아들입니다.
 
 ### `strategy`
 
-The loading strategy of the script. There are four different strategies that can be used:
+스크립트의 로딩 전략입니다. 네 가지 다른 전략을 사용할 수 있습니다:
 
-- `beforeInteractive`: Load before any Next.js code and before any page hydration occurs.
-- `afterInteractive`: (**default**) Load early but after some hydration on the page occurs.
-- `lazyOnload`: Load during browser idle time.
-- `worker`: (experimental) Load in a web worker.
+- `beforeInteractive`: 모든 Next.js 코드와 페이지 하이드레이션 전에 로드합니다.
+- `afterInteractive`: (**기본값**) 페이지에서 일부 하이드레이션이 발생한 후 일찍 로드합니다.
+- `lazyOnload`: 브라우저 유휴 시간 동안 로드합니다.
+- `worker`: (실험적) 웹 워커에서 로드합니다.
 
 ### `beforeInteractive`
 
-Scripts that load with the `beforeInteractive` strategy are injected into the initial HTML from the server, downloaded before any Next.js module, and executed in the order they are placed before _any_ hydration occurs on the page.
+`beforeInteractive` 전략으로 로드되는 스크립트는 서버로부터의 초기 HTML에 삽입되어, 모든 Next.js 모듈 전에 다운로드되며, 페이지에서 _어떤_ 하이드레이션이 발생하기 전에 순서대로 실행됩니다.
 
-Scripts denoted with this strategy are preloaded and fetched before any first-party code, but their execution does not block page hydration from occurring.
+이 전략으로 표시된 스크립트는 모든 퍼스트파티 코드 전에 미리 로드되고 가져오지만, 그 실행은 페이지 하이드레이션을 차단하지 않습니다.
 
-<AppOnly>
+`beforeInteractive` 스크립트는 반드시 루트 레이아웃(`app/layout.tsx`) 내에 배치되어야 하며, 전체 사이트에 필요한 스크립트를 로드하도록 설계되었습니다(즉, 애플리케이션의 어떤 페이지가 서버 사이드에서 로드되었을 때 스크립트가 로드됩니다).
 
-`beforeInteractive` scripts must be placed inside the root layout (`app/layout.tsx`) and are designed to load scripts that are needed by the entire site (i.e. the script will load when any page in the application has been loaded server-side).
-
-</AppOnly>
-
-<PagesOnly>
-
-`beforeInteractive` scripts must be placed inside the `Document` Component (`pages/_document.js`) and are designed to load scripts that are needed by the entire site (i.e. the script will load when any page in the application has been loaded server-side).
-
-</PagesOnly>
-
-**This strategy should only be used for critical scripts that need to be fetched before any part of the page becomes interactive.**
-
-<AppOnly>
+**이 전략은 페이지의 어떤 부분이 상호작용 가능해지기 전에 가져와야 하는 중요한 스크립트에만 사용해야 합니다.**
 
 ```tsx filename="app/layout.tsx" switcher
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -104,12 +94,12 @@ export default function RootLayout({
         />
       </body>
     </html>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/layout.js" switcher
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function RootLayout({ children }) {
   return (
@@ -122,144 +112,117 @@ export default function RootLayout({ children }) {
         />
       </body>
     </html>
-  )
+  );
 }
 ```
 
-</AppOnly>
+> **알아두면 좋은 점**: `beforeInteractive`를 사용하는 스크립트는 컴포넌트 내 어디에 배치되었는지와 상관없이 항상 HTML 문서의 `head` 내부에 삽입됩니다.
 
-<PagesOnly>
+`beforeInteractive`로 가능한 한 빨리 로드해야 하는 스크립트의 몇 가지 예시:
 
-```jsx filename="pages/_document.js"
-import { Html, Head, Main, NextScript } from 'next/document'
-import Script from 'next/script'
-
-export default function Document() {
-  return (
-    <Html>
-      <Head />
-      <body>
-        <Main />
-        <NextScript />
-        <Script
-          src="https://example.com/script.js"
-          strategy="beforeInteractive"
-        />
-      </body>
-    </Html>
-  )
-}
-```
-
-</PagesOnly>
-
-> **Good to know**: Scripts with `beforeInteractive` will always be injected inside the `head` of the HTML document regardless of where it's placed in the component.
-
-Some examples of scripts that should be loaded as soon as possible with `beforeInteractive` include:
-
-- Bot detectors
-- Cookie consent managers
+- 봇 탐지기
+- 쿠키 동의 관리자
 
 ### `afterInteractive`
 
-Scripts that use the `afterInteractive` strategy are injected into the HTML client-side and will load after some (or all) hydration occurs on the page. **This is the default strategy** of the Script component and should be used for any script that needs to load as soon as possible but not before any first-party Next.js code.
+`afterInteractive` 전략을 사용하는 스크립트는 클라이언트 사이드 HTML에 삽입되며 페이지에서 일부(또는 모든) 하이드레이션이 발생한 후에 로드됩니다. 이는 Script 컴포넌트의 **기본 전략**이며 가능한 한 빨리 로드해야 하지만 퍼스트파티 Next.js 코드 전에는 로드할 필요가 없는 모든 스크립트에 사용해야 합니다.
 
-`afterInteractive` scripts can be placed inside of any page or layout and will only load and execute when that page (or group of pages) is opened in the browser.
+`afterInteractive` 스크립트는 모든 페이지나 레이아웃 내에 배치할 수 있으며, 해당 페이지(또는 페이지 그룹)가 브라우저에서 열렸을 때만 로드되고 실행됩니다.
 
 ```jsx filename="app/page.js"
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Page() {
   return (
     <>
       <Script src="https://example.com/script.js" strategy="afterInteractive" />
     </>
-  )
+  );
 }
 ```
 
-Some examples of scripts that are good candidates for `afterInteractive` include:
+`afterInteractive`에 적합한 스크립트의 몇 가지 예시:
 
-- Tag managers
-- Analytics
+- 태그 매니저
+- 애널리틱스
 
 ### `lazyOnload`
 
-Scripts that use the `lazyOnload` strategy are injected into the HTML client-side during browser idle time and will load after all resources on the page have been fetched. This strategy should be used for any background or low priority scripts that do not need to load early.
+`lazyOnload` 전략을 사용하는 스크립트는 클라이언트 사이드 HTML에 삽입되며 브라우저 유휴 시간 동안 페이지의 모든 리소스가 가져와진 후에 로드됩니다. 이 전략은 일찍 로드할 필요가 없는 모든 백그라운드 또는 낮은 우선순위 스크립트에 사용해야 합니다.
 
-`lazyOnload` scripts can be placed inside of any page or layout and will only load and execute when that page (or group of pages) is opened in the browser.
+`lazyOnload` 스크립트는 모든 페이지나 레이아웃 내에 배치할 수 있으며, 해당 페이지(또는 페이지 그룹)가 브라우저에서 열렸을 때만 로드되고 실행됩니다.
 
 ```jsx filename="app/page.js"
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Page() {
   return (
     <>
       <Script src="https://example.com/script.js" strategy="lazyOnload" />
     </>
-  )
+  );
 }
 ```
 
-Examples of scripts that do not need to load immediately and can be fetched with `lazyOnload` include:
+즉시 로드할 필요가 없고 `lazyOnload`로 가져올 수 있는 스크립트의 예시:
 
-- Chat support plugins
-- Social media widgets
+- 채팅 지원 플러그인
+- 소셜 미디어 위젯
 
 ### `worker`
 
-> **Warning:** The `worker` strategy is not yet stable and does not yet work with the [`app`](/docs/app/building-your-application/routing/defining-routes) directory. Use with caution.
+> **경고:** `worker` 전략은 아직 안정적이지 않으며 [`app`](/docs/app/building-your-application/routing/defining-routes) 디렉토리에서는 아직 작동하지 않습니다. 주의해서 사용하세요.
 
-Scripts that use the `worker` strategy are off-loaded to a web worker in order to free up the main thread and ensure that only critical, first-party resources are processed on it. While this strategy can be used for any script, it is an advanced use case that is not guaranteed to support all third-party scripts.
+`worker` 전략을 사용하는 스크립트는 메인 스레드를 해제하고 중요한 퍼스트파티 리소스만 메인 스레드에서 처리되도록 하기 위해 웹 워커로 오프로드됩니다. 이 전략은 모든 스크립트에 사용할 수 있지만, 모든 서드파티 스크립트를 지원하는 것이 보장되지 않는 고급 사용 사례입니다.
 
-To use `worker` as a strategy, the `nextScriptWorkers` flag must be enabled in `next.config.js`:
+`worker`를 전략으로 사용하려면 `next.config.js`에서 `nextScriptWorkers` 플래그를 활성화해야 합니다:
 
 ```js filename="next.config.js"
 module.exports = {
   experimental: {
     nextScriptWorkers: true,
   },
-}
+};
 ```
 
-`worker` scripts can **only currently be used in the `pages/` directory**:
+`worker` 스크립트는 **현재 `pages/` 디렉토리에서만 사용할 수 있습니다**:
 
 ```tsx filename="pages/home.tsx" switcher
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Home() {
   return (
     <>
       <Script src="https://example.com/script.js" strategy="worker" />
     </>
-  )
+  );
 }
 ```
 
 ```jsx filename="pages/home.js" switcher
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Home() {
   return (
     <>
       <Script src="https://example.com/script.js" strategy="worker" />
     </>
-  )
+  );
 }
 ```
 
 ### `onLoad`
 
-> **Warning:** `onLoad` does not yet work with Server Components and can only be used in Client Components. Further, `onLoad` can't be used with `beforeInteractive` – consider using `onReady` instead.
+> **경고:** `onLoad`는 아직 서버 컴포넌트에서 작동하지 않으며 클라이언트 컴포넌트에서만 사용할 수 있습니다. 또한, `onLoad`는 `beforeInteractive`와 함께 사용할 수 없습니다 - 대신 `onReady`를 사용하는 것을 고려해보세요.
 
-Some third-party scripts require users to run JavaScript code once after the script has finished loading in order to instantiate content or call a function. If you are loading a script with either afterInteractive or lazyOnload as a loading strategy, you can execute code after it has loaded using the onLoad property.
+일부 서드파티 스크립트는 스크립트 로딩이 완료된 후 콘텐츠를 인스턴스화하거나 함수를 호출하기 위해 JavaScript 코드를 한 번 실행해야 합니다. afterInteractive 또는 lazyOnload를 로딩 전략으로 사용하여 스크립트를 로드하는 경우, onLoad 속성을 사용하여 스크립트가 로드된 후 코드를 실행할 수 있습니다.
 
-Here's an example of executing a lodash method only after the library has been loaded.
+다음은 라이브러리가 로드된 후에만 lodash 메서드를 실행하는 예시입니다.
 
 ```tsx filename="app/page.tsx" switcher
-'use client'
+"use client";
 
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Page() {
   return (
@@ -267,18 +230,18 @@ export default function Page() {
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"
         onLoad={() => {
-          console.log(_.sample([1, 2, 3, 4]))
+          console.log(_.sample([1, 2, 3, 4]));
         }}
       />
     </>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-'use client'
+"use client";
 
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Page() {
   return (
@@ -286,32 +249,30 @@ export default function Page() {
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"
         onLoad={() => {
-          console.log(_.sample([1, 2, 3, 4]))
+          console.log(_.sample([1, 2, 3, 4]));
         }}
       />
     </>
-  )
+  );
 }
 ```
 
 ### `onReady`
 
-> **Warning:** `onReady` does not yet work with Server Components and can only be used in Client Components.
+> **경고:** `onReady`는 아직 서버 컴포넌트에서 작동하지 않으며 클라이언트 컴포넌트에서만 사용할 수 있습니다.
 
-Some third-party scripts require users to run JavaScript code after the script has finished loading and every time the component is mounted (after a route navigation for example). You can execute code after the script's load event when it first loads and then after every subsequent component re-mount using the onReady property.
+일부 서드파티 스크립트는 스크립트가 로딩을 완료한 후와 컴포넌트가 마운트될 때마다(예: 라우트 네비게이션 후) JavaScript 코드를 실행해야 합니다. onReady 속성을 사용하여 스크립트가 처음 로드될 때 스크립트의 로드 이벤트 후에 코드를 실행하고, 이후 모든 컴포넌트 재마운트 후에도 코드를 실행할 수 있습니다.
 
-Here's an example of how to re-instantiate a Google Maps JS embed every time the component is mounted:
-
-<AppOnly>
+다음은 컴포넌트가 마운트될 때마다 Google Maps JS 내장 요소를 재구성하는 예시입니다:
 
 ```tsx filename="app/page.tsx" switcher
-'use client'
+"use client";
 
-import { useRef } from 'react'
-import Script from 'next/script'
+import { useRef } from "react";
+import Script from "next/script";
 
 export default function Page() {
-  const mapRef = useRef()
+  const mapRef = useRef();
 
   return (
     <>
@@ -323,22 +284,22 @@ export default function Page() {
           new google.maps.Map(mapRef.current, {
             center: { lat: -34.397, lng: 150.644 },
             zoom: 8,
-          })
+          });
         }}
       />
     </>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-'use client'
+"use client";
 
-import { useRef } from 'react'
-import Script from 'next/script'
+import { useRef } from "react";
+import Script from "next/script";
 
 export default function Page() {
-  const mapRef = useRef()
+  const mapRef = useRef();
 
   return (
     <>
@@ -350,57 +311,24 @@ export default function Page() {
           new google.maps.Map(mapRef.current, {
             center: { lat: -34.397, lng: 150.644 },
             zoom: 8,
-          })
+          });
         }}
       />
     </>
-  )
+  );
 }
 ```
-
-</AppOnly>
-
-<PagesOnly>
-
-```jsx
-import { useRef } from 'react'
-import Script from 'next/script'
-
-export default function Page() {
-  const mapRef = useRef()
-
-  return (
-    <>
-      <div ref={mapRef}></div>
-      <Script
-        id="google-maps"
-        src="https://maps.googleapis.com/maps/api/js"
-        onReady={() => {
-          new google.maps.Map(mapRef.current, {
-            center: { lat: -34.397, lng: 150.644 },
-            zoom: 8,
-          })
-        }}
-      />
-    </>
-  )
-}
-```
-
-</PagesOnly>
 
 ### `onError`
 
-> **Warning:** `onError` does not yet work with Server Components and can only be used in Client Components. `onError` cannot be used with the `beforeInteractive` loading strategy.
+> **경고:** `onError`는 아직 서버 컴포넌트에서 작동하지 않으며 클라이언트 컴포넌트에서만 사용할 수 있습니다. `onError`는 `beforeInteractive` 로딩 전략과 함께 사용할 수 없습니다.
 
-Sometimes it is helpful to catch when a script fails to load. These errors can be handled with the onError property:
-
-<AppOnly>
+때로는 스크립트 로딩 실패를 감지하는 것이 도움이 됩니다. 이러한 오류는 onError 속성으로 처리할 수 있습니다:
 
 ```tsx filename="app/page.tsx" switcher
-'use client'
+"use client";
 
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Page() {
   return (
@@ -408,39 +336,18 @@ export default function Page() {
       <Script
         src="https://example.com/script.js"
         onError={(e: Error) => {
-          console.error('Script failed to load', e)
+          console.error("스크립트 로딩 실패", e);
         }}
       />
     </>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-'use client'
+"use client";
 
-import Script from 'next/script'
-
-export default function Page() {
-  return (
-    <>
-      <Script
-        src="https://example.com/script.js"
-        onError={(e: Error) => {
-          console.error('Script failed to load', e)
-        }}
-      />
-    </>
-  )
-}
-```
-
-</AppOnly>
-
-<PagesOnly>
-
-```jsx
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function Page() {
   return (
@@ -448,21 +355,19 @@ export default function Page() {
       <Script
         src="https://example.com/script.js"
         onError={(e: Error) => {
-          console.error('Script failed to load', e)
+          console.error("스크립트 로딩 실패", e);
         }}
       />
     </>
-  )
+  );
 }
 ```
 
-</PagesOnly>
+## 버전 히스토리
 
-## Version History
-
-| Version   | Changes                                                                   |
-| --------- | ------------------------------------------------------------------------- |
-| `v13.0.0` | `beforeInteractive` and `afterInteractive` is modified to support `app`.  |
-| `v12.2.4` | `onReady` prop added.                                                     |
-| `v12.2.2` | Allow `next/script` with `beforeInteractive` to be placed in `_document`. |
-| `v11.0.0` | `next/script` introduced.                                                 |
+| 버전      | 변경 사항                                                                               |
+| --------- | --------------------------------------------------------------------------------------- |
+| `v13.0.0` | `beforeInteractive`와 `afterInteractive`가 `app`을 지원하도록 수정되었습니다.           |
+| `v12.2.4` | `onReady` prop이 추가되었습니다.                                                        |
+| `v12.2.2` | `beforeInteractive`를 사용하는 `next/script`를 `_document`에 배치할 수 있게 되었습니다. |
+| `v11.0.0` | `next/script`가 도입되었습니다.                                                         |

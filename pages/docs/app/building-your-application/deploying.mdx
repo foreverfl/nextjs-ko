@@ -1,41 +1,41 @@
 ---
-title: Deploying
-description: Learn how to deploy your Next.js app to production, either managed or self-hosted.
+title: 배포
+description: Next.js 앱을 관리형 또는 자체 호스팅으로 프로덕션에 배포하는 방법을 알아보세요.
 ---
 
 # 배포
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+{/* 이 문서의 내용은 app과 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 해당하는 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-Congratulations, it's time to ship to production.
+축하합니다. 이제 운영 환경에 배포할 시간입니다.
 
-You can deploy [managed Next.js with Vercel](#managed-nextjs-with-vercel), or self-host on a Node.js server, Docker image, or even static HTML files. When deploying using `next start`, all Next.js features are supported.
+[Vercel을 통한 관리형 Next.js](#vercel을-통한-관리형-nextjs)로 배포하거나, Node.js 서버, Docker 이미지, 또는 정적 HTML 파일로 자체 호스팅할 수 있습니다. `next start`를 사용하여 배포할 때는 모든 Next.js 기능이 지원됩니다.
 
-## Production Builds
+## 운영 환경 빌드
 
-Running `next build` generates an optimized version of your application for production. HTML, CSS, and JavaScript files are created based on your pages. JavaScript is **compiled** and browser bundles are **minified** using the [Next.js Compiler](/docs/architecture/nextjs-compiler) to help achieve the best performance and support [all modern browsers](/docs/architecture/supported-browsers).
+`next build`를 실행하면 운영 환경용으로 최적화된 애플리케이션 버전이 생성됩니다. 페이지를 기반으로 HTML, CSS, JavaScript 파일이 생성됩니다. JavaScript는 [Next.js 컴파일러](/docs/architecture/nextjs-compiler)를 사용하여 **컴파일**되고 브라우저 번들은 **최소화**되어 최상의 성능을 달성하고 [모든 최신 브라우저](/docs/architecture/supported-browsers)를 지원합니다.
 
-Next.js produces a standard deployment output used by managed and self-hosted Next.js. This ensures all features are supported across both methods of deployment. In the next major version, we will be transforming this output into our [Build Output API specification](https://vercel.com/docs/build-output-api/v3?utm_source=next-site&utm_medium=docs&utm_campaign=next-website).
+Next.js는 관리형 및 자체 호스팅 Next.js에서 사용되는 표준 배포 출력을 생성합니다. 이는 두 배포 방식 모두에서 모든 기능이 지원되도록 보장합니다. 다음 주요 버전에서는 이 출력을 [Build Output API 명세](https://vercel.com/docs/build-output-api/v3?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)로 변환할 예정입니다.
 
-## Managed Next.js with Vercel
+## Vercel을 통한 관리형 Next.js
 
-[Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website), the creators and maintainers of Next.js, provide managed infrastructure and a developer experience platform for your Next.js applications.
+Next.js의 제작자이자 관리자인 [Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)은 Next.js 애플리케이션을 위한 관리형 인프라와 개발자 경험 플랫폼을 제공합니다.
 
-Deploying to Vercel is zero-configuration and provides additional enhancements for scalability, availability, and performance globally. However, all Next.js features are still supported when self-hosted.
+Vercel에 배포하는 것은 설정이 필요 없으며 전 세계적으로 확장성, 가용성, 성능을 위한 추가 개선 사항을 제공합니다. 그러나 자체 호스팅 시에도 모든 Next.js 기능이 여전히 지원됩니다.
 
-Learn more about [Next.js on Vercel](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website) or [deploy a template for free](https://vercel.com/templates/next.js?utm_source=next-site&utm_medium=docs&utm_campaign=next-website) to try it out.
+[Vercel의 Next.js](https://vercel.com/docs/frameworks/nextjs?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)에 대해 자세히 알아보거나 [무료로 템플릿을 배포](https://vercel.com/templates/next.js?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)하여 시도해 보세요.
 
-## Self-Hosting
+## 자체 호스팅
 
-You can self-host Next.js in three different ways:
+Next.js를 세 가지 다른 방식으로 자체 호스팅할 수 있습니다:
 
-- [A Node.js server](#nodejs-server)
-- [A Docker container](#docker-image)
-- [A static export](#static-html-export)
+- [Node.js 서버](#nodejs-서버)
+- [Docker 컨테이너](#docker-이미지)
+- [정적 내보내기](#정적-html-내보내기)
 
-### Node.js Server
+### Node.js 서버
 
-Next.js can be deployed to any hosting provider that supports Node.js. Ensure your `package.json` has the `"build"` and `"start"` scripts:
+Next.js는 Node.js를 지원하는 모든 호스팅 제공업체에 배포할 수 있습니다. `package.json`에 `"build"` 및 `"start"` 스크립트가 있는지 확인하세요:
 
 ```json filename="package.json"
 {
@@ -47,113 +47,113 @@ Next.js can be deployed to any hosting provider that supports Node.js. Ensure yo
 }
 ```
 
-Then, run `npm run build` to build your application. Finally, run `npm run start` to start the Node.js server. This server supports all Next.js features.
+그런 다음 `npm run build`를 실행하여 애플리케이션을 빌드합니다. 마지막으로 `npm run start`를 실행하여 Node.js 서버를 시작합니다. 이 서버는 모든 Next.js 기능을 지원합니다.
 
-### Docker Image
+### Docker 이미지
 
-Next.js can be deployed to any hosting provider that supports [Docker](https://www.docker.com/) containers. You can use this approach when deploying to container orchestrators such as [Kubernetes](https://kubernetes.io/) or when running inside a container in any cloud provider.
+Next.js는 [Docker](https://www.docker.com/) 컨테이너를 지원하는 모든 호스팅 제공업체에 배포할 수 있습니다. [Kubernetes](https://kubernetes.io/)와 같은 컨테이너 오케스트레이터에 배포하거나 모든 클라우드 제공업체에서 컨테이너 내에서 실행할 때 이 접근 방식을 사용할 수 있습니다.
 
-1. [Install Docker](https://docs.docker.com/get-docker/) on your machine
-2. [Clone our example](https://github.com/vercel/next.js/tree/canary/examples/with-docker) (or the [multi-environment example](https://github.com/vercel/next.js/tree/canary/examples/with-docker-multi-env))
-3. Build your container: `docker build -t nextjs-docker .`
-4. Run your container: `docker run -p 3000:3000 nextjs-docker`
+1. 기기에 [Docker 설치](https://docs.docker.com/get-docker/)
+2. [예제 클론](https://github.com/vercel/next.js/tree/canary/examples/with-docker) (또는 [다중 환경 예제](https://github.com/vercel/next.js/tree/canary/examples/with-docker-multi-env))
+3. 컨테이너 빌드: `docker build -t nextjs-docker .`
+4. 컨테이너 실행: `docker run -p 3000:3000 nextjs-docker`
 
-Next.js through Docker supports all Next.js features.
+Docker를 통한 Next.js는 모든 Next.js 기능을 지원합니다.
 
-### Static HTML Export
+### 정적 HTML 내보내기
 
-Next.js enables starting as a static site or Single-Page Application (SPA), then later optionally upgrading to use features that require a server.
+Next.js를 사용하면 정적 사이트나 단일 페이지 애플리케이션(SPA)으로 시작한 다음, 나중에 선택적으로 서버가 필요한 기능을 사용하도록 업그레이드할 수 있습니다.
 
-Since Next.js supports this [static export](/docs/app/building-your-application/deploying/static-exports), it can be deployed and hosted on any web server that can serve HTML/CSS/JS static assets. This includes tools like AWS S3, Nginx, or Apache.
+Next.js는 이 [정적 내보내기](/docs/app/building-your-application/deploying/static-exports)를 지원하므로 HTML/CSS/JS 정적 자산을 제공할 수 있는 모든 웹 서버에 배포하고 호스팅할 수 있습니다. 여기에는 AWS S3, Nginx 또는 Apache와 같은 도구가 포함됩니다.
 
-Running as a [static export](/docs/app/building-your-application/deploying/static-exports) does not support Next.js features that require a server. [Learn more](/docs/app/building-your-application/deploying/static-exports#unsupported-features).
+[정적 내보내기](/docs/app/building-your-application/deploying/static-exports)로 실행하면 서버가 필요한 Next.js 기능을 지원하지 않습니다. [자세히 알아보기](/docs/app/building-your-application/deploying/static-exports#unsupported-features).
 
-> **Good to know:**
+> **알아두면 좋은 점:**
 >
-> - [Server Components](/docs/app/building-your-application/rendering/server-components) are supported with static exports.
+> - [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components)는 정적 내보내기에서 지원됩니다.
 
-## Features
+## 기능
 
-### Image Optimization
+### 이미지 최적화
 
-[Image Optimization](/docs/app/building-your-application/optimizing/images) through `next/image` works self-hosted with zero configuration when deploying using `next start`. If you would prefer to have a separate service to optimize images, you can [configure an image loader](/docs/app/building-your-application/optimizing/images#loaders).
+`next/image`를 통한 [이미지 최적화](/docs/app/building-your-application/optimizing/images)는 `next start`를 사용하여 배포할 때 추가 설정 없이 자체 호스팅에서 작동합니다. 이미지를 최적화하는 별도의 서비스를 선호한다면 [이미지 로더를 구성](/docs/app/building-your-application/optimizing/images#loaders)할 수 있습니다.
 
-Image Optimization can be used with a [static export](/docs/app/building-your-application/deploying/static-exports#image-optimization) by defining a custom image loader in `next.config.js`. Note that images are optimized at runtime, not during the build.
+이미지 최적화는 `next.config.js`에서 사용자 정의 이미지 로더를 정의하여 [정적 내보내기](/docs/app/building-your-application/deploying/static-exports#image-optimization)와 함께 사용할 수 있습니다. 이미지는 빌드 중이 아닌 런타임에 최적화됩니다.
 
-> **Good to know:**
+> **알아두면 좋은 점:**
 >
-> - On glibc-based Linux systems, Image Optimization may require [additional configuration](https://sharp.pixelplumbing.com/install#linux-memory-allocator) to prevent excessive memory usage.
-> - Learn more about the [caching behavior of optimized images](/docs/app/api-reference/components/image#caching-behavior) and how to configure the TTL.
-> - You can also [disable Image Optimization](/docs/app/api-reference/components/image#unoptimized) and still retain other benefits of using `next/image` if you prefer. For example, if you are optimizing images yourself separately.
+> - glibc 기반 Linux 시스템에서 이미지 최적화는 과도한 메모리 사용을 방지하기 위해 [추가 구성](https://sharp.pixelplumbing.com/install#linux-memory-allocator)이 필요할 수 있습니다.
+> - [최적화된 이미지의 캐싱 동작](/docs/app/api-reference/components/image#caching-behavior)과 TTL을 구성하는 방법에 대해 자세히 알아보세요.
+> - 원한다면 [이미지 최적화를 비활성화](/docs/app/api-reference/components/image#unoptimized)하고도 `next/image` 사용의 다른 이점을 유지할 수 있습니다. 예를 들어, 이미지를 별도로 직접 최적화하는 경우에 유용합니다.
 
-### Middleware
+### 미들웨어
 
-[Middleware](/docs/app/building-your-application/routing/middleware) works self-hosted with zero configuration when deploying using `next start`. Since it requires access to the incoming request, it is not supported when using a [static export](/docs/app/building-your-application/deploying/static-exports).
+[미들웨어](/docs/app/building-your-application/routing/middleware)는 `next start`를 사용하여 배포할 때 추가 설정 없이 자체 호스팅에서 작동합니다. 들어오는 요청에 접근해야 하므로 [정적 내보내기](/docs/app/building-your-application/deploying/static-exports)를 사용할 때는 지원되지 않습니다.
 
-Middleware uses a [runtime](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes) that is a subset of all available Node.js APIs to help ensure low latency, since it may run in front of every route or asset in your application. This runtime does not require running “at the edge” and works in a single-region server. Additional configuration and infrastructure are required to run Middleware in multiple regions.
+미들웨어는 애플리케이션의 모든 라우트나 자산 앞에서 실행될 수 있으므로 낮은 지연 시간을 보장하기 위해 사용 가능한 모든 Node.js API의 하위 집합인 [런타임](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes)을 사용합니다. 이 런타임은 "엣지에서" 실행될 필요가 없으며 단일 지역 서버에서 작동합니다. 미들웨어를 여러 지역에서 실행하려면 추가 구성과 인프라가 필요합니다.
 
-If you are looking to add logic (or use an external package) that requires all Node.js APIs, you might be able to move this logic to a [layout](/docs/app/building-your-application/routing/layouts-and-templates#layouts) as a [Server Component](/docs/app/building-your-application/rendering/server-components). For example, checking [headers](/docs/app/api-reference/functions/headers) and [redirecting](/docs/app/api-reference/functions/redirect). You can also use headers, cookies, or query parameters to [redirect](/docs/app/api-reference/next-config-js/redirects#header-cookie-and-query-matching) or [rewrite](/docs/app/api-reference/next-config-js/rewrites#header-cookie-and-query-matching) through `next.config.js`. If that does not work, you can also use a [custom server](/docs/pages/building-your-application/configuring/custom-server).
+모든 Node.js API가 필요한 로직을 추가하거나 외부 패키지를 사용하려는 경우, 이 로직을 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components)로서 [레이아웃](/docs/app/building-your-application/routing/layouts-and-templates#layouts)으로 옮길 수 있습니다. 예를 들어, [헤더](/docs/app/api-reference/functions/headers) 확인 및 [리다이렉트](/docs/app/api-reference/functions/redirect)가 있습니다. 또한 `next.config.js`를 통해 헤더, 쿠키 또는 쿼리 매개변수를 사용하여 [리다이렉트](/docs/app/api-reference/next-config-js/redirects#header-cookie-and-query-matching) 또는 [리라이트](/docs/app/api-reference/next-config-js/rewrites#header-cookie-and-query-matching)할 수 있습니다. 그래도 작동하지 않는다면 [사용자 정의 서버](/docs/pages/building-your-application/configuring/custom-server)를 사용할 수도 있습니다.
 
-### Environment Variables
+### 환경 변수
 
-Next.js can support both build time and runtime environment variables.
+Next.js는 빌드 시간과 런타임 환경 변수를 모두 지원할 수 있습니다.
 
-**By default, environment variables are only available on the server**. To expose an environment variable to the browser, it must be prefixed with `NEXT_PUBLIC_`. However, these public environment variables will be inlined into the JavaScript bundle during `next build`.
+**기본적으로 환경 변수는 서버에서만 사용할 수 있습니다**. 환경 변수를 브라우저에 노출하려면 `NEXT_PUBLIC_` 접두사를 붙여야 합니다. 그러나 이러한 공개 환경 변수는 `next build` 중에 JavaScript 번들에 인라인으로 포함됩니다.
 
-To read runtime environment variables, we recommend using `getServerSideProps` or [incrementally adopting the App Router](/docs/app/building-your-application/upgrading/app-router-migration). With the App Router, we can safely read environment variables on the server during dynamic rendering. This allows you to use a singular Docker image that can be promoted through multiple environments with different values.
+런타임 환경 변수를 읽기 위해서는 `getServerSideProps`를 사용하거나 [App Router를 점진적으로 채택](/docs/app/building-your-application/upgrading/app-router-migration)하는 것을 권장합니다. App Router를 사용하면 동적 렌더링 중에 서버에서 안전하게 환경 변수를 읽을 수 있습니다. 이를 통해 다양한 환경에서 서로 다른 값을 가진 단일 Docker 이미지를 사용할 수 있습니다.
 
 ```jsx
 import { unstable_noStore as noStore } from 'next/cache';
 
 export default function Component() {
   noStore();
-  // cookies(), headers(), and other dynamic functions
-  // will also opt into dynamic rendering, making
-  // this env variable is evaluated at runtime
+  // cookies(), headers() 및 기타 동적 함수도
+  // 동적 렌더링을 선택하여
+  // 이 환경 변수가 런타임에 평가되도록 합니다
   const value = process.env.MY_VALUE
   ...
 }
 ```
 
-> **Good to know:**
+> **알아두면 좋은 점:**
 >
-> - You can run code on server startup using the [`register` function](/docs/app/building-your-application/optimizing/instrumentation).
-> - We do not recommend using the [runtimeConfig](/docs/pages/api-reference/next-config-js/runtime-configuration) option, as this does not work with the standalone output mode. Instead, we recommend [incrementally adopting](/docs/app/building-your-application/upgrading/app-router-migration) the App Router.
+> - [`register` 함수](/docs/app/building-your-application/optimizing/instrumentation)를 사용하여 서버 시작 시 코드를 실행할 수 있습니다.
+> - [runtimeConfig](/docs/pages/api-reference/next-config-js/runtime-configuration) 옵션은 권장하지 않습니다. 이는 독립 실행형 출력 모드에서 작동하지 않습니다. 대신 App Router를 [점진적으로 채택](/docs/app/building-your-application/upgrading/app-router-migration)하는 것을 권장합니다.
 
-### Caching and ISR
+### 캐싱 및 ISR
 
-Next.js can cache responses, generated static pages, build outputs, and other static assets like images, fonts, and scripts.
+Next.js는 응답, 생성된 정적 페이지, 빌드 출력, 그리고 이미지, 폰트, 스크립트와 같은 기타 정적 자산을 캐시할 수 있습니다.
 
-Caching and revalidating pages (using Incremental Static Regeneration (ISR) or newer functions in the App Router) use the **same shared cache**. By default, this cache is stored to the filesystem (on disk) on your Next.js server. **This works automatically when self-hosting** using both the Pages and App Router.
+캐싱 및 페이지 재검증(증분 정적 재생성(ISR) 또는 App Router의 새로운 함수 사용)은 **동일한 공유 캐시**를 사용합니다. 기본적으로 이 캐시는 Next.js 서버의 파일 시스템(디스크)에 저장됩니다. **이는 Pages와 App Router를 모두 사용하여 자체 호스팅할 때 자동으로 작동합니다.**
 
-You can configure the Next.js cache location if you want to persist cached pages and data to durable storage, or share the cache across multiple containers or instances of your Next.js application.
+캐시된 페이지와 데이터를 지속적인 스토리지에 유지하거나 Next.js 애플리케이션의 여러 컨테이너 또는 인스턴스 간에 캐시를 공유하려는 경우 Next.js 캐시 위치를 구성할 수 있습니다.
 
-#### Automatic Caching
+#### 자동 캐싱
 
-- Next.js sets the `Cache-Control` header of `public, max-age=31536000, immutable` to truly immutable assets. It cannot be overridden. These immutable files contain a SHA-hash in the file name, so they can be safely cached indefinitely. For example, [Static Image Imports](/docs/app/building-your-application/optimizing/images#local-images). You can [configure the TTL](/docs/app/api-reference/components/image#caching-behavior) for images.
-- Incremental Static Regeneration (ISR) sets the `Cache-Control` header of `s-maxage: <revalidate in getStaticProps>, stale-while-revalidate`. This revalidation time is defined in your [`getStaticProps` function](/docs/pages/building-your-application/data-fetching/get-static-props) in seconds. If you set `revalidate: false`, it will default to a one-year cache duration.
-- Dynamically rendered pages set a `Cache-Control` header of `private, no-cache, no-store, max-age=0, must-revalidate` to prevent user-specific data from being cached. This applies to both the App Router and Pages Router. This also includes [Draft Mode](/docs/app/building-your-application/configuring/draft-mode).
+- Next.js는 완전히 불변인 자산에 대해 `Cache-Control` 헤더를 `public, max-age=31536000, immutable`로 설정합니다. 이는 재정의할 수 없습니다. 이러한 불변 파일에는 파일 이름에 SHA 해시가 포함되어 있어 안전하게 무기한 캐시될 수 있습니다. 예를 들어, [정적 이미지 가져오기](/docs/app/building-your-application/optimizing/images#local-images)가 있습니다. 이미지의 [TTL을 구성](/docs/app/api-reference/components/image#caching-behavior)할 수 있습니다.
+- 증분 정적 재생성(ISR)은 `Cache-Control` 헤더를 `s-maxage: <revalidate in getStaticProps>, stale-while-revalidate`로 설정합니다. 이 재검증 시간은 [`getStaticProps` 함수](/docs/pages/building-your-application/data-fetching/get-static-props)에서 초 단위로 정의됩니다. `revalidate: false`를 설정하면 기본적으로 1년의 캐시 기간이 적용됩니다.
+- 동적으로 렌더링되는 페이지는 사용자별 데이터가 캐시되는 것을 방지하기 위해 `Cache-Control` 헤더를 `private, no-cache, no-store, max-age=0, must-revalidate`로 설정합니다. 이는 App Router와 Pages Router 모두에 적용됩니다. 여기에는 [초안 모드](/docs/app/building-your-application/configuring/draft-mode)도 포함됩니다.
 
-#### Static Assets
+#### 정적 자산
 
-If you want to host static assets on a different domain or CDN, you can use the `assetPrefix` [configuration](/docs/app/api-reference/next-config-js/assetPrefix) in `next.config.js`. Next.js will use this asset prefix when retrieving JavaScript or CSS files. Separating your assets to a different domain does come with the downside of extra time spent on DNS and TLS resolution.
+정적 자산을 다른 도메인이나 CDN에서 호스팅하려면 `next.config.js`에서 `assetPrefix` [구성](/docs/app/api-reference/next-config-js/assetPrefix)을 사용할 수 있습니다. Next.js는 JavaScript 또는 CSS 파일을 검색할 때 이 자산 접두사를 사용합니다. 자산을 다른 도메인으로 분리하면 DNS 및 TLS 해결에 추가 시간이 소요되는 단점이 있습니다.
 
-[Learn more about `assetPrefix`](/docs/app/api-reference/next-config-js/assetPrefix).
+[`assetPrefix`에 대해 자세히 알아보기](/docs/app/api-reference/next-config-js/assetPrefix).
 
-#### Configuring Caching
+#### 캐싱 구성
 
-By default, generated cache assets will be stored in memory (defaults to 50mb) and on disk. If you are hosting Next.js using a container orchestration platform like Kubernetes, each pod will have a copy of the cache. To prevent stale data from being shown since the cache is not shared between pods by default, you can configure the Next.js cache to provide a cache handler and disable in-memory caching.
+기본적으로 생성된 캐시 자산은 메모리(기본 50mb)와 디스크에 저장됩니다. Kubernetes와 같은 컨테이너 오케스트레이션 플랫폼을 사용하여 Next.js를 호스팅하는 경우, 각 파드는 캐시의 복사본을 가지게 됩니다. 기본적으로 파드 간에 캐시가 공유되지 않으므로 오래된 데이터가 표시되는 것을 방지하기 위해 Next.js 캐시를 구성하여 캐시 핸들러를 제공하고 메모리 내 캐싱을 비활성화할 수 있습니다.
 
-To configure the ISR/Data Cache location when self-hosting, you can configure a custom handler in your `next.config.js` file:
+자체 호스팅 시 ISR/데이터 캐시 위치를 구성하려면 `next.config.js` 파일에서 사용자 정의 핸들러를 구성할 수 있습니다:
 
 ```jsx filename="next.config.js"
 module.exports = {
   cacheHandler: require.resolve("./cache-handler.js"),
-  cacheMaxMemorySize: 0, // disable default in-memory caching
+  cacheMaxMemorySize: 0, // 기본 메모리 내 캐싱 비활성화
 };
 ```
 
-Then, create `cache-handler.js` in the root of your project, for example:
+그런 다음 프로젝트의 루트에 `cache-handler.js`를 생성합니다. 예를 들어:
 
 ```jsx filename="cache-handler.js"
 const cache = new Map();
@@ -164,12 +164,12 @@ module.exports = class CacheHandler {
   }
 
   async get(key) {
-    // This could be stored anywhere, like durable storage
+    // 이는 지속적인 스토리지와 같은 어디에나 저장될 수 있습니다
     return cache.get(key);
   }
 
   async set(key, data, ctx) {
-    // This could be stored anywhere, like durable storage
+    // 이는 지속적인 스토리지와 같은 어디에나 저장될 수 있습니다
     cache.set(key, {
       value: data,
       lastModified: Date.now(),
@@ -178,9 +178,9 @@ module.exports = class CacheHandler {
   }
 
   async revalidateTag(tag) {
-    // Iterate over all entries in the cache
+    // 캐시의 모든 엔트리를 반복합니다
     for (let [key, value] of cache) {
-      // If the value's tags include the specified tag, delete this entry
+      // 값의 태그가 지정된 태그를 포함하면 이 엔트리를 삭제합니다
       if (value.tags.includes(tag)) {
         cache.delete(key);
       }
@@ -189,42 +189,42 @@ module.exports = class CacheHandler {
 };
 ```
 
-Using a custom cache handler will allow you to ensure consistency across all pods hosting your Next.js application. For instance, you can save the cached values anywhere, like [Redis](https://github.com/vercel/next.js/tree/canary/examples/cache-handler-redis) or AWS S3.
+사용자 정의 캐시 핸들러를 사용하면 Next.js 애플리케이션을 호스팅하는 모든 파드 간의 일관성을 보장할 수 있습니다. 예를 들어, [Redis](https://github.com/vercel/next.js/tree/canary/examples/cache-handler-redis)나 AWS S3와 같은 어디에나 캐시된 값을 저장할 수 있습니다.
 
-> **Good to know:**
+> **알아두면 좋은 점:**
 >
-> - `revalidatePath` is a convenience layer on top of cache tags. Calling `revalidatePath` will call the `revalidateTag` function with a special default tag for the provided page.
+> - `revalidatePath`는 캐시 태그 위에 있는 편의 레이어입니다. `revalidatePath`를 호출하면 제공된 페이지에 대한 특별한 기본 태그로 `revalidateTag` 함수를 호출합니다.
 
-### Build Cache
+### 빌드 캐시
 
-Next.js generates an ID during `next build` to identify which version of your application is being served. The same build should be used and boot up multiple containers.
+Next.js는 `next build` 중에 제공되는 애플리케이션 버전을 식별하기 위한 ID를 생성합니다. 동일한 빌드를 사용하여 여러 컨테이너를 부팅해야 합니다.
 
-If you are rebuilding for each stage of your environment, you will need to generate a consistent build ID to use between containers. Use the `generateBuildId` command in `next.config.js`:
+환경의 각 단계에 대해 다시 빌드하는 경우, 컨테이너 간에 사용할 일관된 빌드 ID를 생성해야 합니다. `next.config.js`에서 `generateBuildId` 명령을 사용하세요:
 
 ```jsx filename="next.config.js"
 module.exports = {
   generateBuildId: async () => {
-    // This could be anything, using the latest git hash
+    // 이는 최신 git 해시를 사용하는 등 무엇이든 될 수 있습니다
     return process.env.GIT_HASH;
   },
 };
 ```
 
-### Version Skew
+### 버전 불일치
 
-Next.js will automatically mitigate most instances of [version skew](https://www.industrialempathy.com/posts/version-skew/) and automatically reload the application to retrieve new assets when detected. For example, if there is a mismatch in the `deploymentId`, transitions between pages will perform a hard navigation versus using a prefetched value.
+Next.js는 대부분의 [버전 불일치](https://www.industrialempathy.com/posts/version-skew/) 인스턴스를 자동으로 완화하고 감지되면 애플리케이션을 자동으로 다시 로드하여 새 자산을 검색합니다. 예를 들어, `deploymentId`가 일치하지 않는 경우, 페이지 간 전환은 프리페치된 값을 사용하는 대신 하드 네비게이션을 수행합니다.
 
-When the application is reloaded, there may be a loss of application state if it's not designed to persist between page navigations. For example, using URL state or local storage would persist state after a page refresh. However, component state like `useState` would be lost in such navigations.
+애플리케이션이 다시 로드될 때, 페이지 네비게이션 간에 지속되도록 설계되지 않은 경우 애플리케이션 상태가 손실될 수 있습니다. 예를 들어, URL 상태나 로컬 스토리지를 사용하면 페이지 새로 고침 후에도 상태가 유지됩니다. 그러나 `useState`와 같은 컴포넌트 상태는 이러한 네비게이션에서 손실됩니다.
 
-Vercel provides additional [skew protection](https://vercel.com/docs/deployments/skew-protection?utm_source=next-site&utm_medium=docs&utm_campaign=next-website) for Next.js applications to ensure assets and functions from the previous version are still available to older clients, even after the new version is deployed.
+Vercel은 Next.js 애플리케이션을 위한 추가 [버전 불일치 보호](https://vercel.com/docs/deployments/skew-protection?utm_source=next-site&utm_medium=docs&utm_campaign=next-website)를 제공하여 새 버전이 배포된 후에도 이전 버전의 자산과 함수를 이전 클라이언트에서 계속 사용할 수 있도록 합니다.
 
-You can manually configure the `deploymentId` property in your `next.config.js` file to ensure each request uses either `?dpl` query string or `x-deployment-id` header.
+`next.config.js` 파일에서 `deploymentId` 속성을 수동으로 구성하여 각 요청이 `?dpl` 쿼리 문자열이나 `x-deployment-id` 헤더를 사용하도록 할 수 있습니다.
 
-### Streaming and Suspense
+### 스트리밍 및 Suspense
 
-The Next.js App Router supports [streaming responses](/docs/app/building-your-application/routing/loading-ui-and-streaming) when self-hosting. If you are using Nginx or a similar proxy, you will need to configure it to disable buffering to enable streaming.
+Next.js App Router는 자체 호스팅 시 [스트리밍 응답](/docs/app/building-your-application/routing/loading-ui-and-streaming)을 지원합니다. Nginx나 유사한 프록시를 사용하는 경우 스트리밍을 활성화하기 위해 버퍼링을 비활성화하도록 구성해야 합니다.
 
-For example, you can disable buffering in Nginx by setting `X-Accel-Buffering` to `no`:
+예를 들어, Nginx에서 `X-Accel-Buffering`을 `no`로 설정하여 버퍼링을 비활성화할 수 있습니다:
 
 ```js filename="next.config.js"
 module.exports = {
@@ -244,12 +244,12 @@ module.exports = {
 };
 ```
 
-### Partial Prerendering
+### 부분 프리렌더링
 
-[Partial Prendering (experimental)](/docs/app/building-your-application/rendering/partial-prerendering) works by default with Next.js and is not a CDN feature. This includes deployment as a Node.js server (through `next start`) and when used with a Docker container.
+[부분 프리렌더링 (실험적)](/docs/app/building-your-application/rendering/partial-prerendering)은 Next.js와 함께 기본적으로 작동하며 CDN 기능이 아닙니다. 여기에는 Node.js 서버로의 배포(`next start`를 통해) 및 Docker 컨테이너와 함께 사용될 때가 포함됩니다.
 
-### Usage with CDNs
+### CDN과 함께 사용
 
-When using a CDN in front on your Next.js application, the page will include `Cache-Control: private` response header when dynamic APIs are accessed. This ensures that the resulting HTML page is marked as non-cachable. If the page is fully prerendered to static, it will include `Cache-Control: public` to allow the page to be cached on the CDN.
+Next.js 애플리케이션 앞에 CDN을 사용할 때, 동적 API에 접근하면 페이지에 `Cache-Control: private` 응답 헤더가 포함됩니다. 이는 결과 HTML 페이지가 캐시할 수 없음을 표시하기 위한 것입니다. 페이지가 완전히 정적으로 프리렌더링된 경우, 페이지가 CDN에서 캐시될 수 있도록 `Cache-Control: public`을 포함합니다.
 
-If you don't need a mix of both static and dynamic components, you can make your entire route static and cache the output HTML on a CDN. This Automatic Static Optimization is the default behavior when running `next build` if dynamic APIs are not used.
+정적 및 동적 컴포넌트의 혼합이 필요하지 않은 경우, 전체 라우트를 정적으로 만들고 출력 HTML을 CDN에 캐시할 수 있습니다. 이 자동 정적 최적화는 동적 API가 사용되지 않을 때 `next build`를 실행할 때의 기본 동작입니다.

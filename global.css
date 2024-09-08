@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 본문 리스트 스타일 */
+main ul li:before {
+  content: "-";
+  color: #888;
+  position: absolute;
+  margin-left: -23px;
+  margin-top: -1px;
+}
+
+/* 브레드크럼 */
+.nextra-breadcrumb {
+  @apply -mt-4 mb-7 md:mb-10 md:mt-2;
+}
+
+/* 네비게이션 바 */
+.nextra-nav-container {
+  @apply mb-12;
+}
+
+/* 너비 조정 */
+.nx-max-w-\[90rem\] {
+  max-width: unset; /* 기존 max-width를 무효화 */
+  @apply max-w-screen-xl; /* Tailwind의 max-w-screen-xl 클래스를 적용 */
+}
+
+/* 사이드바*/
+aside.nextra-sidebar-container {
+}
+
+/* 오른쪽 TOC */
+nav.nextra-toc {
+}
+
+/* 본문 조정 */
+article.nextra-content {
+}
+
+/* 본문 내부 조정 */
+main {
+}

@@ -8,8 +8,8 @@
   "lazy-loading": "지연 로딩",
   "analytics": "분석",
   "instrumentation": "계측",
-  "open-telemetry": "오픈텔레메트리",
-  "static-assets": "정적 자산",
+  "open-telemetry": "OpenTelemetry",
+  "static-assets": "정적 리소스",
   "third-party-libraries": "타사 라이브러리",
   "memory-usage": "메모리 사용량"
 }

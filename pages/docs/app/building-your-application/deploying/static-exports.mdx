@@ -1,116 +1,110 @@
 ---
-title: Static Exports
-description: Next.js enables starting as a static site or Single-Page Application (SPA), then later optionally upgrading to use features that require a server.
+title: 정적 내보내기
+description: Next.js는 정적 사이트나 단일 페이지 애플리케이션(SPA)으로 시작한 다음, 나중에 선택적으로 서버가 필요한 기능을 사용하도록 업그레이드할 수 있게 해줍니다.
 ---
 
-{/* The content of this doc is shared between the app and pages router. You can use the `<PagesOnly>Content</PagesOnly>` component to add content that is specific to the Pages Router. Any shared content should not be wrapped in a component. */}
+# 정적 내보내기
 
-Next.js enables starting as a static site or Single-Page Application (SPA), then later optionally upgrading to use features that require a server.
+{/* 이 문서의 내용은 app과 pages 라우터 간에 공유됩니다. `<PagesOnly>Content</PagesOnly>` 컴포넌트를 사용하여 Pages 라우터에만 해당하는 내용을 추가할 수 있습니다. 공유된 내용은 컴포넌트로 감싸지 않아야 합니다. */}
 
-When running `next build`, Next.js generates an HTML file per route. By breaking a strict SPA into individual HTML files, Next.js can avoid loading unnecessary JavaScript code on the client-side, reducing the bundle size and enabling faster page loads.
+Next.js는 정적 사이트나 단일 페이지 애플리케이션(SPA)으로 시작한 다음, 나중에 선택적으로 서버가 필요한 기능을 사용하도록 업그레이드할 수 있게 해줍니다.
 
-Since Next.js supports this static export, it can be deployed and hosted on any web server that can serve HTML/CSS/JS static assets.
+`next build`를 실행할 때, Next.js는 각 라우트마다 HTML 파일을 생성합니다. 엄격한 SPA를 개별 HTML 파일로 분리함으로써, Next.js는 클라이언트 측에서 불필요한 JavaScript 코드 로딩을 피할 수 있어 번들 크기를 줄이고 더 빠른 페이지 로딩을 가능하게 합니다.
 
-## Configuration
+Next.js가 이러한 정적 내보내기를 지원하므로, HTML/CSS/JS 정적 자산을 제공할 수 있는 모든 웹 서버에 배포하고 호스팅할 수 있습니다.
 
-To enable a static export, change the output mode inside `next.config.js`:
+## 구성
+
+정적 내보내기를 활성화하려면 `next.config.js` 내의 출력 모드를 변경하세요:
 
 ```js filename="next.config.js" highlight={5}
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  output: 'export',
+  output: "export",
 
-  // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
+  // 선택사항: 링크를 `/me` -> `/me/`로 변경하고 `/me.html` -> `/me/index.html`로 내보냅니다
   // trailingSlash: true,
 
-  // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
+  // 선택사항: 자동 `/me` -> `/me/` 변환을 방지하고 대신 `href`를 보존합니다
   // skipTrailingSlashRedirect: true,
 
-  // Optional: Change the output directory `out` -> `dist`
+  // 선택사항: 출력 디렉토리를 `out` -> `dist`로 변경합니다
   // distDir: 'dist',
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-After running `next build`, Next.js will produce an `out` folder which contains the HTML/CSS/JS assets for your application.
+`next build`를 실행한 후, Next.js는 애플리케이션의 HTML/CSS/JS 자산을 포함하는 `out` 폴더를 생성합니다.
 
-<PagesOnly>
+## 지원되는 기능
 
-You can utilize [`getStaticProps`](/docs/pages/building-your-application/data-fetching/get-static-props) and [`getStaticPaths`](/docs/pages/building-your-application/data-fetching/get-static-paths) to generate an HTML file for each page in your `pages` directory (or more for [dynamic routes](/docs/app/building-your-application/routing/dynamic-routes)).
+Next.js의 핵심은 정적 내보내기를 지원하도록 설계되었습니다.
 
-</PagesOnly>
+### 서버 컴포넌트
 
-<AppOnly>
+정적 내보내기를 생성하기 위해 `next build`를 실행할 때, `app` 디렉토리 내에서 사용되는 서버 컴포넌트는 빌드 중에 실행됩니다. 이는 전통적인 정적 사이트 생성과 유사합니다.
 
-## Supported Features
-
-The core of Next.js has been designed to support static exports.
-
-### Server Components
-
-When you run `next build` to generate a static export, Server Components consumed inside the `app` directory will run during the build, similar to traditional static-site generation.
-
-The resulting component will be rendered into static HTML for the initial page load and a static payload for client navigation between routes. No changes are required for your Server Components when using the static export, unless they consume [dynamic server functions](#unsupported-features).
+결과 컴포넌트는 초기 페이지 로드를 위한 정적 HTML로 렌더링되고, 라우트 간 클라이언트 네비게이션을 위한 정적 페이로드로 렌더링됩니다. [동적 서버 함수](#지원되지-않는-기능)를 사용하지 않는 한, 정적 내보내기를 사용할 때 서버 컴포넌트에 대한 변경은 필요하지 않습니다.
 
 ```tsx filename="app/page.tsx" switcher
 export default async function Page() {
-  // This fetch will run on the server during `next build`
-  const res = await fetch('https://api.example.com/...')
-  const data = await res.json()
+  // 이 fetch는 `next build` 중에 서버에서 실행됩니다
+  const res = await fetch("https://api.example.com/...");
+  const data = await res.json();
 
-  return <main>...</main>
+  return <main>...</main>;
 }
 ```
 
-### Client Components
+### 클라이언트 컴포넌트
 
-If you want to perform data fetching on the client, you can use a Client Component with [SWR](https://github.com/vercel/swr) to memoize requests.
+클라이언트에서 데이터 페칭을 수행하려면 [SWR](https://github.com/vercel/swr)을 사용하는 클라이언트 컴포넌트를 사용하여 요청을 메모이제이션할 수 있습니다.
 
 ```tsx filename="app/other/page.tsx" switcher
-'use client'
+"use client";
 
-import useSWR from 'swr'
+import useSWR from "swr";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function Page() {
   const { data, error } = useSWR(
     `https://jsonplaceholder.typicode.com/posts/1`,
     fetcher
-  )
-  if (error) return 'Failed to load'
-  if (!data) return 'Loading...'
+  );
+  if (error) return "Failed to load";
+  if (!data) return "Loading...";
 
-  return data.title
+  return data.title;
 }
 ```
 
 ```jsx filename="app/other/page.js" switcher
-'use client'
+"use client";
 
-import useSWR from 'swr'
+import useSWR from "swr";
 
-const fetcher = (url) => fetch(url).then((r) => r.json())
+const fetcher = (url) => fetch(url).then((r) => r.json());
 
 export default function Page() {
   const { data, error } = useSWR(
     `https://jsonplaceholder.typicode.com/posts/1`,
     fetcher
-  )
-  if (error) return 'Failed to load'
-  if (!data) return 'Loading...'
+  );
+  if (error) return "Failed to load";
+  if (!data) return "Loading...";
 
-  return data.title
+  return data.title;
 }
 ```
 
-Since route transitions happen client-side, this behaves like a traditional SPA. For example, the following index route allows you to navigate to different posts on the client:
+라우트 전환이 클라이언트 측에서 일어나기 때문에, 이는 전통적인 SPA처럼 동작합니다. 예를 들어, 다음 인덱스 라우트는 클라이언트에서 다른 포스트로 네비게이션할 수 있게 해줍니다:
 
 ```tsx filename="app/page.tsx" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -126,12 +120,12 @@ export default function Page() {
         </li>
       </ul>
     </>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -141,47 +135,28 @@ export default function Page() {
         <Link href="/other">Other Page</Link>
       </p>
     </>
-  )
+  );
 }
 ```
 
-</AppOnly>
+### 이미지 최적화
 
-<PagesOnly>
-
-## Supported Features
-
-The majority of core Next.js features needed to build a static site are supported, including:
-
-- [Dynamic Routes when using `getStaticPaths`](/docs/app/building-your-application/routing/dynamic-routes)
-- Prefetching with `next/link`
-- Preloading JavaScript
-- [Dynamic Imports](/docs/pages/building-your-application/optimizing/lazy-loading)
-- Any styling options (e.g. CSS Modules, styled-jsx)
-- [Client-side data fetching](/docs/pages/building-your-application/data-fetching/client-side)
-- [`getStaticProps`](/docs/pages/building-your-application/data-fetching/get-static-props)
-- [`getStaticPaths`](/docs/pages/building-your-application/data-fetching/get-static-paths)
-
-</PagesOnly>
-
-### Image Optimization
-
-[Image Optimization](/docs/app/building-your-application/optimizing/images) through `next/image` can be used with a static export by defining a custom image loader in `next.config.js`. For example, you can optimize images with a service like Cloudinary:
+`next/image`를 통한 [이미지 최적화](/docs/app/building-your-application/optimizing/images)는 `next.config.js`에서 사용자 정의 이미지 로더를 정의하여 정적 내보내기와 함께 사용할 수 있습니다. 예를 들어, Cloudinary와 같은 서비스로 이미지를 최적화할 수 있습니다:
 
 ```js filename="next.config.js"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: "export",
   images: {
-    loader: 'custom',
-    loaderFile: './my-loader.ts',
+    loader: "custom",
+    loaderFile: "./my-loader.ts",
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-This custom loader will define how to fetch images from a remote source. For example, the following loader will construct the URL for Cloudinary:
+이 사용자 정의 로더는 원격 소스에서 이미지를 가져오는 방법을 정의합니다. 예를 들어, 다음 로더는 Cloudinary의 URL을 구성합니다:
 
 ```ts filename="my-loader.ts" switcher
 export default function cloudinaryLoader({
@@ -189,69 +164,67 @@ export default function cloudinaryLoader({
   width,
   quality,
 }: {
-  src: string
-  width: number
-  quality?: number
+  src: string;
+  width: number;
+  quality?: number;
 }) {
-  const params = ['f_auto', 'c_limit', `w_${width}`, `q_${quality || 'auto'}`]
+  const params = ["f_auto", "c_limit", `w_${width}`, `q_${quality || "auto"}`];
   return `https://res.cloudinary.com/demo/image/upload/${params.join(
-    ','
-  )}${src}`
+    ","
+  )}${src}`;
 }
 ```
 
 ```js filename="my-loader.js" switcher
 export default function cloudinaryLoader({ src, width, quality }) {
-  const params = ['f_auto', 'c_limit', `w_${width}`, `q_${quality || 'auto'}`]
+  const params = ["f_auto", "c_limit", `w_${width}`, `q_${quality || "auto"}`];
   return `https://res.cloudinary.com/demo/image/upload/${params.join(
-    ','
-  )}${src}`
+    ","
+  )}${src}`;
 }
 ```
 
-You can then use `next/image` in your application, defining relative paths to the image in Cloudinary:
+그런 다음 애플리케이션에서 `next/image`를 사용할 수 있으며, Cloudinary의 이미지에 대한 상대 경로를 정의할 수 있습니다:
 
 ```tsx filename="app/page.tsx" switcher
-import Image from 'next/image'
+import Image from "next/image";
 
 export default function Page() {
-  return <Image alt="turtles" src="/turtles.jpg" width={300} height={300} />
+  return <Image alt="turtles" src="/turtles.jpg" width={300} height={300} />;
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import Image from 'next/image'
+import Image from "next/image";
 
 export default function Page() {
-  return <Image alt="turtles" src="/turtles.jpg" width={300} height={300} />
+  return <Image alt="turtles" src="/turtles.jpg" width={300} height={300} />;
 }
 ```
 
-<AppOnly>
+### 라우트 핸들러
 
-### Route Handlers
-
-Route Handlers will render a static response when running `next build`. Only the `GET` HTTP verb is supported. This can be used to generate static HTML, JSON, TXT, or other files from cached or uncached data. For example:
+라우트 핸들러는 `next build`를 실행할 때 정적 응답을 렌더링합니다. `GET` HTTP 메서드만 지원됩니다. 이는 캐시된 데이터나 캐시되지 않은 데이터에서 정적 HTML, JSON, TXT 또는 다른 파일을 생성하는 데 사용할 수 있습니다. 예를 들어:
 
 ```ts filename="app/data.json/route.ts" switcher
 export async function GET() {
-  return Response.json({ name: 'Lee' })
+  return Response.json({ name: "Lee" });
 }
 ```
 
 ```js filename="app/data.json/route.js" switcher
 export async function GET() {
-  return Response.json({ name: 'Lee' })
+  return Response.json({ name: "Lee" });
 }
 ```
 
-The above file `app/data.json/route.ts` will render to a static file during `next build`, producing `data.json` containing `{ name: 'Lee' }`.
+위의 `app/data.json/route.ts` 파일은 `next build` 중에 정적 파일로 렌더링되어 `{ name: 'Lee' }`를 포함하는 `data.json`을 생성합니다.
 
-If you need to read dynamic values from the incoming request, you cannot use a static export.
+들어오는 요청에서 동적 값을 읽어야 하는 경우, 정적 내보내기를 사용할 수 없습니다.
 
-### Browser APIs
+### 브라우저 API
 
-Client Components are pre-rendered to HTML during `next build`. Because [Web APIs](https://developer.mozilla.org/docs/Web/API) like `window`, `localStorage`, and `navigator` are not available on the server, you need to safely access these APIs only when running in the browser. For example:
+클라이언트 컴포넌트는 `next build` 중에 HTML로 사전 렌더링됩니다. [Web API](https://developer.mozilla.org/docs/Web/API)와 같은 `window`, `localStorage`, `navigator`는 서버에서 사용할 수 없기 때문에, 브라우저에서 실행될 때만 이러한 API에 안전하게 접근해야 합니다. 예를 들어:
 
 ```jsx
 'use client';
@@ -260,7 +233,7 @@ import { useEffect } from 'react';
 
 export default function ClientComponent() {
   useEffect(() => {
-    // You now have access to `window`
+    // 이제 `window`에 접근할 수 있습니다
     console.log(window.innerHeight);
   }, [])
 
@@ -268,69 +241,46 @@ export default function ClientComponent() {
 }
 ```
 
-</AppOnly>
+## 지원되지 않는 기능
 
-## Unsupported Features
+Node.js 서버가 필요하거나 빌드 프로세스 중에 계산할 수 없는 동적 로직이 필요한 기능은 지원되지 **않습니다**:
 
-Features that require a Node.js server, or dynamic logic that cannot be computed during the build process, are **not** supported:
+- `dynamicParams: true`를 사용하는 [동적 라우트](/docs/app/building-your-application/routing/dynamic-routes)
+- `generateStaticParams()`가 없는 [동적 라우트](/docs/app/building-your-application/routing/dynamic-routes)
+- Request에 의존하는 [라우트 핸들러](/docs/app/building-your-application/routing/route-handlers)
+- [쿠키](/docs/app/api-reference/functions/cookies)
+- [리라이트](/docs/app/api-reference/next-config-js/rewrites)
+- [리다이렉트](/docs/app/api-reference/next-config-js/redirects)
+- [헤더](/docs/app/api-reference/next-config-js/headers)
+- [미들웨어](/docs/app/building-your-application/routing/middleware)
+- [증분 정적 재생성](/docs/app/building-your-application/data-fetching/caching-and-revalidating)
+- 기본 `loader`를 사용한 [이미지 최적화](/docs/app/building-your-application/optimizing/images)
+- [초안 모드](/docs/app/building-your-application/configuring/draft-mode)
+- [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)
 
-<AppOnly>
-
-- [Dynamic Routes](/docs/app/building-your-application/routing/dynamic-routes) with `dynamicParams: true`
-- [Dynamic Routes](/docs/app/building-your-application/routing/dynamic-routes) without `generateStaticParams()`
-- [Route Handlers](/docs/app/building-your-application/routing/route-handlers) that rely on Request
-- [Cookies](/docs/app/api-reference/functions/cookies)
-- [Rewrites](/docs/app/api-reference/next-config-js/rewrites)
-- [Redirects](/docs/app/api-reference/next-config-js/redirects)
-- [Headers](/docs/app/api-reference/next-config-js/headers)
-- [Middleware](/docs/app/building-your-application/routing/middleware)
-- [Incremental Static Regeneration](/docs/app/building-your-application/data-fetching/caching-and-revalidating)
-- [Image Optimization](/docs/app/building-your-application/optimizing/images) with the default `loader`
-- [Draft Mode](/docs/app/building-your-application/configuring/draft-mode)
-- [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)
-
-Attempting to use any of these features with `next dev` will result in an error, similar to setting the [`dynamic`](/docs/app/api-reference/file-conventions/route-segment-config#dynamic) option to `error` in the root layout.
+`next dev`로 이러한 기능을 사용하려고 하면 루트 레이아웃에서 [`dynamic`](/docs/app/api-reference/file-conventions/route-segment-config#dynamic) 옵션을 `error`로 설정한 것과 유사한 오류가 발생합니다.
 
 ```jsx
-export const dynamic = 'error'
+export const dynamic = "error";
 ```
 
-</AppOnly>
+## 배포
 
-<PagesOnly>
+정적 내보내기를 사용하면 Next.js를 HTML/CSS/JS 정적 자산을 제공할 수 있는 모든 웹 서버에 배포하고 호스팅할 수 있습니다.
 
-- [Internationalized Routing](/docs/pages/building-your-application/routing/internationalization)
-- [API Routes](/docs/pages/building-your-application/routing/api-routes)
-- [Rewrites](/docs/pages/api-reference/next-config-js/rewrites)
-- [Redirects](/docs/pages/api-reference/next-config-js/redirects)
-- [Headers](/docs/pages/api-reference/next-config-js/headers)
-- [Middleware](/docs/pages/building-your-application/routing/middleware)
-- [Incremental Static Regeneration](/docs/pages/building-your-application/data-fetching/incremental-static-regeneration)
-- [Image Optimization](/docs/pages/building-your-application/optimizing/images) with the default `loader`
-- [Draft Mode](/docs/pages/building-your-application/configuring/draft-mode)
-- [`getStaticPaths` with `fallback: true`](/docs/pages/api-reference/functions/get-static-paths#fallback-true)
-- [`getStaticPaths` with `fallback: 'blocking'`](/docs/pages/api-reference/functions/get-static-paths#fallback-blocking)
-- [`getServerSideProps`](/docs/pages/building-your-application/data-fetching/get-server-side-props)
-
-</PagesOnly>
-
-## Deploying
-
-With a static export, Next.js can be deployed and hosted on any web server that can serve HTML/CSS/JS static assets.
-
-When running `next build`, Next.js generates the static export into the `out` folder. For example, let's say you have the following routes:
+`next build`를 실행할 때, Next.js는 `out` 폴더에 정적 내보내기를 생성합니다. 예를 들어, 다음과 같은 라우트가 있다고 가정해 봅시다:
 
 - `/`
 - `/blog/[id]`
 
-After running `next build`, Next.js will generate the following files:
+`next build`를 실행한 후, Next.js는 다음 파일들을 생성합니다:
 
 - `/out/index.html`
 - `/out/404.html`
 - `/out/blog/post-1.html`
 - `/out/blog/post-2.html`
 
-If you are using a static host like Nginx, you can configure rewrites from incoming requests to the correct files:
+Nginx와 같은 정적 호스트를 사용하는 경우, 들어오는 요청을 올바른 파일로 리라이트하도록 구성할 수 있습니다:
 
 ```nginx filename="nginx.conf"
 server {
@@ -343,8 +293,8 @@ server {
       try_files $uri $uri.html $uri/ =404;
   }
 
-  # This is necessary when `trailingSlash: false`.
-  # You can omit this when `trailingSlash: true`.
+  # 이는 `trailingSlash: false`일 때 필요합니다.
+  # `trailingSlash: true`일 때는 이를 생략할 수 있습니다.
   location /blog/ {
       rewrite ^/blog/(.*)$ /blog/$1.html break;
   }
@@ -356,10 +306,10 @@ server {
 }
 ```
 
-## Version History
+## 버전 이력
 
-| Version   | Changes                                                                                                              |
-| --------- | -------------------------------------------------------------------------------------------------------------------- |
-| `v14.0.0` | `next export` has been removed in favor of `"output": "export"`                                                      |
-| `v13.4.0` | App Router (Stable) adds enhanced static export support, including using React Server Components and Route Handlers. |
-| `v13.3.0` | `next export` is deprecated and replaced with `"output": "export"`                                                   |
+| 버전      | 변경사항                                                                                               |
+| --------- | ------------------------------------------------------------------------------------------------------ |
+| `v14.0.0` | `next export`가 제거되고 `"output": "export"`로 대체됨                                                 |
+| `v13.4.0` | App Router (안정화)가 React 서버 컴포넌트 및 라우트 핸들러를 포함한 향상된 정적 내보내기 지원을 추가함 |
+| `v13.3.0` | `next export`가 더 이상 사용되지 않고 `"output": "export"`로 대체됨                                    |

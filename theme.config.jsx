@@ -1,11 +1,15 @@
 import { useConfig } from "nextra-theme-docs";
 import { useRouter } from "next/router";
 
+import { ArrowUpRight } from "@geist-ui/icons";
+import cn from "classnames";
+
 const logo = (
-  <>
+  <div className="flex items-center gap-2">
+    {/* Vercel 로고 */}
     <svg
       aria-label="Vercel logomark"
-      height="30"
+      height="22"
       role="img"
       viewBox="0 0 74 64"
     >
@@ -14,20 +18,23 @@ const logo = (
         fill="black"
       ></path>
     </svg>
-    <svg height="30" role="separator" viewBox="0 0 32 32" width="32">
+
+    {/* 구분 기호 */}
+    <svg height="32" role="separator" viewBox="0 0 32 32" width="32">
       <path
         d="M22 5L9 28"
-        stroke="black"
+        stroke="#eaeaea"
         strokeLinecap="round"
         strokeLinejoin="round"
       ></path>
     </svg>
+
+    {/* Next.js 로고 */}
     <svg
       aria-label="Next.js logotype"
-      height="30"
+      height="18"
       role="img"
       viewBox="0 0 394 79"
-      width="150"
     >
       <path
         d="M261.919 0.0330722H330.547V12.7H303.323V79.339H289.71V12.7H261.919V0.0330722Z"
@@ -64,7 +71,7 @@ const logo = (
         fill="black"
       ></path>
     </svg>
-  </>
+  </div>
 );
 
 const config = {
@@ -133,6 +140,115 @@ const config = {
       </>
     );
   },
+  sidebar: {
+    defaultMenuCollapseLevel: 3,
+    titleComponent({ title, type }) {
+      if (title === "Using App Router" || title === "Using Pages Router") {
+        return null;
+      }
+      return <>{title}</>;
+    },
+  },
+  components: {
+    h1: ({ className, ...props }) => {
+      const computedClassName = cn(
+        "text-[2.25em] font-semibold my-4 mb-[0.888em] leading-[1.111] text-[hsl(0,0%,9%)] dark:text-[hsl(0,0%,100%)]",
+        className
+      );
+      return (
+        <h1 className={computedClassName} {...props}>
+          {props.children}
+        </h1>
+      );
+    },
+
+    h2: ({ className, ...props }) => {
+      const computedClassName = cn(
+        // 테두리 스타일 및 패딩
+        "border-t border-solid border-t-1 border-gray-200 dark:border-gray-700",
+        // 텍스트 스타일
+        "font-semibold text-[1.5em] my-8 leading-[1.3333] text-gray-800 dark:text-gray-100",
+        // 기타 스타일
+        "pt-10 scroll-mt-[11px]",
+        className
+      );
+
+      return (
+        <h2 className={computedClassName} {...props}>
+          {props.children}
+        </h2>
+      );
+    },
+
+    h3: ({ className, ...props }) => {
+      const computedClassName = cn(
+        // 텍스트 스타일
+        "font-semibold text-[1.25em] mt-[1.6em] mb-[0.6em] leading-[1.6] text-gray-800 dark:text-gray-100",
+
+        className
+      );
+
+      return (
+        <h3 className={computedClassName} {...props}>
+          {props.children}
+        </h3>
+      );
+    },
+
+    a: ({ href = "", className, ...props }) => {
+      const isExternal = href.startsWith("http"); // 외부 링크 여부 확인
+      const computedClassName = cn(
+        "nx-text-primary-600 nx-no-underline nx-decoration-from-font [text-underline-position:from-font]",
+        className
+      );
+
+      return (
+        <a
+          href={href}
+          className={computedClassName}
+          target={isExternal ? "_blank" : "_self"}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          {...props}
+          style={{ display: "inline-flex", alignItems: "center" }}
+        >
+          {props.children}
+          {isExternal && <ArrowUpRight size={15} />}
+        </a>
+      );
+    },
+
+    p: ({ className, ...props }) => {
+      const computedClassName = cn("mt-4 mb-4", className);
+
+      return (
+        <p className={computedClassName} {...props}>
+          {props.children}
+        </p>
+      );
+    },
+
+    blockquote: ({ className, ...props }) => {
+      const computedClassName = cn(
+        "p-3 my-8 text-sm border border-gray-200 rounded not-italic font-normal",
+        className
+      );
+
+      return <blockquote className={computedClassName} {...props} />;
+    },
+
+    ul: ({ className, ...props }) => {
+      const computedClassName = cn(
+        "nx-mt-6 first:nx-mt-0 ltr:nx-ml-6 rtl:nx-mr-6",
+        className
+      );
+
+      return (
+        <ul className={computedClassName} {...props}>
+          {props.children}
+        </ul>
+      );
+    },
+  },
   toc: {
     title: "목차",
     backToTop: true,
@@ -143,14 +259,6 @@ const config = {
   feedback: {
     content: <>질문이 있으신가요?</>,
     labels: "feedback",
-  },
-  sidebar: {
-    // titleComponent({ title, type }) {
-    //   if (title === "Using App Router" || title === "Using Pages Router") {
-    //     return <RouterSelector />;
-    //   }
-    //   return <>{title}</>;
-    // },
   },
   footer: {
     text: (

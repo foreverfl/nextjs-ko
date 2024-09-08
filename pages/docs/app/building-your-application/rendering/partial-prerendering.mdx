@@ -1,59 +1,62 @@
 ---
-title: Partial Prerendering
-description: Learn how to combine the benefits of static and dynamic rendering with Partial Prerendering.
+title: 부분 사전 렌더링
+description: 부분 사전 렌더링으로 정적 및 동적 렌더링의 장점을 결합하는 방법을 알아보세요.
 ---
 
-Partial Prerendering (PPR) enables you to combine static and dynamic components together in the same route.
+import Image from "next/image";
 
-During the build, Next.js prerenders as much of the route as possible. If [dynamic](/docs/app/building-your-application/rendering/server-components#dynamic-rendering) code is detected, like reading from the incoming request, you can wrap the relevant component with a [React Suspense](https://react.dev/reference/react/Suspense) boundary. The Suspense boundary fallback will then be included in the prerendered HTML.
+# 부분 사전 렌더링
 
-> **Note:** Partial Prerendering is an **experimental** feature and subject to change. It is not ready for production use.
+부분 사전 렌더링(PPR)을 사용하면 동일한 경로에서 정적 및 동적 컴포넌트를 함께 결합할 수 있습니다.
+
+빌드 중에 Next.js는 가능한 한 많은 경로를 사전 렌더링합니다. 들어오는 요청에서 읽기와 같은 [동적](/docs/app/building-your-application/rendering/server-components#dynamic-rendering) 코드가 감지되면 관련 컴포넌트를 [React Suspense](https://react.dev/reference/react/Suspense) 경계로 감쌀 수 있습니다. 그러면 Suspense 경계 폴백이 사전 렌더링된 HTML에 포함됩니다.
+
+> **참고:** 부분 사전 렌더링은 **실험적인** 기능이며 변경될 수 있습니다. 아직 운영 환경 사용에 적합하지 않습니다.
 
 <Image
-  alt="Partially Prerendered Product Page showing static nav and product information, and dynamic cart and recommended products"
-  srcLight="/learn/light/thinking-in-ppr.png"
-  srcDark="/learn/dark/thinking-in-ppr.png"
+  alt="정적 내비게이션과 제품 정보, 동적 장바구니 및 추천 제품을 보여주는 부분 사전 렌더링된 제품 페이지"
+  src="https://nextjs.org/_next/image?url=%2Flearn%2Flight%2Fthinking-in-ppr.png&w=1920&q=75"
   width="1600"
   height="632"
 />
 
-> **🎥 Watch:** Why PPR and how it works → [YouTube (10 minutes)](https://www.youtube.com/watch?v=MTcPrTIBkpA).
+> **🎥 시청하기:** PPR의 이유와 작동 방식 → [YouTube (10분)](https://www.youtube.com/watch?v=MTcPrTIBkpA).
 
-## Background
+## 배경
 
-PPR enables your Next.js server to immediately send prerendered content.
+PPR을 사용하면 Next.js 서버가 사전 렌더링된 콘텐츠를 즉시 전송할 수 있습니다.
 
-To prevent client to server waterfalls, dynamic components begin streaming from the server in parallel while serving the initial prerender. This ensures dynamic components can begin rendering before client JavaScript has been loaded in the browser.
+클라이언트에서 서버로의 연속적인 요청 지연을 방지하기 위해, 동적 컴포넌트는 초기 사전 렌더링을 제공하는 동안 서버에서 병렬로 스트리밍을 시작합니다. 이를 통해 클라이언트 JavaScript가 브라우저에 로드되기 전에 동적 컴포넌트가 렌더링을 시작할 수 있습니다.
 
-To prevent creating many HTTP requests for each dynamic component, PPR is able to combine the static prerender and dynamic components together into a single HTTP request. This ensures there are not multiple network roundtrips needed for each dynamic component.
+각 동적 컴포넌트에 대해 많은 HTTP 요청을 생성하는 것을 방지하기 위해, PPR은 정적 사전 렌더링과 동적 컴포넌트를 단일 HTTP 요청으로 결합할 수 있습니다. 이는 각 동적 컴포넌트에 대해 여러 네트워크 라운드트립이 필요하지 않도록 합니다.
 
-## Using Partial Prerendering
+## 부분 사전 렌더링 사용하기
 
-### Incremental Adoption (Version 15)
+### 점진적 도입 (버전 15)
 
-In Next.js 15, you can incrementally adopt Partial Prerendering in [layouts](/docs/app/building-your-application/routing/layouts-and-templates) and [pages](/docs/app/building-your-application/routing/pages) by setting the [`ppr`](/docs/app/api-reference/next-config-js/ppr) option in `next.config.js` to `incremental`, and exporting the `experimental_ppr` [route config option](/docs/app/api-reference/file-conventions/route-segment-config) at the top of the file:
+Next.js 15에서는 `next.config.js`에서 [`ppr`](/docs/app/api-reference/next-config-js/ppr) 옵션을 `incremental`로 설정하고, 파일 상단에 `experimental_ppr` [경로 구성 옵션](/docs/app/api-reference/file-conventions/route-segment-config)을 내보내어 [레이아웃](/docs/app/building-your-application/routing/layouts-and-templates)과 [페이지](/docs/app/building-your-application/routing/pages)에서 부분 사전 렌더링을 점진적으로 도입할 수 있습니다:
 
 ```ts filename="next.config.ts" switcher
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    ppr: 'incremental',
+    ppr: "incremental",
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ```js filename="next.config.js" switcher
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    ppr: 'incremental',
+    ppr: "incremental",
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
 ```tsx filename="app/page.tsx" switcher
@@ -92,26 +95,26 @@ export default function Page() {
 }
 ```
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - Routes that don't have `experimental_ppr` will default to `false` and will not be prerendered using PPR. You need to explicitly opt-in to PPR for each route.
-> - `experimental_ppr` will apply to all children of the route segment, including nested layouts and pages. You don't have to add it to every file, only the top segment of a route.
-> - To disable PPR for children segments, you can set `experimental_ppr` to `false` in the child segment.
+> - `experimental_ppr`이 없는 경로는 기본적으로 `false`로 설정되며 PPR을 사용하여 사전 렌더링되지 않습니다. 각 경로에 대해 PPR을 명시적으로 선택해야 합니다.
+> - `experimental_ppr`은 중첩된 레이아웃과 페이지를 포함하여 경로 세그먼트의 모든 자식에 적용됩니다. 모든 파일에 추가할 필요는 없고, 경로의 최상위 세그먼트에만 추가하면 됩니다.
+> - 자식 세그먼트에 대해 PPR을 비활성화하려면 자식 세그먼트에서 `experimental_ppr`을 `false`로 설정할 수 있습니다.
 
-### Enabling PPR (Version 14)
+### PPR 활성화하기 (버전 14)
 
-For version 14, you can enable it by adding the [`ppr`](/docs/app/api-reference/next-config-js/ppr) option to your `next.config.js` file. This will apply to all routes in your application:
+버전 14의 경우 `next.config.js` 파일에 [`ppr`](/docs/app/api-reference/next-config-js/ppr) 옵션을 추가하여 활성화할 수 있습니다. 이는 애플리케이션의 모든 경로에 적용됩니다:
 
 ```ts filename="next.config.ts" switcher
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ```js filename="next.config.js" switcher
@@ -120,42 +123,42 @@ const nextConfig = {
   experimental: {
     ppr: true,
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
 ```
 
-## Dynamic Components
+## 동적 컴포넌트
 
-When creating the prender for your route during `next build`, Next.js requires that dynamic functions are wrapped with React Suspense. The `fallback` is then included in the prerender.
+`next build` 중에 경로에 대한 사전 렌더링을 생성할 때, Next.js는 동적 함수가 React Suspense로 감싸져 있어야 합니다. 그러면 `fallback`이 사전 렌더링에 포함됩니다.
 
-For example, using functions like `cookies()` or `headers()`:
+예를 들어, `cookies()` 또는 `headers()`와 같은 함수를 사용할 때:
 
 ```jsx filename="app/user.js" switcher
-import { cookies } from 'next/headers'
+import { cookies } from "next/headers";
 
 export function User() {
-  const session = cookies().get('session')?.value
-  return '...'
+  const session = cookies().get("session")?.value;
+  return "...";
 }
 ```
 
 ```tsx filename="app/user.tsx" switcher
-import { cookies } from 'next/headers'
+import { cookies } from "next/headers";
 
 export function User() {
-  const session = cookies().get('session')?.value
-  return '...'
+  const session = cookies().get("session")?.value;
+  return "...";
 }
 ```
 
-This component requires looking at the incoming request to read cookies. To use this with PPR, you should wrap the component with Suspense:
+이 컴포넌트는 쿠키를 읽기 위해 들어오는 요청을 확인해야 합니다. PPR과 함께 사용하려면 컴포넌트를 Suspense로 감싸야 합니다:
 
 ```tsx filename="app/page.tsx" switcher
-import { Suspense } from 'react'
-import { User, AvatarSkeleton } from './user'
+import { Suspense } from "react";
+import { User, AvatarSkeleton } from "./user";
 
-export const experimental_ppr = true
+export const experimental_ppr = true;
 
 export default function Page() {
   return (
@@ -165,15 +168,15 @@ export default function Page() {
         <User />
       </Suspense>
     </section>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import { Suspense } from 'react'
-import { User, AvatarSkeleton } from './user'
+import { Suspense } from "react";
+import { User, AvatarSkeleton } from "./user";
 
-export const experimental_ppr = true
+export const experimental_ppr = true;
 
 export default function Page() {
   return (
@@ -183,33 +186,33 @@ export default function Page() {
         <User />
       </Suspense>
     </section>
-  )
+  );
 }
 ```
 
-Components only opt into dynamic rendering when the value is accessed.
+컴포넌트는 값이 접근될 때만 동적 렌더링으로 전환됩니다.
 
-For example, if you are reading `searchParams` from a `page`, you can forward this value to another component as a prop:
+예를 들어, `page`에서 `searchParams`를 읽고 있다면 이 값을 prop으로 다른 컴포넌트에 전달할 수 있습니다:
 
 ```tsx filename="app/page.tsx" switcher
-import { Table } from './table'
+import { Table } from "./table";
 
 export default function Page({
   searchParams,
 }: {
-  searchParams: { sort: string }
+  searchParams: { sort: string };
 }) {
   return (
     <section>
       <h1>This will be prerendered</h1>
       <Table searchParams={searchParams} />
     </section>
-  )
+  );
 }
 ```
 
 ```jsx filename="app/page.js" switcher
-import { Table } from './table'
+import { Table } from "./table";
 
 export default function Page({ searchParams }) {
   return (
@@ -217,24 +220,22 @@ export default function Page({ searchParams }) {
       <h1>This will be prerendered</h1>
       <Table searchParams={searchParams} />
     </section>
-  )
+  );
 }
 ```
 
-Inside of the table component, accessing the value from `searchParams` will make the component run dynamically:
+테이블 컴포넌트 내부에서 `searchParams`의 값에 접근하면 컴포넌트가 동적으로 실행됩니다:
 
 ```tsx filename="app/table.tsx" switcher
 export function Table({ searchParams }: { searchParams: { sort: string } }) {
-  const sort = searchParams.sort === 'true'
-  return '...'
+  const sort = searchParams.sort === "true";
+  return "...";
 }
 ```
 
 ```jsx filename="app/table.js" switcher
-export function Table({ searchParams }: {
-  searchParams: { sort: string }
-}) {
-  const sort = searchParams.sort === 'true';
-  return '...'
+export function Table({ searchParams }: { searchParams: { sort: string } }) {
+  const sort = searchParams.sort === "true";
+  return "...";
 }
 ```

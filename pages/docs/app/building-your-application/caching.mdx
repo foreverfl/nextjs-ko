@@ -1,534 +1,526 @@
 ---
-title: Caching in Next.js
-nav_title: Caching
-description: An overview of caching mechanisms in Next.js.
+title: Next.js의 캐싱
+nav_title: 캐싱
+description: Next.js의 캐싱 메커니즘에 대한 개요입니다.
 ---
 
 import Image from "next/image";
 
-# 캐싱
+# Next.js의 캐싱
 
-Next.js improves your application's performance and reduces costs by caching rendering work and data requests. This page provides an in-depth look at Next.js caching mechanisms, the APIs you can use to configure them, and how they interact with each other.
+Next.js는 렌더링 작업과 데이터 요청을 캐싱하여 애플리케이션의 성능을 향상시키고 비용을 절감합니다. 이 페이지에서는 Next.js의 캐싱 메커니즘, 이를 구성하는 데 사용할 수 있는 API, 그리고 이들이 서로 어떻게 상호작용하는지에 대해 자세히 살펴봅니다.
 
-> **Good to know**: This page helps you understand how Next.js works under the hood but is **not** essential knowledge to be productive with Next.js. Most of Next.js' caching heuristics are determined by your API usage and have defaults for the best performance with zero or minimal configuration.
+> **알아두면 좋은 점**: 이 페이지는 Next.js가 내부적으로 어떻게 작동하는지 이해하는 데 도움이 되지만, Next.js를 생산적으로 사용하는 데 **필수적인 지식은 아닙니다**. Next.js의 대부분의 캐싱 방식은 API 사용에 따라 결정되며, 최상의 성능을 위해 제로 또는 최소한의 구성으로 기본값이 설정되어 있습니다. 대신 예제로 바로 넘어가고 싶다면, [여기서 시작하세요](/docs/app/building-your-application/data-fetching/fetching).
 
-## Overview
+## 개요
 
-Here's a high-level overview of the different caching mechanisms and their purpose:
+다음은 다양한 캐싱 메커니즘과 그 목적에 대한 개요입니다:
 
-| Mechanism                                   | What                       | Where  | Purpose                                         | Duration                        |
-| ------------------------------------------- | -------------------------- | ------ | ----------------------------------------------- | ------------------------------- |
-| [Request Memoization](#request-memoization) | Return values of functions | Server | Re-use data in a React Component tree           | Per-request lifecycle           |
-| [Data Cache](#data-cache)                   | Data                       | Server | Store data across user requests and deployments | Persistent (can be revalidated) |
-| [Full Route Cache](#full-route-cache)       | HTML and RSC payload       | Server | Reduce rendering cost and improve performance   | Persistent (can be revalidated) |
-| [Router Cache](#client-side-router-cache)   | RSC Payload                | Client | Reduce server requests on navigation            | User session or time-based      |
+| 메커니즘                                  | 무엇을               | 어디서     | 목적                                  | 지속 기간                  |
+| ----------------------------------------- | -------------------- | ---------- | ------------------------------------- | -------------------------- |
+| [요청 메모이제이션](#요청-메모이제이션)   | 함수의 반환 값       | 서버       | React 컴포넌트 트리에서 데이터 재사용 | 요청 수명 주기당           |
+| [데이터 캐시](#데이터-캐시)               | 데이터               | 서버       | 사용자 요청과 배포 간 데이터 저장     | 지속적 (재검증 가능)       |
+| [전체 경로 캐시](#전체-경로-캐시)         | HTML 및 RSC 페이로드 | 서버       | 렌더링 비용 감소 및 성능 향상         | 지속적 (재검증 가능)       |
+| [라우터 캐시](#클라이언트-측-라우터-캐시) | RSC 페이로드         | 클라이언트 | 탐색 시 서버 요청 감소                | 사용자 세션 또는 시간 기반 |
 
-By default, Next.js will cache as much as possible to improve performance and reduce cost. This means routes are **statically rendered** and data requests are **cached** unless you opt out. The diagram below shows the default caching behavior: when a route is statically rendered at build time and when a static route is first visited.
+기본적으로 Next.js는 성능을 향상시키고 비용을 줄이기 위해 가능한 한 많이 캐시합니다. 이는 기본 설정에서 제외하지 않는 한 경로가 **정적으로 렌더링**되고 데이터 요청이 **캐시**된다는 것을 의미합니다. 아래 다이어그램은 기본 캐싱 동작을 보여줍니다: 경로가 빌드 시 정적으로 렌더링될 때와 정적 경로를 처음 방문할 때의 동작입니다.
 
 <Image
-  alt="Diagram showing the default caching behavior in Next.js for the four mechanisms, with HIT, MISS and SET at build time and when a route is first visited."
-  srcLight="/docs/light/caching-overview.png"
-  srcDark="/docs/dark/caching-overview.png"
+  alt="Next.js의 네 가지 메커니즘에 대한 기본 캐싱 동작을 보여주는 다이어그램으로, 빌드 시와 경로를 처음 방문할 때의 HIT, MISS, SET를 표시합니다."
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fcaching-overview.png&w=1920&q=75"
   width="1600"
   height="1179"
 />
 
-Caching behavior changes depending on whether the route is statically or dynamically rendered, data is cached or uncached, and whether a request is part of an initial visit or a subsequent navigation. Depending on your use case, you can configure the caching behavior for individual routes and data requests.
+캐싱 동작은 경로가 정적으로 렌더링되는지 동적으로 렌더링되는지, 데이터가 캐시되었는지 캐시되지 않았는지, 그리고 요청이 초기 방문의 일부인지 후속 탐색의 일부인지에 따라 달라집니다. 사용 사례에 따라 개별 경로와 데이터 요청에 대한 캐싱 동작을 구성할 수 있습니다.
 
-## Request Memoization
+## 요청 메모이제이션
 
-Next.js extends the [`fetch` API](#fetch) to automatically **memoize** requests that have the same URL and options. This means you can call a fetch function for the same data in multiple places in a React component tree while only executing it once.
+Next.js는 [`fetch` API](#fetch)를 확장하여 동일한 URL과 옵션을 가진 요청을 자동으로 **메모이제이션**합니다. 이는 React 컴포넌트 트리의 여러 위치에서 동일한 데이터에 대한 fetch 함수를 호출할 수 있지만 한 번만 실행한다는 것을 의미합니다.
 
 <Image
-  alt="Deduplicated Fetch Requests"
-  srcLight="/docs/light/deduplicated-fetch-requests.png"
-  srcDark="/docs/dark/deduplicated-fetch-requests.png"
+  alt="중복 제거된 Fetch 요청"
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fdeduplicated-fetch-requests.png&w=1920&q=75"
   width="1600"
   height="857"
 />
 
-For example, if you need to use the same data across a route (e.g. in a Layout, Page, and multiple components), you do not have to fetch data at the top of the tree, and forward props between components. Instead, you can fetch data in the components that need it without worrying about the performance implications of making multiple requests across the network for the same data.
+예를 들어, 경로 전체에서 동일한 데이터를 사용해야 하는 경우(예: 레이아웃, 페이지 및 여러 컴포넌트에서), 트리 상단에서 데이터를 가져와 컴포넌트 간에 props를 전달할 필요가 없습니다. 대신, 동일한 데이터에 대해 네트워크를 통해 여러 요청을 하는 성능 영향을 걱정하지 않고 필요한 컴포넌트에서 데이터를 가져올 수 있습니다.
 
 ```tsx filename="app/example.tsx" switcher
 async function getItem() {
-  // The `fetch` function is automatically memoized and the result
-  // is cached
+  // `fetch` 함수는 자동으로 메모이제이션되고 결과가
+  // 캐시됩니다
   const res = await fetch("https://.../item/1");
   return res.json();
 }
 
-// This function is called twice, but only executed the first time
-const item = await getItem(); // cache MISS
+// 이 함수는 두 번 호출되지만 처음에만 실행됩니다
+const item = await getItem(); // 캐시 MISS
 
-// The second call could be anywhere in your route
-const item = await getItem(); // cache HIT
+// 두 번째 호출은 경로의 어디에서나 있을 수 있습니다
+const item = await getItem(); // 캐시 HIT
 ```
 
 ```jsx filename="app/example.js" switcher
 async function getItem() {
-  // The `fetch` function is automatically memoized and the result
-  // is cached
+  // `fetch` 함수는 자동으로 메모이제이션되고 결과가
+  // 캐시됩니다
   const res = await fetch("https://.../item/1");
   return res.json();
 }
 
-// This function is called twice, but only executed the first time
-const item = await getItem(); // cache MISS
+// 이 함수는 두 번 호출되지만 처음에만 실행됩니다
+const item = await getItem(); // 캐시 MISS
 
-// The second call could be anywhere in your route
-const item = await getItem(); // cache HIT
+// 두 번째 호출은 경로의 어디에서나 있을 수 있습니다
+const item = await getItem(); // 캐시 HIT
 ```
 
-**How Request Memoization Works**
+**요청 메모이제이션의 작동 방식**
 
 <Image
-  alt="Diagram showing how fetch memoization works during React rendering."
-  srcLight="/docs/light/request-memoization.png"
-  srcDark="/docs/dark/request-memoization.png"
+  alt="React 렌더링 중 fetch 메모이제이션이 작동하는 방식을 보여주는 다이어그램."
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Frequest-memoization.png&w=1920&q=75"
   width="1600"
   height="742"
 />
 
-- While rendering a route, the first time a particular request is called, its result will not be in memory and it'll be a cache `MISS`.
-- Therefore, the function will be executed, and the data will be fetched from the external source, and the result will be stored in memory.
-- Subsequent function calls of the request in the same render pass will be a cache `HIT`, and the data will be returned from memory without executing the function.
-- Once the route has been rendered and the rendering pass is complete, memory is "reset" and all request memoization entries are cleared.
+- 경로를 렌더링하는 동안, 특정 요청이 처음 호출될 때 그 결과는 메모리에 없으므로 캐시 `MISS`가 됩니다.
+- 따라서 함수가 실행되고, 외부 소스에서 데이터가 가져와지며, 결과는 메모리에 저장됩니다.
+- 동일한 렌더링 패스에서 해당 요청의 후속 함수 호출은 캐시 `HIT`가 되며, 함수를 실행하지 않고 메모리에서 데이터가 반환됩니다.
+- 경로가 렌더링되고 렌더링 패스가 완료되면 메모리가 "리셋"되고 모든 요청 메모이제이션 항목이 지워집니다.
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - Request memoization is a React feature, not a Next.js feature. It's included here to show how it interacts with the other caching mechanisms.
-> - Memoization only applies to the `GET` method in `fetch` requests.
-> - Memoization only applies to the React Component tree, this means:
->   - It applies to `fetch` requests in `generateMetadata`, `generateStaticParams`, Layouts, Pages, and other Server Components.
->   - It doesn't apply to `fetch` requests in Route Handlers as they are not a part of the React component tree.
-> - For cases where `fetch` is not suitable (e.g. some database clients, CMS clients, or GraphQL clients), you can use the [React `cache` function](#react-cache-function) to memoize functions.
+> - 요청 메모이제이션은 Next.js 기능이 아닌 React 기능입니다. 여기에 포함된 이유는 다른 캐싱 메커니즘과 어떻게 상호작용하는지 보여주기 위해서입니다.
+> - 메모이제이션은 `fetch` 요청의 `GET` 메서드에만 적용됩니다.
+> - 메모이제이션은 React 컴포넌트 트리에만 적용됩니다. 이는 다음을 의미합니다:
+>   - `generateMetadata`, `generateStaticParams`, 레이아웃, 페이지 및 기타 서버 컴포넌트의 `fetch` 요청에 적용됩니다.
+>   - React 컴포넌트 트리의 일부가 아니므로 라우트 핸들러의 `fetch` 요청에는 적용되지 않습니다.
+> - `fetch`가 적합하지 않은 경우(예: 일부 데이터베이스 클라이언트, CMS 클라이언트 또는 GraphQL 클라이언트), [React `cache` 함수](#react-cache-function)를 사용하여 함수를 메모이제이션할 수 있습니다.
 
-### Duration
+### 지속 기간
 
-The cache lasts the lifetime of a server request until the React component tree has finished rendering.
+캐시는 React 컴포넌트 트리 렌더링이 완료될 때까지 서버 요청의 수명 동안 지속됩니다.
 
-### Revalidating
+### 재검증
 
-Since the memoization is not shared across server requests and only applies during rendering, there is no need to revalidate it.
+메모이제이션은 서버 요청 간에 공유되지 않고 렌더링 중에만 적용되므로 재검증할 필요가 없습니다.
 
-### Opting out
+### 기본 설정에서 제외하기
 
-Memoization only applies to the `GET` method in `fetch` requests, other methods, such as `POST` and `DELETE`, are not memoized. This default behavior is a React optimization and we do not recommend opting out of it.
+메모이제이션은 `fetch` 요청의 `GET` 메서드에만 적용되며, `POST` 및 `DELETE`와 같은 다른 메서드는 메모이제이션되지 않습니다. 이 기본 동작은 React의 최적화이며 기본 설정에서 제외하지 않는 것을 권장합니다.
 
-To manage individual requests, you can use the [`signal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal) property from [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). However, this will not opt requests out of memoization, rather, abort in-flight requests.
+개별 요청을 관리하려면 [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)의 [`signal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal) 속성을 사용할 수 있습니다. 그러나 이는 요청을 메모이제이션에서 제외하는 것이 아니라 진행 중인 요청을 중단합니다.
 
 ```js filename="app/example.js"
 const { signal } = new AbortController();
 fetch(url, { signal });
 ```
 
-## Data Cache
+## 데이터 캐시
 
-Next.js has a built-in Data Cache that **persists** the result of data fetches across incoming **server requests** and **deployments**. This is possible because Next.js extends the native `fetch` API to allow each request on the server to set its own persistent caching semantics.
+Next.js에는 들어오는 **서버 요청**과 **배포** 간에 데이터 가져오기 결과를 **지속**하는 내장 데이터 캐시가 있습니다. 이는 Next.js가 서버의 각 요청이 자체 영구 캐싱 의미를 설정할 수 있도록 네이티브 `fetch` API를 확장하기 때문에 가능합니다.
 
-> **Good to know**: In the browser, the `cache` option of `fetch` indicates how a request will interact with the browser's HTTP cache, in Next.js, the `cache` option indicates how a server-side request will interact with the server's Data Cache.
+> **알아두면 좋은 점**: 브라우저에서 `fetch`의 `cache` 옵션은 요청이 브라우저의 HTTP 캐시와 어떻게 상호작용할지를 나타내는 반면, Next.js에서 `cache` 옵션은 서버 측 요청이 서버의 데이터 캐시와 어떻게 상호작용할지를 나타냅니다.
 
-By default, data requests that use `fetch` are not **cached**. You can use the [`cache`](#fetch-optionscache) and [`next.revalidate`](#fetch-optionsnextrevalidate) options of `fetch` to configure the caching behavior.
+기본적으로 `fetch`를 사용하는 데이터 요청은 **캐시되지 않습니다**. `fetch`의 [`cache`](#fetch-optionscache) 및 [`next.revalidate`](#fetch-optionsnextrevalidate) 옵션을 사용하여 캐싱 동작을 구성할 수 있습니다.
 
-**How the Data Cache Works**
+**데이터 캐시의 작동 방식**
 
 <Image
-  alt="Diagram showing how cached and uncached fetch requests interact with the Data Cache. Cached requests are stored in the Data Cache, and memoized, uncached requests are fetched from the data source, not stored in the Data Cache, and memoized."
-  srcLight="/docs/light/data-cache.png"
-  srcDark="/docs/dark/data-cache.png"
+  alt="캐시된 및 캐시되지 않은 fetch 요청이 데이터 캐시와 어떻게 상호작용하는지 보여주는 다이어그램. 캐시된 요청은 데이터 캐시에 저장되고 메모이제이션되며, 캐시되지 않은 요청은 데이터 소스에서 가져와 데이터 캐시에 저장되지 않고 메모이제이션됩니다."
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fdata-cache.png&w=1920&q=75"
   width="1600"
   height="661"
 />
 
-- The first time a `fetch` request with the `'force-cache'` option is called during rendering, Next.js checks the Data Cache for a cached response.
-- If a cached response is found, it's returned immediately and [memoized](#request-memoization).
-- If a cached response is not found, the request is made to the data source, the result is stored in the Data Cache, and memoized.
-- For uncached data (e.g. no `cache` option defined or using `{ cache: 'no-store' }`), the result is always fetched from the data source, and memoized.
-- Whether the data is cached or uncached, the requests are always memoized to avoid making duplicate requests for the same data during a React render pass.
+- 렌더링 중에 `'force-cache'` 옵션이 있는 `fetch` 요청이 처음 호출될 때, Next.js는 데이터 캐시에서 캐시된 응답을 확인합니다.
+- 캐시된 응답이 발견되면 즉시 반환되고 [메모이제이션](#요청-메모이제이션)됩니다.
+- 캐시된 응답이 발견되지 않으면 데이터 소스에 요청이 이루어지고, 결과는 데이터 캐시에 저장되며 메모이제이션됩니다.
+- 캐시되지 않은 데이터(예: `cache` 옵션이 정의되지 않았거나 `{ cache: 'no-store' }`를 사용하는 경우)의 경우, 결과는 항상 데이터 소스에서 가져와지고 메모이제이션됩니다.
+- 데이터가 캐시되었는지 여부에 관계없이 요청은 항상 메모이제이션되어 React 렌더링 과정 동안 동일한 데이터에 대한 중복 요청을 피합니다.
 
-> **Differences between the Data Cache and Request Memoization**
+> **데이터 캐시와 요청 메모이제이션의 차이점**
 >
-> While both caching mechanisms help improve performance by re-using cached data, the Data Cache is persistent across incoming requests and deployments, whereas memoization only lasts the lifetime of a request.
+> 두 캐싱 메커니즘 모두 캐시된 데이터를 재사용하여 성능을 향상시키지만, 데이터 캐시는 들어오는 요청과 배포 간에 지속되는 반면 메모이제이션은 요청의 수명 동안만 지속됩니다.
 >
-> With memoization, we reduce the number of **duplicate** requests in the same render pass that have to cross the network boundary from the rendering server to the Data Cache server (e.g. a CDN or Edge Network) or data source (e.g. a database or CMS). With the Data Cache, we reduce the number of requests made to our origin data source.
+> 메모이제이션을 통해 우리는 동일한 렌더링 패스에서 렌더링 서버에서 데이터 캐시 서버(예: CDN 또는 엣지 네트워크) 또는 데이터 소스(예: 데이터베이스 또는 CMS)로 네트워크 경계를 넘어야 하는 **중복** 요청의 수를 줄입니다. 데이터 캐시를 통해 우리는 원본 데이터 소스에 대한 요청 수를 줄입니다.
 
-### Duration
+### 지속 기간
 
-The Data Cache is persistent across incoming requests and deployments unless you revalidate or opt-out.
+데이터 캐시는 재검증하거나 기본 설정에서 제외하지 않는 한 들어오는 요청과 배포 간에 지속됩니다.
 
-### Revalidating
+### 재검증
 
-Cached data can be revalidated in two ways, with:
+캐시된 데이터는 두 가지 방법으로 재검증할 수 있습니다:
 
-- **Time-based Revalidation**: Revalidate data after a certain amount of time has passed and a new request is made. This is useful for data that changes infrequently and freshness is not as critical.
-- **On-demand Revalidation:** Revalidate data based on an event (e.g. form submission). On-demand revalidation can use a tag-based or path-based approach to revalidate groups of data at once. This is useful when you want to ensure the latest data is shown as soon as possible (e.g. when content from your headless CMS is updated).
+- **시간 기반 재검증**: 일정 시간이 지나고 새로운 요청이 이루어진 후 데이터를 재검증합니다. 이는 자주 변경되지 않고 최신 상태가 그다지 중요하지 않은 데이터에 유용합니다.
+- **온디맨드 재검증:** 이벤트(예: 폼 제출)를 기반으로 데이터를 재검증합니다. 온디맨드 재검증은 태그 기반 또는 경로 기반 접근 방식을 사용하여 한 번에 데이터 그룹을 재검증할 수 있습니다. 이는 최신 데이터를 가능한 한 빨리 표시하고 싶을 때 유용합니다(예: 헤드리스 CMS의 콘텐츠가 업데이트되었을 때).
 
-#### Time-based Revalidation
+#### 시간 기반 재검증
 
-To revalidate data at a timed interval, you can use the `next.revalidate` option of `fetch` to set the cache lifetime of a resource (in seconds).
+시간 간격으로 데이터를 재검증하려면 `fetch`의 `next.revalidate` 옵션을 사용하여 리소스의 캐시 수명(초 단위)을 설정할 수 있습니다.
 
 ```js
-// Revalidate at most every hour
+// 최대 1시간마다 재검증
 fetch("https://...", { next: { revalidate: 3600 } });
 ```
 
-Alternatively, you can use [Route Segment Config options](#segment-config-options) to configure all `fetch` requests in a segment or for cases where you're not able to use `fetch`.
+또는 [라우트 세그먼트 구성 옵션](#segment-config-options)을 사용하여 세그먼트의 모든 `fetch` 요청을 구성하거나 `fetch`를 사용할 수 없는 경우에 사용할 수 있습니다.
 
-**How Time-based Revalidation Works**
+**시간 기반 재검증의 작동 방식**
 
 <Image
-  alt="Diagram showing how time-based revalidation works, after the revalidation period, stale data is returned for the first request, then data is revalidated."
-  srcLight="/docs/light/time-based-revalidation.png"
-  srcDark="/docs/dark/time-based-revalidation.png"
+  alt="시간 기반 재검증이 작동하는 방식을 보여주는 다이어그램. 재검증 기간 이후, 첫 번째 요청에 대해 오래된 데이터가 반환되고, 그 후 데이터가 재검증됩니다."
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Ftime-based-revalidation.png&w=1920&q=75"
   width="1600"
   height="1252"
 />
 
-- The first time a fetch request with `revalidate` is called, the data will be fetched from the external data source and stored in the Data Cache.
-- Any requests that are called within the specified timeframe (e.g. 60-seconds) will return the cached data.
-- After the timeframe, the next request will still return the cached (now stale) data.
-  - Next.js will trigger a revalidation of the data in the background.
-  - Once the data is fetched successfully, Next.js will update the Data Cache with the fresh data.
-  - If the background revalidation fails, the previous data will be kept unaltered.
+- `revalidate`가 있는 fetch 요청이 처음 호출될 때, 데이터는 외부 데이터 소스에서 가져와져 데이터 캐시에 저장됩니다.
+- 지정된 시간 프레임(예: 60초) 내에 호출되는 모든 요청은 캐시된 데이터를 반환합니다.
+- 시간 프레임이 지난 후, 다음 요청은 여전히 캐시된(이제는 오래된) 데이터를 반환합니다.
+  - Next.js는 백그라운드에서 데이터 재검증을 트리거합니다.
+  - 데이터가 성공적으로 가져와지면 Next.js는 데이터 캐시를 새로운 데이터로 업데이트합니다.
+  - 백그라운드 재검증이 실패하면 이전 데이터는 변경되지 않은 채로 유지됩니다.
 
-This is similar to [**stale-while-revalidate**](https://web.dev/stale-while-revalidate/) behavior.
+이는 [**stale-while-revalidate**](https://web.dev/stale-while-revalidate/) 동작과 유사합니다.
 
-#### On-demand Revalidation
+#### 온디맨드 재검증
 
-Data can be revalidated on-demand by path ([`revalidatePath`](#revalidatepath)) or by cache tag ([`revalidateTag`](#fetch-optionsnexttags-and-revalidatetag)).
+데이터는 경로([`revalidatePath`](#revalidatepath))별로 또는 캐시 태그([`revalidateTag`](#fetch-optionsnexttags-and-revalidatetag))별로 온디맨드로 재검증할 수 있습니다.
 
-**How On-Demand Revalidation Works**
+**온디맨드 재검증의 작동 방식**
 
 <Image
-  alt="Diagram showing how on-demand revalidation works, the Data Cache is updated with fresh data after a revalidation request."
-  srcLight="/docs/light/on-demand-revalidation.png"
-  srcDark="/docs/dark/on-demand-revalidation.png"
+  alt="온디맨드 재검증이 작동하는 방식을 보여주는 다이어그램. 재검증 요청 후 데이터 캐시가 새로운 데이터로 업데이트됩니다."
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fon-demand-revalidation.png&w=1920&q=75"
   width="1600"
   height="1082"
 />
 
-- The first time a `fetch` request is called, the data will be fetched from the external data source and stored in the Data Cache.
-- When an on-demand revalidation is triggered, the appropriate cache entries will be purged from the cache.
-  - This is different from time-based revalidation, which keeps the stale data in the cache until the fresh data is fetched.
-- The next time a request is made, it will be a cache `MISS` again, and the data will be fetched from the external data source and stored in the Data Cache.
+- `fetch` 요청이 처음 호출될 때, 데이터는 외부 데이터 소스에서 가져와져 데이터 캐시에 저장됩니다.
+- 온디맨드 재검증이 트리거되면 적절한 캐시 항목이 캐시에서 제거됩니다.
+  - 이는 시간 기반 재검증과 다릅니다. 시간 기반 재검증은 새로운 데이터를 가져올 때까지 오래된 데이터를 캐시에 유지합니다.
+- 다음 요청 시, 다시 캐시 `MISS`가 되어 데이터는 외부 데이터 소스에서 가져와져 데이터 캐시에 저장됩니다.
 
-### Opting out
+### 기본 설정에서 제외하기
 
-Since `fetch` requests are not cached by default, you don't need to opt out of caching. This means data will be fetched from your data source whenever `fetch` is called.
+`fetch` 요청은 기본적으로 캐시되지 않으므로 캐싱을 기본 설정에서 제외할 필요가 없습니다. 이는 `fetch`가 호출될 때마다 데이터 소스에서 데이터를 가져온다는 의미입니다.
 
-> **Note**: Data Cache is currently only available in Layout, Pages, and Route Handlers, not Middleware. Any fetches done inside of your middleware will not be cached by default.
+> **참고**: 데이터 캐시는 현재 레이아웃, 페이지 및 라우트 핸들러에서만 사용할 수 있으며 미들웨어에서는 사용할 수 없습니다. 미들웨어 내에서 수행되는 모든 가져오기는 기본적으로 캐시되지 않습니다.
 
-> **Vercel Data Cache**
+> **Vercel 데이터 캐시**
 >
-> If your Next.js application is deployed to Vercel, we recommend reading the [Vercel Data Cache](https://vercel.com/docs/infrastructure/data-cache) documentation for a better understanding of Vercel specific features.
+> Next.js 애플리케이션이 Vercel에 배포된 경우, [Vercel 데이터 캐시](https://vercel.com/docs/infrastructure/data-cache) 문서를 읽어 Vercel 특정 기능을 더 잘 이해하는 것이 좋습니다.
 
-## Full Route Cache
+## 전체 경로 캐시
 
-> **Related terms**:
+> **관련 용어**:
 >
-> You may see the terms **Automatic Static Optimization**, **Static Site Generation**, or **Static Rendering** being used interchangeably to refer to the process of rendering and caching routes of your application at build time.
+> **자동 정적 최적화**, **정적 사이트 생성**, 또는 **정적 렌더링**이라는 용어가 애플리케이션의 경로를 빌드 시에 렌더링하고 캐싱하는 과정을 지칭하는 데 서로 바꿔 사용되는 것을 볼 수 있습니다.
 
-Next.js automatically renders and caches routes at build time. This is an optimization that allows you to serve the cached route instead of rendering on the server for every request, resulting in faster page loads.
+Next.js는 자동으로 빌드 시에 경로를 렌더링하고 캐시합니다. 이는 모든 요청에 대해 서버에서 렌더링하는 대신 캐시된 경로를 제공할 수 있게 하는 최적화로, 더 빠른 페이지 로드를 가능하게 합니다.
 
-To understand how the Full Route Cache works, it's helpful to look at how React handles rendering, and how Next.js caches the result:
+전체 경로 캐시가 어떻게 작동하는지 이해하려면 React가 렌더링을 어떻게 처리하는지, 그리고 Next.js가 결과를 어떻게 캐시하는지 살펴보는 것이 도움이 됩니다:
 
-### 1. React Rendering on the Server
+### 1. 서버에서의 React 렌더링
 
-On the server, Next.js uses React's APIs to orchestrate rendering. The rendering work is split into chunks: by individual routes segments and Suspense boundaries.
+서버에서 Next.js는 React의 API를 사용하여 렌더링을 조율합니다. 렌더링 작업은 개별 경로 세그먼트와 Suspense 경계에 의해 청크로 나뉩니다.
 
-Each chunk is rendered in two steps:
+각 청크는 두 단계로 렌더링됩니다:
 
-1. React renders Server Components into a special data format, optimized for streaming, called the **React Server Component Payload**.
-2. Next.js uses the React Server Component Payload and Client Component JavaScript instructions to render **HTML** on the server.
+1. React는 서버 컴포넌트를 **React 서버 컴포넌트 페이로드**라고 하는 스트리밍에 최적화된 특별한 데이터 형식으로 렌더링합니다.
+2. Next.js는 React 서버 컴포넌트 페이로드와 클라이언트 컴포넌트 JavaScript 지침을 사용하여 서버에서 **HTML**을 렌더링합니다.
 
-This means we don't have to wait for everything to render before caching the work or sending a response. Instead, we can stream a response as work is completed.
+이는 모든 것이 렌더링될 때까지 기다릴 필요 없이 작업이 완료되는 대로 응답을 스트리밍할 수 있다는 것을 의미합니다.
 
-> **What is the React Server Component Payload?**
+> **React 서버 컴포넌트 페이로드란 무엇인가요?**
 >
-> The React Server Component Payload is a compact binary representation of the rendered React Server Components tree. It's used by React on the client to update the browser's DOM. The React Server Component Payload contains:
+> React 서버 컴포넌트 페이로드는 렌더링된 React 서버 컴포넌트 트리의 컴팩트한 바이너리 표현입니다. React가 클라이언트에서 브라우저의 DOM을 업데이트하는 데 사용됩니다. React 서버 컴포넌트 페이로드에는 다음이 포함됩니다:
 >
-> - The rendered result of Server Components
-> - Placeholders for where Client Components should be rendered and references to their JavaScript files
-> - Any props passed from a Server Component to a Client Component
+> - 서버 컴포넌트의 렌더링 결과
+> - 클라이언트 컴포넌트가 렌더링되어야 할 위치에 대한 플레이스홀더와 그들의 JavaScript 파일에 대한 참조
+> - 서버 컴포넌트에서 클라이언트 컴포넌트로 전달된 모든 props
 >
-> To learn more, see the [Server Components](/docs/app/building-your-application/rendering/server-components) documentation.
+> 자세한 내용은 [서버 컴포넌트](/docs/app/building-your-application/rendering/server-components) 문서를 참조하세요.
 
-### 2. Next.js Caching on the Server (Full Route Cache)
+### 2. 서버에서의 Next.js 캐싱 (전체 경로 캐시)
 
 <Image
-  alt="Default behavior of the Full Route Cache, showing how the React Server Component Payload and HTML are cached on the server for statically rendered routes."
-  srcLight="/docs/light/full-route-cache.png"
-  srcDark="/docs/dark/full-route-cache.png"
+  alt="정적으로 렌더링된 경로에 대해 React 서버 컴포넌트 페이로드와 HTML이 서버에서 캐시되는 전체 경로 캐시의 기본 동작을 보여줍니다."
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Ffull-route-cache.png&w=1920&q=75"
   width="1600"
   height="888"
 />
 
-The default behavior of Next.js is to cache the rendered result (React Server Component Payload and HTML) of a route on the server. This applies to statically rendered routes at build time, or during revalidation.
+Next.js의 기본 동작은 서버에서 경로의 렌더링 결과(React 서버 컴포넌트 페이로드 및 HTML)를 캐시하는 것입니다. 이는 빌드 시 또는 재검증 중 정적으로 렌더링된 경로에 적용됩니다.
 
-### 3. React Hydration and Reconciliation on the Client
+### 3. 클라이언트에서의 React 하이드레이션 및 조정
 
-At request time, on the client:
+요청 시, 클라이언트에서:
 
-1. The HTML is used to immediately show a fast non-interactive initial preview of the Client and Server Components.
-2. The React Server Components Payload is used to reconcile the Client and rendered Server Component trees, and update the DOM.
-3. The JavaScript instructions are used to [hydrate](https://react.dev/reference/react-dom/client/hydrateRoot) Client Components and make the application interactive.
+1. HTML은 클라이언트 및 서버 컴포넌트의 빠른 비대화형 초기 미리보기를 즉시 표시하는 데 사용됩니다.
+2. React 서버 컴포넌트 페이로드는 클라이언트 및 렌더링된 서버 컴포넌트 트리를 조정하고 DOM을 업데이트하는 데 사용됩니다.
+3. JavaScript 지침은 클라이언트 컴포넌트를 [하이드레이트](https://react.dev/reference/react-dom/client/hydrateRoot)하고 애플리케이션을 대화형으로 만드는 데 사용됩니다.
 
-### 4. Next.js Caching on the Client (Router Cache)
+### 4. 클라이언트에서의 Next.js 캐싱 (라우터 캐시)
 
-The React Server Component Payload is stored in the client-side [Router Cache](#client-side-router-cache) - a separate in-memory cache, split by individual route segment. This Router Cache is used to improve the navigation experience by storing previously visited routes and prefetching future routes.
+React 서버 컴포넌트 페이로드는 클라이언트 측 [라우터 캐시](#클라이언트-측-라우터-캐시)에 저장됩니다 - 개별 경로 세그먼트로 분할된 별도의 인메모리 캐시입니다. 이 라우터 캐시는 이전에 방문한 경로를 저장하고 미래의 경로를 미리 가져옴으로써 탐색 경험을 개선하는 데 사용됩니다.
 
-### 5. Subsequent Navigations
+### 5. 후속 탐색
 
-On subsequent navigations or during prefetching, Next.js will check if the React Server Components Payload is stored in the Router Cache. If so, it will skip sending a new request to the server.
+후속 탐색이나 미리 가져오기 중에 Next.js는 React 서버 컴포넌트 페이로드가 라우터 캐시에 저장되어 있는지 확인합니다. 그렇다면 서버에 새 요청을 보내지 않습니다.
 
-If the route segments are not in the cache, Next.js will fetch the React Server Components Payload from the server, and populate the Router Cache on the client.
+만약 경로 세그먼트가 캐시에 없다면, Next.js는 서버에서 React 서버 컴포넌트 페이로드를 가져와 클라이언트의 라우터 캐시를 채웁니다.
 
-### Static and Dynamic Rendering
+### 정적 및 동적 렌더링
 
-Whether a route is cached or not at build time depends on whether it's statically or dynamically rendered. Static routes are cached by default, whereas dynamic routes are rendered at request time, and not cached.
+경로가 빌드 시에 캐시되는지 여부는 정적으로 렌더링되는지 동적으로 렌더링되는지에 따라 달라집니다. 정적 경로는 기본적으로 캐시되는 반면, 동적 경로는 요청 시 렌더링되며 캐시되지 않습니다.
 
-This diagram shows the difference between statically and dynamically rendered routes, with cached and uncached data:
+이 다이어그램은 캐시된 데이터와 캐시되지 않은 데이터를 가진 정적 및 동적으로 렌더링된 경로 간의 차이를 보여줍니다:
 
 <Image
-  alt="How static and dynamic rendering affects the Full Route Cache. Static routes are cached at build time or after data revalidation, whereas dynamic routes are never cached"
-  srcLight="/docs/light/static-and-dynamic-routes.png"
-  srcDark="/docs/dark/static-and-dynamic-routes.png"
+  alt="정적 및 동적 렌더링이 전체 경로 캐시에 미치는 영향. 정적 경로는 빌드 시 또는 데이터 재검증 후에 캐시되는 반면, 동적 경로는 절대 캐시되지 않습니다"
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fstatic-and-dynamic-routes.png&w=1920&q=75"
   width="1600"
   height="1314"
 />
 
-Learn more about [static and dynamic rendering](/docs/app/building-your-application/rendering/server-components#server-rendering-strategies).
+[정적 및 동적 렌더링](/docs/app/building-your-application/rendering/server-components#server-rendering-strategies)에 대해 자세히 알아보세요.
 
-### Duration
+### 지속 기간
 
-By default, the Full Route Cache is persistent. This means that the render output is cached across user requests.
+기본적으로 전체 경로 캐시는 지속적입니다. 이는 렌더링 출력이 사용자 요청 간에 캐시된다는 것을 의미합니다.
 
-### Invalidation
+### 무효화
 
-There are two ways you can invalidate the Full Route Cache:
+전체 경로 캐시를 무효화할 수 있는 두 가지 방법이 있습니다:
 
-- **[Revalidating Data](/docs/app/building-your-application/caching#revalidating)**: Revalidating the [Data Cache](#data-cache), will in turn invalidate the Router Cache by re-rendering components on the server and caching the new render output.
-- **Redeploying**: Unlike the Data Cache, which persists across deployments, the Full Route Cache is cleared on new deployments.
+- **[데이터 재검증](/docs/app/building-your-application/caching#revalidating)**: [데이터 캐시](#데이터-캐시)를 재검증하면 서버에서 컴포넌트를 다시 렌더링하고 새로운 렌더링 출력을 캐싱함으로써 라우터 캐시를 차례로 무효화합니다.
+- **재배포**: 데이터 캐시와 달리 배포 간에 지속되는 전체 경로 캐시는 새로운 배포 시 지워집니다.
 
-### Opting out
+### 기본 설정에서 제외하기
 
-You can opt out of the Full Route Cache, or in other words, dynamically render components for every incoming request, by:
+다음과 같은 방법으로 전체 경로 캐시를 기본 설정에서 제외하거나, 다시 말해 들어오는 모든 요청에 대해 컴포넌트를 동적으로 렌더링할 수 있습니다:
 
-- **Using a [Dynamic Function](#dynamic-functions)**: This will opt the route out from the Full Route Cache and dynamically render it at request time. The Data Cache can still be used.
-- **Using the `dynamic = 'force-dynamic'` or `revalidate = 0` route segment config options**: This will skip the Full Route Cache and the Data Cache. Meaning components will be rendered and data fetched on every incoming request to the server. The Router Cache will still apply as it's a client-side cache.
-- **Opting out of the [Data Cache](#data-cache)**: If a route has a `fetch` request that is not cached, this will opt the route out of the Full Route Cache. The data for the specific `fetch` request will be fetched for every incoming request. Other `fetch` requests that do not opt out of caching will still be cached in the Data Cache. This allows for a hybrid of cached and uncached data.
+- **[동적 함수](#dynamic-functions) 사용**: 이는 전체 경로 캐시에서 경로를 기본 설정에서 제외하고 요청 시 동적으로 렌더링합니다. 데이터 캐시는 여전히 사용될 수 있습니다.
+- **`dynamic = 'force-dynamic'` 또는 `revalidate = 0` 경로 세그먼트 구성 옵션 사용**: 이는 전체 경로 캐시와 데이터 캐시를 건너뜁니다. 즉, 컴포넌트가 렌더링되고 서버로 들어오는 모든 요청에 대해 데이터가 가져와집니다. 라우터 캐시는 클라이언트 측 캐시이므로 여전히 적용됩니다.
+- **[데이터 캐시](#데이터-캐시) 해제**: 경로에 캐시되지 않은 `fetch` 요청이 있으면 이는 전체 경로 캐시에서 경로를 기본 설정에서 제외합니다. 특정 `fetch` 요청에 대한 데이터는 들어오는 모든 요청에 대해 가져와집니다. 캐싱을 기본 설정에서 제외하지 않은 다른 `fetch` 요청은 여전히 데이터 캐시에 캐시됩니다. 이를 통해 캐시된 데이터와 캐시되지 않은 데이터의 하이브리드가 가능합니다.
 
-## Client-side Router Cache
+## 클라이언트 측 라우터 캐시
 
-Next.js has an in-memory client-side router cache that stores the RSC payload of route segments, split by layouts, loading states, and pages.
+Next.js에는 레이아웃, 로딩 상태 및 페이지로 분할된 경로 세그먼트의 RSC 페이로드를 저장하는 인메모리 클라이언트 측 라우터 캐시가 있습니다.
 
-When a user navigates between routes, Next.js caches the visited route segments and [prefetches](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching) the routes the user is likely to navigate to.This results in instant back/forward navigation, no full-page reload between navigations, and preservation of React state and browser state.
+사용자가 경로 간을 탐색할 때 Next.js는 방문한 경로 세그먼트를 캐시하고 사용자가 탐색할 가능성이 높은 경로를 [미리 가져옵니다](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching). 이는 즉각적인 뒤로/앞으로 탐색, 탐색 간 전체 페이지 리로드 없음, React 상태 및 브라우저 상태 보존을 가능하게 합니다.
 
-With the Router Cache:
+라우터 캐시를 사용하면:
 
-- **Layouts** are cached and reused on navigation ([partial rendering](/docs/app/building-your-application/routing/linking-and-navigating#4-partial-rendering)).
-- **Loading states** are cached and reused on navigation for [instant navigation](/docs/app/building-your-application/routing/loading-ui-and-streaming#instant-loading-states).
-- **Pages** are not cached by default, but are reused during browser backward and forward navigation. You can enable caching for page segments by using the experimental [`staleTimes`](/docs/app/api-reference/next-config-js/staleTimes) config option.
+- **레이아웃**은 탐색 시 캐시되고 재사용됩니다([부분 렌더링](/docs/app/building-your-application/routing/linking-and-navigating#4-partial-rendering)).
+- **로딩 상태**는 [즉각적인 로딩 상태](/docs/app/building-your-application/routing/loading-ui-and-streaming#instant-loading-states)를 위해 탐색 시 캐시되고 재사용됩니다.
+- **페이지**는 기본적으로 캐시되지 않지만 브라우저의 뒤로 및 앞으로 탐색 중에 재사용됩니다. 실험적인 [`staleTimes`](/docs/app/api-reference/next-config-js/staleTimes) 구성 옵션을 사용하여 페이지 세그먼트에 대한 캐싱을 활성화할 수 있습니다.
 
-{/* TODO: Update diagram to match v15 behavior */}
+{/* TODO: v15 동작에 맞게 다이어그램 업데이트 */}
 
-> **Good to know:** This cache specifically applies to Next.js and Server Components, and is different to the browser's [bfcache](https://web.dev/bfcache/), though it has a similar result.
+> **알아두면 좋은 점:** 이 캐시는 특별히 Next.js와 서버 컴포넌트에 적용되며, 브라우저의 [bfcache](https://web.dev/bfcache/)와는 다르지만 유사한 결과를 가집니다.
 
-### Duration
+### 지속 기간
 
-The cache is stored in the browser's temporary memory. Two factors determine how long the router cache lasts:
+캐시는 브라우저의 임시 메모리에 저장됩니다. 라우터 캐시가 지속되는 기간을 결정하는 두 가지 요소가 있습니다:
 
-- **Session**: The cache persists across navigation. However, it's cleared on page refresh.
-- **Automatic Invalidation Period**: The cache of layouts and loading states is automatically invalidated after a specific time. The duration depends on how the resource was [prefetched](/docs/app/api-reference/components/link#prefetch), and if the resource was [statically generated](/docs/app/building-your-application/rendering/server-components#static-rendering-default):
-  - **Default Prefetching** (`prefetch={null}` or unspecified): not cached for dynamic pages, 5 minutes for static pages.
-  - **Full Prefetching** (`prefetch={true}` or `router.prefetch`): 5 minutes for both static & dynamic pages.
+- **세션**: 캐시는 탐색 간에 지속됩니다. 그러나 페이지 새로고침 시 지워집니다.
+- **자동 무효화 기간**: 레이아웃 및 로딩 상태의 캐시는 특정 시간 후에 자동으로 무효화됩니다. 기간은 리소스가 어떻게 [미리 가져와졌는지](/docs/app/api-reference/components/link#prefetch)와 리소스가 [정적으로 생성](/docs/app/building-your-application/rendering/server-components#static-rendering-default)되었는지에 따라 달라집니다:
+  - **기본 미리 가져오기** (`prefetch={null}` 또는 지정되지 않음): 동적 페이지의 경우 캐시되지 않음, 정적 페이지의 경우 5분
+  - **전체 미리 가져오기** (`prefetch={true}` 또는 `router.prefetch`): 정적 및 동적 페이지 모두 5분
 
-While a page refresh will clear **all** cached segments, the automatic invalidation period only affects the individual segment from the time it was prefetched.
+페이지 새로고침은 **모든** 캐시된 세그먼트를 지우는 반면, 자동 무효화 기간은 미리 가져온 시점부터 개별 세그먼트에만 영향을 미칩니다.
 
-> **Good to know**: The experimental [`staleTimes`](/docs/app/api-reference/next-config-js/staleTimes) config option can be used to adjust the automatic invalidation times mentioned above.
+> **알아두면 좋은 점**: 실험적인 [`staleTimes`](/docs/app/api-reference/next-config-js/staleTimes) 구성 옵션을 사용하여 위에서 언급한 자동 무효화 시간을 조정할 수 있습니다.
 
-### Invalidation
+### 무효화
 
-There are two ways you can invalidate the Router Cache:
+라우터 캐시를 무효화할 수 있는 두 가지 방법이 있습니다:
 
-- In a **Server Action**:
-  - Revalidating data on-demand by path with ([`revalidatePath`](/docs/app/api-reference/functions/revalidatePath)) or by cache tag with ([`revalidateTag`](/docs/app/api-reference/functions/revalidateTag))
-  - Using [`cookies.set`](/docs/app/api-reference/functions/cookies#cookiessetname-value-options) or [`cookies.delete`](/docs/app/api-reference/functions/cookies#deleting-cookies) invalidates the Router Cache to prevent routes that use cookies from becoming stale (e.g. authentication).
-- Calling [`router.refresh`](/docs/app/api-reference/functions/use-router) will invalidate the Router Cache and make a new request to the server for the current route.
+- **서버 액션**에서:
+  - ([`revalidatePath`](/docs/app/api-reference/functions/revalidatePath))로 경로별 또는 ([`revalidateTag`](/docs/app/api-reference/functions/revalidateTag))로 캐시 태그별로 데이터를 온디맨드로 재검증
+  - [`cookies.set`](/docs/app/api-reference/functions/cookies#cookiessetname-value-options) 또는 [`cookies.delete`](/docs/app/api-reference/functions/cookies#deleting-cookies) 사용은 쿠키를 사용하는 경로가 오래되는 것을 방지하기 위해 라우터 캐시를 무효화합니다(예: 인증).
+- [`router.refresh`](/docs/app/api-reference/functions/use-router)를 호출하면 라우터 캐시를 무효화하고 현재 경로에 대해 서버에 새로운 요청을 합니다.
 
-### Opting out
+### 기본 설정에서 제외하기
 
-As of Next.js 15, page segments are opted out by default.
+Next.js 15부터 페이지 세그먼트는 기본적으로 설정에서 제외됩니다.
 
-> **Good to know:** You can also opt out of [prefetching](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching) by setting the `prefetch` prop of the `<Link>` component to `false`.
+> **알아두면 좋은 점:** `<Link>` 컴포넌트의 `prefetch` prop을 `false`로 설정하여 [미리 가져오기](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching)를 기본설정에서 제외 할 수도 있습니다.
 
-## Cache Interactions
+## 캐시 상호작용
 
-When configuring the different caching mechanisms, it's important to understand how they interact with each other:
+다양한 캐싱 메커니즘을 구성할 때 그들이 서로 어떻게 상호작용하는지 이해하는 것이 중요합니다:
 
-### Data Cache and Full Route Cache
+### 데이터 캐시와 전체 경로 캐시
 
-- Revalidating or opting out of the Data Cache **will** invalidate the Full Route Cache, as the render output depends on data.
-- Invalidating or opting out of the Full Route Cache **does not** affect the Data Cache. You can dynamically render a route that has both cached and uncached data. This is useful when most of your page uses cached data, but you have a few components that rely on data that needs to be fetched at request time. You can dynamically render without worrying about the performance impact of re-fetching all the data.
+- 데이터 캐시를 재검증하거나 설정에서 제외하면 전체 경로 캐시가 **무효화됩니다**. 렌더링 출력이 데이터에 의존하기 때문입니다.
+- 전체 경로 캐시를 무효화하거나 설정에서 제외해도 데이터 캐시에는 **영향을 미치지 않습니다**. 캐시된 데이터와 캐시되지 않은 데이터를 모두 가진 경로를 동적으로 렌더링할 수 있습니다. 이는 페이지의 대부분이 캐시된 데이터를 사용하지만 요청 시 가져와야 하는 데이터에 의존하는 몇 개의 컴포넌트가 있을 때 유용합니다. 모든 데이터를 다시 가져오는 성능 영향을 걱정하지 않고 동적으로 렌더링할 수 있습니다.
 
-### Data Cache and Client-side Router cache
+### 데이터 캐시와 클라이언트 측 라우터 캐시
 
-- To immediately invalidate the Data Cache and Router cache, you can use [`revalidatePath`](#revalidatepath) or [`revalidateTag`](#fetch-optionsnexttags-and-revalidatetag) in a [Server Action](/docs/app/building-your-application/data-fetching/server-actions-and-mutations).
-- Revalidating the Data Cache in a [Route Handler](/docs/app/building-your-application/routing/route-handlers) **will not** immediately invalidate the Router Cache as the Route Handler isn't tied to a specific route. This means Router Cache will continue to serve the previous payload until a hard refresh, or the automatic invalidation period has elapsed.
+- 데이터 캐시와 라우터 캐시를 즉시 무효화하려면 [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)에서 [`revalidatePath`](#revalidatepath) 또는 [`revalidateTag`](#fetch-optionsnexttags-and-revalidatetag)를 사용할 수 있습니다.
+- [라우트 핸들러](/docs/app/building-your-application/routing/route-handlers)에서 데이터 캐시를 재검증하는 것은 라우트 핸들러가 특정 경로에 묶여있지 않기 때문에 라우터 캐시를 **즉시 무효화하지 않습니다**. 이는 하드 새로고침이나 자동 무효화 기간이 경과할 때까지 라우터 캐시가 이전 페이로드를 계속 제공한다는 것을 의미합니다.
 
-## APIs
+## API
 
-The following table provides an overview of how different Next.js APIs affect caching:
+다음 표는 다양한 Next.js API가 캐싱에 미치는 영향을 개괄적으로 보여줍니다:
 
-| API                                                                     | Router Cache               | Full Route Cache      | Data Cache            | React Cache |
-| ----------------------------------------------------------------------- | -------------------------- | --------------------- | --------------------- | ----------- |
-| [`<Link prefetch>`](#link)                                              | Cache                      |                       |                       |             |
-| [`router.prefetch`](#routerprefetch)                                    | Cache                      |                       |                       |             |
-| [`router.refresh`](#routerrefresh)                                      | Revalidate                 |                       |                       |             |
-| [`fetch`](#fetch)                                                       |                            |                       | Cache                 | Cache       |
-| [`fetch` `options.cache`](#fetch-optionscache)                          |                            |                       | Cache or Opt out      |             |
-| [`fetch` `options.next.revalidate`](#fetch-optionsnextrevalidate)       |                            | Revalidate            | Revalidate            |             |
-| [`fetch` `options.next.tags`](#fetch-optionsnexttags-and-revalidatetag) |                            | Cache                 | Cache                 |             |
-| [`revalidateTag`](#fetch-optionsnexttags-and-revalidatetag)             | Revalidate (Server Action) | Revalidate            | Revalidate            |             |
-| [`revalidatePath`](#revalidatepath)                                     | Revalidate (Server Action) | Revalidate            | Revalidate            |             |
-| [`const revalidate`](#segment-config-options)                           |                            | Revalidate or Opt out | Revalidate or Opt out |             |
-| [`const dynamic`](#segment-config-options)                              |                            | Cache or Opt out      | Cache or Opt out      |             |
-| [`cookies`](#cookies)                                                   | Revalidate (Server Action) | Opt out               |                       |             |
-| [`headers`, `searchParams`](#dynamic-functions)                         |                            | Opt out               |                       |             |
-| [`generateStaticParams`](#generatestaticparams)                         |                            | Cache                 |                       |             |
-| [`React.cache`](#react-cache-function)                                  |                            |                       |                       | Cache       |
-| [`unstable_cache`](/docs/app/api-reference/functions/unstable_cache)    |                            |                       | Cache                 |             |
+| API                                                                     | 라우터 캐시        | 전체 경로 캐시            | 데이터 캐시               | React 캐시 |
+| ----------------------------------------------------------------------- | ------------------ | ------------------------- | ------------------------- | ---------- |
+| [`<Link prefetch>`](#link)                                              | 캐시               |                           |                           |            |
+| [`router.prefetch`](#routerprefetch)                                    | 캐시               |                           |                           |            |
+| [`router.refresh`](#routerrefresh)                                      | 재검증             |                           |                           |            |
+| [`fetch`](#fetch)                                                       |                    |                           | 캐시                      | 캐시       |
+| [`fetch` `options.cache`](#fetch-optionscache)                          |                    |                           | 캐시 또는 설정에서 제외   |            |
+| [`fetch` `options.next.revalidate`](#fetch-optionsnextrevalidate)       |                    | 재검증                    | 재검증                    |            |
+| [`fetch` `options.next.tags`](#fetch-optionsnexttags-and-revalidatetag) |                    | 캐시                      | 캐시                      |            |
+| [`revalidateTag`](#fetch-optionsnexttags-and-revalidatetag)             | 재검증 (서버 액션) | 재검증                    | 재검증                    |            |
+| [`revalidatePath`](#revalidatepath)                                     | 재검증 (서버 액션) | 재검증                    | 재검증                    |            |
+| [`const revalidate`](#segment-config-options)                           |                    | 재검증 또는 설정에서 제외 | 재검증 또는 설정에서 제외 |            |
+| [`const dynamic`](#segment-config-options)                              |                    | 캐시 또는 설정에서 제외   | 캐시 또는 설정에서 제외   |            |
+| [`cookies`](#cookies)                                                   | 재검증 (서버 액션) | 설정에서 제외             |                           |            |
+| [`headers`, `searchParams`](#dynamic-functions)                         |                    | 설정에서 제외             |                           |            |
+| [`generateStaticParams`](#generatestaticparams)                         |                    | 캐시                      |                           |            |
+| [`React.cache`](#react-cache-function)                                  |                    |                           |                           | 캐시       |
+| [`unstable_cache`](/docs/app/api-reference/functions/unstable_cache)    |                    |                           | 캐시                      |            |
 
 ### `<Link>`
 
-By default, the `<Link>` component automatically prefetches routes from the Full Route Cache and adds the React Server Component Payload to the Router Cache.
+기본적으로 `<Link>` 컴포넌트는 전체 경로 캐시에서 경로를 자동으로 미리 가져와 React 서버 컴포넌트 페이로드를 라우터 캐시에 추가합니다.
 
-To disable prefetching, you can set the `prefetch` prop to `false`. But this will not skip the cache permanently, the route segment will still be cached client-side when the user visits the route.
+미리 가져오기를 비활성화하려면 `prefetch` prop을 `false`로 설정할 수 있습니다. 하지만 이는 캐시를 영구적으로 건너뛰지 않으며, 사용자가 경로를 방문할 때 경로 세그먼트는 여전히 클라이언트 측에서 캐시됩니다.
 
-Learn more about the [`<Link>` component](/docs/app/api-reference/components/link).
+[`<Link>` 컴포넌트](/docs/app/api-reference/components/link)에 대해 자세히 알아보세요.
 
 ### `router.prefetch`
 
-The `prefetch` option of the `useRouter` hook can be used to manually prefetch a route. This adds the React Server Component Payload to the Router Cache.
+`useRouter` 훅의 `prefetch` 옵션을 사용하여 수동으로 경로를 미리 가져올 수 있습니다. 이는 React 서버 컴포넌트 페이로드를 라우터 캐시에 추가합니다.
 
-See the [`useRouter` hook](/docs/app/api-reference/functions/use-router) API reference.
+[`useRouter` 훅](/docs/app/api-reference/functions/use-router) API 참조를 참조하세요.
 
 ### `router.refresh`
 
-The `refresh` option of the `useRouter` hook can be used to manually refresh a route. This completely clears the Router Cache, and makes a new request to the server for the current route. `refresh` does not affect the Data or Full Route Cache.
+`useRouter` 훅의 `refresh` 옵션을 사용하여 수동으로 경로를 새로 고칠 수 있습니다. 이는 라우터 캐시를 완전히 지우고 현재 경로에 대해 서버에 새로운 요청을 합니다. `refresh`는 데이터 캐시나 전체 경로 캐시에 영향을 미치지 않습니다.
 
-The rendered result will be reconciled on the client while preserving React state and browser state.
+렌더링된 결과는 React 상태와 브라우저 상태를 보존하면서 클라이언트에서 조정됩니다.
 
-See the [`useRouter` hook](/docs/app/api-reference/functions/use-router) API reference.
+[`useRouter` 훅](/docs/app/api-reference/functions/use-router) API 참조를 참조하세요.
 
 ### `fetch`
 
-Data returned from `fetch` is **not** automatically cached in the Data Cache.
+`fetch`에서 반환된 데이터는 데이터 캐시에 자동으로 **캐시되지 않습니다**.
 
 ```jsx
-// Cached by default. `no-store` is the default option and can be omitted.
+// 기본적으로 캐시됩니다. `no-store`는 기본 옵션이며 생략할 수 있습니다.
 fetch(`https://...`, { cache: "no-store" });
 ```
 
-Since the render output depends on data, using `cache: 'no-store'` will also skip the Full Route Cache for the route where the `fetch` request is used. That is, the route will be dynamically rendered on every request, but you can still have other cached data requests in the same route.
+렌더링 출력이 데이터에 의존하기 때문에 `cache: 'no-store'`를 사용하면 `fetch` 요청이 사용되는 경로에 대한 전체 경로 캐시도 건너뜁니다. 즉, 경로는 모든 요청에 대해 동적으로 렌더링되지만 동일한 경로에서 다른 캐시된 데이터 요청을 계속 가질 수 있습니다.
 
-See the [`fetch` API Reference](/docs/app/api-reference/functions/fetch) for more options.
+더 많은 옵션은 [`fetch` API 참조](/docs/app/api-reference/functions/fetch)를 참조하세요.
 
 ### `fetch options.cache`
 
-You can opt individual `fetch` into caching by setting the `cache` option to `force-cache`:
+개별 `fetch`를 `cache` 옵션을 `force-cache`로 설정하여 캐싱에 활성화 할 수 있습니다:
 
 ```jsx
-// Opt out of caching
+// 캐싱 활성화
 fetch(`https://...`, { cache: "force-cache" });
 ```
 
-See the [`fetch` API Reference](/docs/app/api-reference/functions/fetch) for more options.
+더 많은 옵션은 [`fetch` API 참조](/docs/app/api-reference/functions/fetch)를 참조하세요.
 
 ### `fetch options.next.revalidate`
 
-You can use the `next.revalidate` option of `fetch` to set the revalidation period (in seconds) of an individual `fetch` request. This will revalidate the Data Cache, which in turn will revalidate the Full Route Cache. Fresh data will be fetched, and components will be re-rendered on the server.
+`fetch`의 `next.revalidate` 옵션을 사용하여 개별 `fetch` 요청의 재검증 기간(초 단위)을 설정할 수 있습니다. 이는 데이터 캐시를 재검증하고, 차례로 전체 경로 캐시를 재검증합니다. 새로운 데이터가 가져와지고 서버에서 컴포넌트가 다시 렌더링됩니다.
 
 ```jsx
-// Revalidate at most after 1 hour
+// 최대 1시간 후에 재검증
 fetch(`https://...`, { next: { revalidate: 3600 } });
 ```
 
-See the [`fetch` API reference](/docs/app/api-reference/functions/fetch) for more options.
+더 많은 옵션은 [`fetch` API 참조](/docs/app/api-reference/functions/fetch)를 참조하세요.
 
-### `fetch options.next.tags` and `revalidateTag`
+### `fetch options.next.tags` 및 `revalidateTag`
 
-Next.js has a cache tagging system for fine-grained data caching and revalidation.
+Next.js에는 세분화된 데이터 캐싱 및 재검증을 위한 캐시 태깅 시스템이 있습니다.
 
-1. When using `fetch` or [`unstable_cache`](/docs/app/api-reference/functions/unstable_cache), you have the option to tag cache entries with one or more tags.
-2. Then, you can call `revalidateTag` to purge the cache entries associated with that tag.
+1. `fetch` 또는 [`unstable_cache`](/docs/app/api-reference/functions/unstable_cache)를 사용할 때 하나 이상의 태그로 캐시 항목에 태그를 지정할 수 있습니다.
+2. 그런 다음 `revalidateTag`를 호출하여 해당 태그와 관련된 캐시 항목을 제거할 수 있습니다.
 
-For example, you can set a tag when fetching data:
+예를 들어, 데이터를 가져올 때 태그를 설정할 수 있습니다:
 
 ```jsx
-// Cache data with a tag
+// 태그로 데이터 캐시
 fetch(`https://...`, { next: { tags: ["a", "b", "c"] } });
 ```
 
-Then, call `revalidateTag` with a tag to purge the cache entry:
+그런 다음 `revalidateTag`를 특정 태그와 함께 호출하여 캐시 항목을 제거합니다:
 
 ```jsx
-// Revalidate entries with a specific tag
+// 특정 태그를 가진 항목 재검증
 revalidateTag("a");
 ```
 
-There are two places you can use `revalidateTag`, depending on what you're trying to achieve:
+`revalidateTag`를 사용할 수 있는 두 가지 위치가 있으며, 목표에 따라 선택할 수 있습니다:
 
-1. [Route Handlers](/docs/app/building-your-application/routing/route-handlers) - to revalidate data in response of a third party event (e.g. webhook). This will not invalidate the Router Cache immediately as the Router Handler isn't tied to a specific route.
-2. [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) - to revalidate data after a user action (e.g. form submission). This will invalidate the Router Cache for the associated route.
+1. [라우트 핸들러](/docs/app/building-your-application/routing/route-handlers) - 서드파티 이벤트(예: 웹훅)에 대한 응답으로 데이터를 재검증합니다. 이는 라우트 핸들러가 특정 경로에 묶여있지 않기 때문에 라우터 캐시를 즉시 무효화하지 않습니다.
+2. [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) - 사용자 액션(예: 폼 제출) 후 데이터를 재검증합니다. 이는 관련 경로에 대한 라우터 캐시를 무효화합니다.
 
 ### `revalidatePath`
 
-`revalidatePath` allows you manually revalidate data **and** re-render the route segments below a specific path in a single operation. Calling the `revalidatePath` method revalidates the Data Cache, which in turn invalidates the Full Route Cache.
+`revalidatePath`를 사용하면 특정 경로 아래의 경로 세그먼트를 수동으로 재검증하고 단일 작업으로 다시 렌더링할 수 있습니다. `revalidatePath` 메서드를 호출하면 데이터 캐시를 재검증하고, 차례로 전체 경로 캐시를 무효화합니다.
 
 ```jsx
 revalidatePath("/");
 ```
 
-There are two places you can use `revalidatePath`, depending on what you're trying to achieve:
+`revalidatePath`를 사용할 수 있는 두 가지 위치가 있으며, 목표에 따라 선택할 수 있습니다:
 
-1. [Route Handlers](/docs/app/building-your-application/routing/route-handlers) - to revalidate data in response to a third party event (e.g. webhook).
-2. [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) - to revalidate data after a user interaction (e.g. form submission, clicking a button).
+1. [라우트 핸들러](/docs/app/building-your-application/routing/route-handlers) - 서드파티 이벤트(예: 웹훅)에 대한 응답으로 데이터를 재검증합니다.
+2. [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) - 사용자 상호작용(예: 폼 제출, 버튼 클릭) 후 데이터를 재검증합니다.
 
-See the [`revalidatePath` API reference](/docs/app/api-reference/functions/revalidatePath) for more information.
+자세한 정보는 [`revalidatePath` API 참조](/docs/app/api-reference/functions/revalidatePath)를 참조하세요.
 
 > **`revalidatePath`** vs. **`router.refresh`**:
 >
-> Calling `router.refresh` will clear the Router cache, and re-render route segments on the server without invalidating the Data Cache or the Full Route Cache.
+> `router.refresh`를 호출하면 라우터 캐시가 지워지고 데이터 캐시나 전체 경로 캐시를 무효화하지 않고 서버에서 경로 세그먼트를 다시 렌더링합니다.
 >
-> The difference is that `revalidatePath` purges the Data Cache and Full Route Cache, whereas `router.refresh()` does not change the Data Cache and Full Route Cache, as it is a client-side API.
+> 차이점은 `revalidatePath`는 데이터 캐시와 전체 경로 캐시를 제거하는 반면, `router.refresh()`는 클라이언트 측 API이기 때문에 데이터 캐시와 전체 경로 캐시를 변경하지 않는다는 것입니다.
 
-### Dynamic Functions
+### 동적 함수
 
-Dynamic functions like `cookies` and `headers`, and the `searchParams` prop in Pages depend on runtime incoming request information. Using them will opt a route out of the Full Route Cache, in other words, the route will be dynamically rendered.
+`cookies`와 `headers` 같은 동적 함수와 페이지의 `searchParams` prop은 런타임 들어오는 요청 정보에 의존합니다. 이들을 사용하면 경로가 전체 경로 캐시에서 제외됩니다. 다시 말해, 경로가 동적으로 렌더링됩니다.
 
 #### `cookies`
 
-Using `cookies.set` or `cookies.delete` in a Server Action invalidates the Router Cache to prevent routes that use cookies from becoming stale (e.g. to reflect authentication changes).
+서버 액션에서 `cookies.set` 또는 `cookies.delete`를 사용하면 쿠키를 사용하는 경로가 오래되는 것을 방지하기 위해 라우터 캐시가 무효화됩니다(예: 인증 변경 사항을 반영하기 위해).
 
-See the [`cookies`](/docs/app/api-reference/functions/cookies) API reference.
+[`cookies`](/docs/app/api-reference/functions/cookies) API 참조를 참조하세요.
 
-### Segment Config Options
+### 세그먼트 구성 옵션
 
-The Route Segment Config options can be used to override the route segment defaults or when you're not able to use the `fetch` API (e.g. database client or 3rd party libraries).
+라우트 세그먼트 구성 옵션은 경로 세그먼트 기본값을 재정의하거나 `fetch` API를 사용할 수 없을 때(예: 데이터베이스 클라이언트 또는 서드파티 라이브러리) 사용할 수 있습니다.
 
-The following Route Segment Config options will opt out of the Data Cache and Full Route Cache:
+다음 라우트 세그먼트 구성 옵션은 데이터 캐시와 전체 경로 캐시에서 제외합니다:
 
 - `const dynamic = 'force-dynamic'`
 - `const revalidate = 0`
 
-See the [Route Segment Config](/docs/app/api-reference/file-conventions/route-segment-config) documentation for more options.
+더 많은 옵션은 [라우트 세그먼트 구성](/docs/app/api-reference/file-conventions/route-segment-config) 문서를 참조하세요.
 
 ### `generateStaticParams`
 
-For [dynamic segments](/docs/app/building-your-application/routing/dynamic-routes) (e.g. `app/blog/[slug]/page.js`), paths provided by `generateStaticParams` are cached in the Full Route Cache at build time. At request time, Next.js will also cache paths that weren't known at build time the first time they're visited.
+[동적 세그먼트](/docs/app/building-your-application/routing/dynamic-routes)(예: `app/blog/[slug]/page.js`)의 경우, `generateStaticParams`에 의해 제공된 경로는 빌드 시 전체 경로 캐시에 캐시됩니다. 요청 시, Next.js는 빌드 시 알려지지 않았던 경로도 처음 방문할 때 캐시합니다.
 
-To statically render all paths at build time, supply the full list of paths to `generateStaticParams`:
+빌드 시 모든 경로를 정적으로 렌더링하려면 `generateStaticParams`에 전체 경로 목록을 제공하세요:
 
 ```jsx filename="app/blog/[slug]/page.js"
 export async function generateStaticParams() {
@@ -540,20 +532,20 @@ export async function generateStaticParams() {
 }
 ```
 
-To statically render a subset of paths at build time, and the rest the first time they're visited at runtime, return a partial list of paths:
+빌드 시 경로의 일부를 정적으로 렌더링하고 나머지는 런타임에 처음 방문할 때 렌더링하려면 부분적인 경로 목록을 반환하세요:
 
 ```jsx filename="app/blog/[slug]/page.js"
 export async function generateStaticParams() {
   const posts = await fetch("https://.../posts").then((res) => res.json());
 
-  // Render the first 10 posts at build time
+  // 빌드 시 처음 10개의 게시물 렌더링
   return posts.slice(0, 10).map((post) => ({
     slug: post.slug,
   }));
 }
 ```
 
-To statically render all paths the first time they're visited, return an empty array (no paths will be rendered at build time) or utilize [`export const dynamic = 'force-static'`](/docs/app/api-reference/file-conventions/route-segment-config#dynamic):
+모든 경로를 처음 방문할 때 정적으로 렌더링하려면 빈 배열을 반환하거나(빌드 시 렌더링되는 경로 없음) [`export const dynamic = 'force-static'`](/docs/app/api-reference/file-conventions/route-segment-config#dynamic)을 사용하세요:
 
 ```jsx filename="app/blog/[slug]/page.js"
 export async function generateStaticParams() {
@@ -561,19 +553,19 @@ export async function generateStaticParams() {
 }
 ```
 
-> **Good to know:** You must return an array from `generateStaticParams`, even if it's empty. Otherwise, the route will be dynamically rendered.
+> **알아두면 좋은 점:** 빈 배열이라도 `generateStaticParams`에서 배열을 반환해야 합니다. 그렇지 않으면 경로가 동적으로 렌더링됩니다.
 
 ```jsx filename="app/changelog/[slug]/page.js"
 export const dynamic = "force-static";
 ```
 
-To disable caching at request time, add the `export const dynamicParams = false` option in a route segment. When this config option is used, only paths provided by `generateStaticParams` will be served, and other routes will 404 or match (in the case of [catch-all routes](/docs/app/building-your-application/routing/dynamic-routes#catch-all-segments)).
+요청 시 캐싱을 비활성화하려면 경로 세그먼트에 `export const dynamicParams = false` 옵션을 추가하세요. 이 구성 옵션을 사용하면 `generateStaticParams`에서 제공한 경로만 제공되며, 다른 경로는 404가 되거나 일치합니다([catch-all 경로](/docs/app/building-your-application/routing/dynamic-routes#catch-all-segments)의 경우).
 
-### React `cache` function
+### React `cache` 함수
 
-The React `cache` function allows you to memoize the return value of a function, allowing you to call the same function multiple times while only executing it once.
+React `cache` 함수를 사용하면 함수의 반환 값을 메모이제이션할 수 있어, 동일한 함수를 여러 번 호출하면서도 한 번만 실행할 수 있습니다.
 
-Since `fetch` requests are automatically memoized, you do not need to wrap it in React `cache`. However, you can use `cache` to manually memoize data requests for use cases when the `fetch` API is not suitable. For example, some database clients, CMS clients, or GraphQL clients.
+`fetch` 요청은 자동으로 메모이제이션되므로 React `cache`로 감쌀 필요가 없습니다. 하지만 `fetch` API가 적합하지 않은 사용 사례에 대해 데이터 요청을 수동으로 메모이제이션하기 위해 `cache`를 사용할 수 있습니다. 예를 들어, 일부 데이터베이스 클라이언트, CMS 클라이언트 또는 GraphQL 클라이언트에 사용할 수 있습니다.
 
 ```ts filename="utils/get-item.ts" switcher
 import { cache } from "react";

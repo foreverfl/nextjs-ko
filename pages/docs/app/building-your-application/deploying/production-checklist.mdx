@@ -1,165 +1,103 @@
 ---
-title: Production Checklist
-description: Recommendations to ensure the best performance and user experience before taking your Next.js application to production.
+title: 운영 환경 체크리스트
+description: Next.js 애플리케이션을 운영 환경에 배포하기 전 최상의 성능과 사용자 경험을 보장하기 위한 권장 사항들입니다.
 ---
 
-Before taking your Next.js application to production, there are some optimizations and patterns you should consider implementing for the best user experience, performance, and security.
+# 운영 환경 체크리스트
 
-This page provides best practices that you can use as a reference when [building your application](#during-development), [before going to production](#before-going-to-production), and [after deployment](#after-deployment) - as well as the [automatic Next.js optimizations](#automatic-optimizations) you should be aware of.
+Next.js 애플리케이션을 운영 환경에 배포하기 전에, 최상의 사용자 경험, 성능 및 보안을 위해 구현을 고려해야 할 몇 가지 최적화와 패턴이 있습니다.
 
-## Automatic optimizations
+이 페이지는 [애플리케이션 구축 중](#개발-중), [운영 환경 배포 전](#운영-환경-배포-전), 그리고 [배포 후](#배포-후)에 참조할 수 있는 모범 사례를 제공합니다. 또한 알아두어야 할 [자동 Next.js 최적화](#자동-최적화)에 대해서도 다룹니다.
 
-These Next.js optimizations are enabled by default and require no configuration:
+## 자동 최적화
 
-<AppOnly>
+이러한 Next.js 최적화는 기본적으로 활성화되어 있으며 추가 구성이 필요하지 않습니다:
 
-- **[Server Components](/docs/app/building-your-application/rendering/server-components):** Next.js uses Server Components by default. Server Components run on the server, and don't require JavaScript to render on the client. As such, they have no impact on the size of your client-side JavaScript bundles. You can then use [Client Components](/docs/app/building-your-application/rendering/client-components) as needed for interactivity.
-- **[Code-splitting](/docs/app/building-your-application/routing/linking-and-navigating#how-routing-and-navigation-works):** Server Components enable automatic code-splitting by route segments. You may also consider [lazy loading](/docs/app/building-your-application/optimizing/lazy-loading) Client Components and third-party libraries, where appropriate.
-- **[Prefetching](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching):** When a link to a new route enters the user's viewport, Next.js prefetches the route in background. This makes navigation to new routes almost instant. You can opt out of prefetching, where appropriate.
-- **[Static Rendering](/docs/app/building-your-application/rendering/server-components#static-rendering-default):** Next.js statically renders Server and Client Components on the server at build time and caches the rendered result to improve your application's performance. You can opt into [Dynamic Rendering](/docs/app/building-your-application/rendering/server-components#dynamic-rendering) for specific routes, where appropriate. {/* TODO: Update when PPR is stable */}
-- **[Caching](/docs/app/building-your-application/caching):** Next.js caches data requests, the rendered result of Server and Client Components, static assets, and more, to reduce the number of network requests to your server, database, and backend services. You may opt out of caching, where appropriate.
+- **[서버 컴포넌트](/docs/app/building-your-application/rendering/server-components):** Next.js는 기본적으로 서버 컴포넌트를 사용합니다. 서버 컴포넌트는 서버에서 실행되며, 클라이언트에서 렌더링하기 위해 JavaScript가 필요하지 않습니다. 따라서 클라이언트 측 JavaScript 번들 크기에 영향을 미치지 않습니다. 필요에 따라 상호작용을 위해 [클라이언트 컴포넌트](/docs/app/building-your-application/rendering/client-components)를 사용할 수 있습니다.
+- **[코드 분할](/docs/app/building-your-application/routing/linking-and-navigating#how-routing-and-navigation-works):** 서버 컴포넌트는 라우트 세그먼트별로 자동 코드 분할을 가능하게 합니다. 또한 적절한 경우 클라이언트 컴포넌트와 서드파티 라이브러리의 [지연 로딩](/docs/app/building-your-application/optimizing/lazy-loading)을 고려할 수 있습니다.
+- **[프리페칭](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching):** 새 라우트로의 링크가 사용자의 뷰포트에 들어오면, Next.js는 백그라운드에서 해당 라우트를 프리페치합니다. 이로 인해 새 라우트로의 네비게이션이 거의 즉각적으로 이루어집니다. 필요한 경우 프리페칭을 비활성화 할 수 있습니다.
+- **[정적 렌더링](/docs/app/building-your-application/rendering/server-components#static-rendering-default):** Next.js는 빌드 시 서버와 클라이언트 컴포넌트를 정적으로 렌더링하고 렌더링된 결과를 캐시하여 애플리케이션의 성능을 향상시킵니다. 필요한 경우 특정 라우트에 대해 [동적 렌더링](/docs/app/building-your-application/rendering/server-components#dynamic-rendering)을 사용하도록 설정할 수 있습니다. {/* TODO: PPR이 안정화되면 업데이트 */}
+- **[캐싱](/docs/app/building-your-application/caching):** Next.js는 데이터 요청, 서버 및 클라이언트 컴포넌트의 렌더링 결과, 정적 리소스 등을 캐시하여 서버, 데이터베이스 및 백엔드 서비스에 대한 네트워크 요청 수를 줄입니다. 필요한 경우 캐싱을 비활성화 할 수 있습니다.
 
-</AppOnly>
+이러한 기본 설정은 애플리케이션의 성능을 향상시키고, 각 네트워크 요청에서 전송되는 데이터의 양과 비용을 줄이는 것을 목표로 합니다.
 
-<PagesOnly>
+## 개발 과정에서
 
-- **[Code-splitting](/docs/pages/building-your-application/routing/pages-and-layouts):** Next.js automatically code-splits your application code by pages. This means only the code needed for the current page is loaded on navigation. You may also consider [lazy loading](/docs/pages/building-your-application/optimizing/lazy-loading) third-party libraries, where appropriate.
-- **[Prefetching](/docs/pages/api-reference/components/link#prefetch):** When a link to a new route enters the user's viewport, Next.js prefetches the route in background. This makes navigation to new routes almost instant. You can opt out of prefetching, where appropriate.
-- **[Automatic Static Optimization](/docs/pages/building-your-application/rendering/automatic-static-optimization):** Next.js automatically determines that a page is static (can be pre-rendered) if it has no blocking data requirements. Optimized pages can be cached, and served to the end-user from multiple CDN locations. You may opt into [Server-side Rendering](/docs/pages/building-your-application/data-fetching/get-server-side-props), where appropriate.
+애플리케이션을 구축하는 동안, 최상의 성능과 사용자 경험을 보장하기 위해 다음 기능들을 사용하는 것을 권장합니다:
 
-</PagesOnly>
+### 라우팅 및 렌더링
 
-These defaults aim to improve your application's performance, and reduce the cost and amount of data transferred on each network request.
+- **[레이아웃](/docs/app/building-your-application/routing/layouts-and-templates#layouts):** 레이아웃을 사용하여 페이지 간 UI를 공유하고 네비게이션 시 [부분 렌더링](/docs/app/building-your-application/routing/linking-and-navigating#4-partial-rendering)을 가능하게 합니다.
+- **[`<Link>` 컴포넌트](/docs/app/building-your-application/routing/linking-and-navigating#link-component):** `<Link>` 컴포넌트를 사용하여 [클라이언트 측 네비게이션 및 프리페칭](/docs/app/building-your-application/routing/linking-and-navigating#how-routing-and-navigation-works)을 구현합니다.
+- **[에러 처리](/docs/app/building-your-application/routing/error-handling):** 커스텀 에러 페이지를 만들어 운영 환경에서 [전체 에러](/docs/app/building-your-application/routing/error-handling)와 [404 에러](/docs/app/api-reference/file-conventions/not-found)를 우아하게 처리합니다.
+- **[컴포지션 패턴](/docs/app/building-your-application/rendering/composition-patterns):** 서버 및 클라이언트 컴포넌트에 대한 권장 컴포지션 패턴을 따르고, 클라이언트 측 JavaScript 번들이 불필요하게 증가하는 것을 방지하기 위해 [`"use client"` 경계](/docs/app/building-your-application/rendering/composition-patterns#moving-client-components-down-the-tree)의 배치를 확인합니다.
+- **[동적 함수](/docs/app/building-your-application/rendering/server-components#dynamic-functions):** [`cookies()`](/docs/app/api-reference/functions/cookies)와 [`searchParams`](/docs/app/api-reference/file-conventions/page#searchparams-optional) prop과 같은 동적 함수는 전체 라우트를 [동적 렌더링](/docs/app/building-your-application/rendering/server-components#dynamic-rendering)으로 옵트인한다는 점을 인지하세요 ([루트 레이아웃](/docs/app/building-your-application/routing/layouts-and-templates#root-layout-required)에서 사용된 경우 전체 애플리케이션에 영향을 미칩니다). 동적 함수 사용이 의도적인지 확인하고 적절한 경우 `<Suspense>` 경계로 감싸세요.
 
-## During development
+> **알아두면 좋은 점**: [부분 프리렌더링(실험적)](/blog/next-14#partial-prerendering-preview)은 전체 라우트를 동적 렌더링으로 설정하지 않아도, 라우트의 일부를 동적으로 만들 수 있게 해줍니다.
 
-While building your application, we recommend using the following features to ensure the best performance and user experience:
+### 데이터 가져오기 및 캐싱
 
-### Routing and rendering
+- **[서버 컴포넌트](/docs/app/building-your-application/data-fetching/fetching#should-i-fetch-data-on-the-server-or-the-client):** 서버 컴포넌트를 사용하여 서버에서 데이터를 페칭하는 이점을 활용합니다.
+- **[라우트 핸들러](/docs/app/building-your-application/routing/route-handlers):** 클라이언트 컴포넌트에서 백엔드 리소스에 접근하기 위해 라우트 핸들러를 사용합니다. 하지만 추가적인 서버 요청을 피하기 위해 서버 컴포넌트에서 라우트 핸들러를 호출하지 마세요.
+- **[스트리밍](/docs/app/building-your-application/routing/loading-ui-and-streaming):** 로딩 UI와 React Suspense를 사용하여 UI를 서버에서 클라이언트로 점진적으로 전송하고, 데이터를 페칭하는 동안 전체 라우트가 차단되는 것을 방지합니다.
+- **[병렬 데이터 가져오기](/docs/app/building-your-application/data-fetching/fetching#parallel-and-sequential-data-fetching):** 적절한 경우 병렬로 데이터를 페칭하여 네트워크 워터폴을 줄입니다. 또한 적절한 경우 [데이터 프리로딩](/docs/app/building-your-application/data-fetching/fetching#preloading-data)을 고려하세요.
+- **[데이터 캐싱](/docs/app/building-your-application/caching#data-cache):** 데이터 요청이 캐시되고 있는지 확인하고, 적절한 경우 캐싱을 옵트인합니다. `fetch`를 사용하지 않는 요청이 [캐시](/docs/app/api-reference/functions/unstable_cache)되고 있는지 확인하세요.
+- **[정적 이미지](/docs/app/building-your-application/optimizing/static-assets):** `public` 디렉토리를 사용하여 이미지와 같은 애플리케이션의 정적 리소스을 자동으로 캐시합니다.
 
-<AppOnly>
+### UI 및 접근성
 
-- **[Layouts](/docs/app/building-your-application/routing/layouts-and-templates#layouts):** Use layouts to share UI across pages and enable [partial rendering](/docs/app/building-your-application/routing/linking-and-navigating#4-partial-rendering) on navigation.
-- **[`<Link>` component](/docs/app/building-your-application/routing/linking-and-navigating#link-component):** Use the `<Link>` component for [client-side navigation and prefetching](/docs/app/building-your-application/routing/linking-and-navigating#how-routing-and-navigation-works).
-- **[Error Handling](/docs/app/building-your-application/routing/error-handling):** Gracefully handle [catch-all errors](/docs/app/building-your-application/routing/error-handling) and [404 errors](/docs/app/api-reference/file-conventions/not-found) in production by creating custom error pages.
-- **[Composition Patterns](/docs/app/building-your-application/rendering/composition-patterns):** Follow the recommended composition patterns for Server and Client Components, and check the placement of your [`"use client"` boundaries](/docs/app/building-your-application/rendering/composition-patterns#moving-client-components-down-the-tree) to avoid unnecessarily increasing your client-side JavaScript bundle.
-- **[Dynamic Functions](/docs/app/building-your-application/rendering/server-components#dynamic-functions):** Be aware that dynamic functions like [`cookies()`](/docs/app/api-reference/functions/cookies) and the [`searchParams`](/docs/app/api-reference/file-conventions/page#searchparams-optional) prop will opt the entire route into [Dynamic Rendering](/docs/app/building-your-application/rendering/server-components#dynamic-rendering) (or your whole application if used in the [Root Layout](/docs/app/building-your-application/routing/layouts-and-templates#root-layout-required)). Ensure dynamic function usage is intentional and wrap them in `<Suspense>` boundaries where appropriate.
+- **[폼 및 유효성 검사](/docs/app/building-your-application/data-fetching/server-actions-and-mutations#forms):** 서버 액션을 사용하여 폼 제출, 서버 측 유효성 검사 및 오류 처리를 관리합니다.
 
-> **Good to know**: [Partial Prerendering (experimental)](/blog/next-14#partial-prerendering-preview) will allow parts of a route to be dynamic without opting the whole route into dynamic rendering.
+- **[폰트 모듈](/docs/app/building-your-application/optimizing/fonts):** 폰트 모듈을 사용하여 폰트를 최적화합니다. 이 모듈은 자동으로 폰트 파일을 다른 정적 리소스와 함께 호스팅하고, 외부 네트워크 요청을 제거하며, [레이아웃 시프트](https://web.dev/articles/cls)를 줄입니다.
+- **[`<Image>` 컴포넌트](/docs/app/building-your-application/optimizing/images):** Image 컴포넌트를 사용하여 이미지를 최적화합니다. 이 컴포넌트는 자동으로 이미지를 최적화하고, 레이아웃 시프트를 방지하며, WebP나 AVIF와 같은 최신 형식으로 이미지를 제공합니다.
+- **[`<Script>` 컴포넌트](/docs/app/building-your-application/optimizing/scripts):** Script 컴포넌트를 사용하여 서드파티 스크립트를 최적화합니다. 이 컴포넌트는 자동으로 스크립트를 지연시키고 메인 스레드를 차단하지 않도록 합니다.
+- **[ESLint](/docs/architecture/accessibility#linting):** 내장된 `eslint-plugin-jsx-a11y` 플러그인을 사용하여 접근성 문제를 조기에 발견합니다.
 
-</AppOnly>
+### 보안
 
-<PagesOnly>
+- **[오염](/docs/app/building-your-application/data-fetching/fetching#preventing-sensitive-data-from-being-exposed-to-the-client):** 데이터 객체 및/또는 특정 값을 오염시켜 민감한 데이터가 클라이언트에 노출되는 것을 방지합니다.
+- **[서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations#authentication-and-authorization):** 사용자가 서버 액션을 호출할 권한이 있는지 확인합니다. 권장되는 [보안 관행](/blog/security-nextjs-server-components-actions)을 검토하세요.
 
-- **[`<Link>` component](/docs/pages/building-your-application/routing/linking-and-navigating):** Use the `<Link>` component for client-side navigation and prefetching.
-- **[Custom Errors](/docs/pages/building-your-application/routing/custom-error):** Gracefully handle [500](/docs/pages/building-your-application/routing/custom-error#500-page) and [404 errors](/docs/pages/building-your-application/routing/custom-error#404-page)
+- **[환경 변수](/docs/app/building-your-application/configuring/environment-variables):** `.env.*` 파일이 `.gitignore`에 추가되어 있는지 확인하고 공개 변수만 `NEXT_PUBLIC_` 접두사를 사용하도록 합니다.
+- **[콘텐츠 보안 정책](/docs/app/building-your-application/configuring/content-security-policy):** 콘텐츠 보안 정책을 추가하여 크로스 사이트 스크립팅, 클릭재킹 및 기타 코드 주입 공격과 같은 다양한 보안 위협으로부터 애플리케이션을 보호하는 것을 고려하세요.
 
-</PagesOnly>
+### 메타데이터 및 SEO
 
-### Data fetching and caching
+- **[메타데이터 API](/docs/app/building-your-application/optimizing/metadata):** 메타데이터 API를 사용하여 페이지 제목, 설명 등을 추가함으로써 애플리케이션의 검색 엔진 최적화(SEO)를 개선합니다.
+- **[오픈 그래프(OG) 이미지](/docs/app/api-reference/file-conventions/metadata/opengraph-image):** OG 이미지를 생성하여 애플리케이션의 소셜 미디어 공유를 준비합니다.
+- **[사이트맵](/docs/app/api-reference/functions/generate-sitemaps)과 [로봇](/docs/app/api-reference/file-conventions/metadata/robots):** 사이트맵과 robots 파일을 생성하여 검색 엔진이 페이지를 크롤링하고 인덱싱하는 데 도움을 줍니다.
 
-<AppOnly>
+### 타입 안전성
 
-- **[Server Components](/docs/app/building-your-application/data-fetching/fetching#should-i-fetch-data-on-the-server-or-the-client):** Leverage the benefits of fetching data on the server using Server Components.
-- **[Route Handlers](/docs/app/building-your-application/routing/route-handlers):** Use Route Handlers to access your backend resources from Client Components. But do not call Route Handlers from Server Components to avoid an additional server request.
-- **[Streaming](/docs/app/building-your-application/routing/loading-ui-and-streaming):** Use Loading UI and React Suspense to progressively send UI from the server to the client, and prevent the whole route from blocking while data is being fetched.
-- **[Parallel Data Fetching](/docs/app/building-your-application/data-fetching/fetching#parallel-and-sequential-data-fetching):** Reduce network waterfalls by fetching data in parallel, where appropriate. Also, consider [preloading data](/docs/app/building-your-application/data-fetching/fetching#preloading-data) where appropriate.
-- **[Data Caching](/docs/app/building-your-application/caching#data-cache):** Verify whether your data requests are being cached or not, and opt into caching, where appropriate. Ensure requests that don't use `fetch` are [cached](/docs/app/api-reference/functions/unstable_cache).
-- **[Static Images](/docs/app/building-your-application/optimizing/static-assets):** Use the `public` directory to automatically cache your application's static assets, e.g. images.
+- **TypeScript와 [TS 플러그인](/docs/app/building-your-application/configuring/typescript):** TypeScript와 TypeScript 플러그인을 사용하여 더 나은 타입 안전성을 확보하고 오류를 조기에 발견할 수 있습니다.
 
-</AppOnly>
+## 운영 환경 배포 전
 
-<PagesOnly>
+운영 환경에 배포하기 전에 `next build`를 실행하여 애플리케이션을 로컬에서 빌드하고 빌드 오류를 포착한 다음, `next start`를 실행하여 운영 환경과 유사한 환경에서 애플리케이션의 성능을 측정할 수 있습니다.
 
-- **[API Routes](/docs/pages/building-your-application/routing/api-routes):** Use Route Handlers to access your backend resources, and prevent sensitive secrets from being exposed to the client.
-- **[Data Caching](/docs/pages/building-your-application/data-fetching/get-static-props):** Verify whether your data requests are being cached or not, and opt into caching, where appropriate. Ensure requests that don't use `getStaticProps` are cached where appropriate.
-- **[Incremental Static Regeneration](/docs/pages/building-your-application/data-fetching/incremental-static-regeneration):** Use Incremental Static Regeneration to update static pages after they've been built, without rebuilding your entire site.
-- **[Static Images](/docs/pages/building-your-application/optimizing/static-assets):** Use the `public` directory to automatically cache your application's static assets, e.g. images.
+### 핵심 웹 바이탈
 
-</PagesOnly>
+- **[Lighthouse](https://developers.google.com/web/tools/lighthouse):** 시크릿 모드에서 Lighthouse를 실행하여 사용자가 사이트를 어떻게 경험할지 더 잘 이해하고 개선이 필요한 영역을 파악합니다. 이는 시뮬레이션된 테스트이므로 실제 데이터(예: 핵심 웹 바이탈)를 확인하는 것과 함께 사용해야 합니다.
 
-### UI and accessibility
+- **[`useReportWebVitals` 훅](/docs/app/api-reference/functions/use-report-web-vitals):** 이 훅을 사용하여 [핵심 웹 바이탈](https://web.dev/articles/vitals) 데이터를 분석 도구로 전송합니다.
 
-<AppOnly>
+### 번들 분석
 
-- **[Forms and Validation](/docs/app/building-your-application/data-fetching/server-actions-and-mutations#forms):** Use Server Actions to handle form submissions, server-side validation, and handle errors.
+[`@next/bundle-analyzer` 플러그인](/docs/app/building-your-application/optimizing/package-bundling#analyzing-javascript-bundles)을 사용하여 JavaScript 번들의 크기를 분석하고 애플리케이션의 성능에 영향을 미칠 수 있는 큰 모듈과 종속성을 식별합니다.
 
-</AppOnly>
-
-- **[Font Module](/docs/app/building-your-application/optimizing/fonts):** Optimize fonts by using the Font Module, which automatically hosts your font files with other static assets, removes external network requests, and reduces [layout shift](https://web.dev/articles/cls).
-- **[`<Image>` Component](/docs/app/building-your-application/optimizing/images):** Optimize images by using the Image Component, which automatically optimizes images, prevents layout shift, and serves them in modern formats like WebP or AVIF.
-- **[`<Script>` Component](/docs/app/building-your-application/optimizing/scripts):** Optimize third-party scripts by using the Script Component, which automatically defers scripts and prevents them from blocking the main thread.
-- **[ESLint](/docs/architecture/accessibility#linting):** Use the built-in `eslint-plugin-jsx-a11y` plugin to catch accessibility issues early.
-
-### Security
-
-<AppOnly>
-
-- **[Tainting](/docs/app/building-your-application/data-fetching/fetching#preventing-sensitive-data-from-being-exposed-to-the-client):** Prevent sensitive data from being exposed to the client by tainting data objects and/or specific values.
-- **[Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations#authentication-and-authorization):** Ensure users are authorized to call Server Actions. Review the recommended [security practices](/blog/security-nextjs-server-components-actions).
-
-</AppOnly>
-
-- **[Environment Variables](/docs/app/building-your-application/configuring/environment-variables):** Ensure your `.env.*` files are added to `.gitignore` and only public variables are prefixed with `NEXT_PUBLIC_`.
-- **[Content Security Policy](/docs/app/building-your-application/configuring/content-security-policy):** Consider adding a Content Security Policy to protect your application against various security threats such as cross-site scripting, clickjacking, and other code injection attacks.
-
-### Metadata and SEO
-
-<AppOnly>
-
-- **[Metadata API](/docs/app/building-your-application/optimizing/metadata):** Use the Metadata API to improve your application's Search Engine Optimization (SEO) by adding page titles, descriptions, and more.
-- **[Open Graph (OG) images](/docs/app/api-reference/file-conventions/metadata/opengraph-image):** Create OG images to prepare your application for social sharing.
-- **[Sitemaps](/docs/app/api-reference/functions/generate-sitemaps) and [Robots](/docs/app/api-reference/file-conventions/metadata/robots):** Help Search Engines crawl and index your pages by generating sitemaps and robots files.
-
-</AppOnly>
-
-<PagesOnly>
-
-- **[`<Head>` Component](/docs/pages/api-reference/components/head):** Use the `next/head` component to add page titles, descriptions, and more.
-
-</PagesOnly>
-
-### Type safety
-
-- **TypeScript and [TS Plugin](/docs/app/building-your-application/configuring/typescript):** Use TypeScript and the TypeScript plugin for better type-safety, and to help you catch errors early.
-
-## Before going to production
-
-Before going to production, you can run `next build` to build your application locally and catch any build errors, then run `next start` to measure the performance of your application in a production-like environment.
-
-### Core Web Vitals
-
-- **[Lighthouse](https://developers.google.com/web/tools/lighthouse):** Run lighthouse in incognito to gain a better understanding of how your users will experience your site, and to identify areas for improvement. This is a simulated test and should be paired with looking at field data (such as Core Web Vitals).
-
-<AppOnly>
-
-- **[`useReportWebVitals` hook](/docs/app/api-reference/functions/use-report-web-vitals):** Use this hook to send [Core Web Vitals](https://web.dev/articles/vitals) data to analytics tools.
-
-</AppOnly>
-
-### Analyzing bundles
-
-Use the [`@next/bundle-analyzer` plugin](/docs/app/building-your-application/optimizing/package-bundling#analyzing-javascript-bundles) to analyze the size of your JavaScript bundles and identify large modules and dependencies that might be impacting your application's performance.
-
-Additionally, the following tools can help you understand the impact of adding new dependencies to your application:
+추가로, 다음 도구들은 새로운 종속성을 애플리케이션에 추가할 때의 영향을 이해하는 데 도움이 될 수 있습니다:
 
 - [Import Cost](https://marketplace.visualstudio.com/items?itemName=wix.vscode-import-cost)
 - [Package Phobia](https://packagephobia.com/)
 - [Bundle Phobia](https://bundlephobia.com/)
 - [bundlejs](https://bundlejs.com/)
 
-## After deployment
+## 배포 후
 
-Depending on where you deploy your application, you might have access to additional tools and integrations to help you monitor and improve your application's performance.
+애플리케이션을 어디에 배포하느냐에 따라 애플리케이션의 성능을 모니터링하고 개선하는 데 도움이 되는 추가 도구와 통합을 사용할 수 있습니다.
 
-For Vercel deployments, we recommend the following:
+Vercel 배포의 경우, 다음을 권장합니다:
 
-- **[Analytics](https://vercel.com/analytics?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs):** A built-in analytics dashboard to help you understand your application's traffic, including the number of unique visitors, page views, and more.
-- **[Speed Insights](https://vercel.com/docs/speed-insights?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs):** Real-world performance insights based on visitor data, offering a practical view of how your website is performing in the field.
-- **[Logging](https://vercel.com/docs/observability/runtime-logs?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs):** Runtime and Activity logs to help you debug issues and monitor your application in production. Alternatively, see the [integrations page](https://vercel.com/integrations?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs) for a list of third-party tools and services.
-
-> **Good to know:**
->
-> To get a comprehensive understanding of the best practices for production deployments on Vercel, including detailed strategies for improving website performance, refer to the [Vercel Production Checklist](https://vercel.com/docs/production-checklist?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs).
-
-Following these recommendations will help you build a faster, more reliable, and secure application for your users.
+- **[Analytics](https://vercel.com/analytics?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs):** 고유 방문자 수, 페이지 뷰 등을 포함한 애플리케이션의 트래픽을 이해하는 데 도움이 되는 내장 분석 대시보드입니다.
+- **[Speed Insights](https://vercel.com/docs/speed-insights?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs):** 방문자 데이터를 기반으로 한 실제 성능 인사이트로, 웹사이트가 실제 환경에서 어떻게 수행되고 있는지에 대한 실용적인 뷰를 제공합니다.
+- **[로깅](https://vercel.com/docs/observability/runtime-logs?utm_source=next-site&utm_campaign=nextjs-docs&utm_medium=docs):** 런타임 및 활동 로그를 통해 문제를 디버깅하고 운영 환경에서 애플리케이션을 모니터링할 수 있습니다.

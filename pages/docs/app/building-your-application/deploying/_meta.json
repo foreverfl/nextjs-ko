@@ -1,5 +1,5 @@
 {
-  "production-checklist": "프로덕션 체크리스트",
+  "production-checklist": "운영 환경 체크리스트",
   "static-exports": "정적 내보내기",
-  "multi-zones": "다중 구역"
+  "multi-zones": "멀티 존"
 }

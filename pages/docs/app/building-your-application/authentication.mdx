@@ -1,47 +1,46 @@
 ---
-title: Authentication
-description: Learn how to implement authentication in your Next.js application.
+title: 인증
+description: Next.js 애플리케이션에서 인증을 구현하는 방법을 알아보세요.
 ---
 
 import Image from "next/image";
 
 # 인증
 
-Understanding authentication is crucial for protecting your application's data. This page will guide you through what React and Next.js features to use to implement auth.
+애플리케이션의 데이터를 보호하기 위해서는 인증에 대한 이해가 중요합니다. 이 페이지에서는 인증을 구현하기 위해 어떤 React와 Next.js 기능을 사용해야 하는지 안내해 드리겠습니다.
 
-Before starting, it helps to break down the process into three concepts:
+시작하기 전에, 이 과정을 세 가지 개념으로 나누는 것이 도움이 됩니다:
 
-1. **[Authentication](#authentication)**: Verifies if the user is who they say they are. It requires the user to prove their identity with something they have, such as a username and password.
-2. **[Session Management](#session-management)**: Tracks the user's auth state across requests.
-3. **[Authorization](#authorization)**: Decides what routes and data the user can access.
+1. **[인증](#authentication)**: 사용자가 자신이 주장하는 사람인지 확인합니다. 사용자에게 사용자 이름과 비밀번호와 같이 가지고 있는 것으로 신원을 증명하도록 요구합니다.
+2. **[세션 관리](#session-management)**: 요청 간에 사용자의 인증 상태를 추적합니다.
+3. **[권한 부여](#authorization)**: 사용자가 접근할 수 있는 경로와 데이터를 결정합니다.
 
-This diagram shows the authentication flow using React and Next.js features:
+이 다이어그램은 React와 Next.js 기능을 사용한 인증 흐름을 보여줍니다:
 
 <Image
-  alt="Diagram showing the authentication flow with React and Next.js features"
-  srcLight="/docs/light/authentication-overview.png"
-  srcDark="/docs/dark/authentication-overview.png"
+  alt="React와 Next.js 기능을 사용한 인증 흐름을 보여주는 다이어그램"
+  src="https://nextjs.org/_next/image?url=%2Fdocs%2Flight%2Fauthentication-overview.png&w=1920&q=75"
   width="1600"
   height="1383"
 />
 
-The examples on this page walk through basic username and password auth for educational purposes. While you can implement a custom auth solution, for increased security and simplicity, we recommend using an authentication library. These offer built-in solutions for authentication, session management, and authorization, as well as additional features such as social logins, multi-factor authentication, and role-based access control. You can find a list in the [Auth Libraries](#auth-libraries) section.
+이 페이지의 예제들은 교육 목적으로 기본적인 사용자 이름과 비밀번호 인증을 다룹니다. 직접 사용자 정의 인증 솔루션을 구현할 수 있지만, 보안 강화와 단순화를 위해 인증 라이브러리를 사용하는 것을 권장합니다. 이러한 라이브러리들은 인증, 세션 관리, 권한 부여에 대한 내장 솔루션을 제공하며, 소셜 로그인, 다중 요소 인증, 역할 기반 접근 제어와 같은 추가 기능도 제공합니다. [인증 라이브러리](#auth-libraries) 섹션에서 목록을 확인할 수 있습니다.
 
-## Authentication
+## 인증
 
-### Sign-up and login functionality
+### 회원가입 및 로그인 기능
 
-> **Good to know**: These examples use React's `useActionState` hook, which is available in React 19 RC. If you are using an earlier version of React, use `useFormState` instead. See the [React docs](https://react.dev/reference/react/useActionState) for more information.
+> **알아두면 좋은 점**: 이 예제들은 React 19 RC에서 사용 가능한 React의 `useActionState` 훅을 사용합니다. 이전 버전의 React를 사용하고 있다면 대신 `useFormState`를 사용하세요. 자세한 정보는 [React 문서](https://react.dev/reference/react/useActionState)를 참조하세요.
 
-You can use the [`<form>`](https://react.dev/reference/react-dom/components/form) element with React's [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) and [`useActionState`](https://react.dev/reference/react/useActionState) to capture user credentials, validate form fields, and call your Authentication Provider's API or database.
+React의 [서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)와 [`useActionState`](https://react.dev/reference/react/useActionState)와 함께 [`<form>`](https://react.dev/reference/react-dom/components/form) 요소를 사용하여 사용자 자격 증명을 캡처하고, 폼 필드를 검증하고, 인증 제공자의 API나 데이터베이스를 호출할 수 있습니다.
 
-Since Server Actions always execute on the server, they provide a secure environment for handling authentication logic.
+서버 액션은 항상 서버에서 실행되므로 인증 로직을 처리하기 위한 안전한 환경을 제공합니다.
 
-Here are the steps to implement signup/login functionality:
+회원가입/로그인 기능을 구현하는 단계는 다음과 같습니다:
 
-#### 1. Capture user credentials
+#### 1. 사용자 자격 증명 수집하기
 
-To capture user credentials, create a form that invokes a Server Action on submission. For example, a signup form that accepts the user's name, email, and password:
+사용자 자격 증명을 수집하기 위해, 제출 시 Server Action을 호출하는 폼을 만듭니다. 예를 들어, 사용자의 이름, 이메일, 비밀번호를 받는 회원가입 폼입니다:
 
 ```tsx filename="app/ui/signup-form.tsx" switcher
 import { signup } from "@/app/actions/auth";
@@ -99,11 +98,11 @@ export async function signup(formData: FormData) {}
 export async function signup(formData) {}
 ```
 
-#### 2. Validate form fields on the server
+#### 2. 서버에서 폼 필드 검증하기
 
-Use the Server Action to validate the form fields on the server. If your authentication provider doesn't provide form validation, you can use a schema validation library like [Zod](https://zod.dev/) or [Yup](https://github.com/jquense/yup).
+Server Action을 사용하여 서버에서 폼 필드를 검증합니다. 인증 제공자가 폼 검증을 제공하지 않는 경우, [Zod](https://zod.dev/)나 [Yup](https://github.com/jquense/yup)과 같은 스키마(데이터 형식) 검증 라이브러리를 사용할 수 있습니다.
 
-Using Zod as an example, you can define a form schema with appropriate error messages:
+Zod를 예로 들어, 적절한 오류 메시지와 함께 폼 스키마를 정의할 수 있습니다:
 
 ```ts filename="app/lib/definitions.ts" switcher
 import { z } from "zod";
@@ -158,27 +157,27 @@ export const SignupFormSchema = z.object({
 });
 ```
 
-To prevent unnecessary calls to your authentication provider's API or database, you can `return` early in the Server Action if any form fields do not match the defined schema.
+인증 제공자의 API나 데이터베이스에 불필요한 호출을 방지하기 위해, 폼 필드가 정의된 스키마와 일치하지 않을 경우 Server Action에서 일찍 `return`할 수 있습니다.
 
 ```ts filename="app/actions/auth.ts" switcher
 import { SignupFormSchema, FormState } from "@/app/lib/definitions";
 
 export async function signup(state: FormState, formData: FormData) {
-  // Validate form fields
+  // 폼 필드 검증
   const validatedFields = SignupFormSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  // If any form fields are invalid, return early
+  // 폼 필드가 유효하지 않으면 일찍 리턴
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
-  // Call the provider or db to create a user...
+  // 사용자를 생성하기 위해 제공자나 데이터베이스 호출...
 }
 ```
 
@@ -186,25 +185,25 @@ export async function signup(state: FormState, formData: FormData) {
 import { SignupFormSchema } from "@/app/lib/definitions";
 
 export async function signup(state, formData) {
-  // Validate form fields
+  // 폼 필드 검증
   const validatedFields = SignupFormSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  // If any form fields are invalid, return early
+  // 폼 필드가 유효하지 않으면 일찍 리턴
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
-  // Call the provider or db to create a user...
+  // 사용자를 생성하기 위해 제공자나 데이터베이스 호출...
 }
 ```
 
-Back in your `<SignupForm />`, you can use React's `useActionState()` hook to display validation errors and a pending state while the form is submitting:
+`<SignupForm />`으로 돌아가서, React의 `useActionState()` 훅을 사용하여 검증 오류를 표시하고 폼이 제출되는 동안 대기 상태를 표시할 수 있습니다:
 
 ```tsx filename="app/ui/signup-form.tsx" switcher highlight={7,15,21,27-39}
 "use client";
@@ -296,25 +295,25 @@ export function SignupForm() {
 }
 ```
 
-> **Good to know:** Alternatively, you can use the [`useFormStatus`](https://react.dev/reference/react-dom/hooks/useFormStatus) hook to display the pending state.
+> **알아두면 좋은 점:** 대안으로, [`useFormStatus`](https://ko.react.dev/reference/react-dom/hooks/useFormStatus) 훅을 사용하여 대기 상태를 표시할 수 있습니다.
 
-#### 3. Create a user or check user credentials
+#### 3. 사용자 생성 또는 사용자 자격 증명 확인하기
 
-After validating form fields, you can create a new user account or check if the user exists by calling your authentication provider's API or database.
+폼 필드를 검증한 후, 인증 제공자의 API나 데이터베이스를 호출하여 새 사용자 계정을 생성하거나 사용자가 존재하는지 확인할 수 있습니다.
 
-Continuing from the previous example:
+이전 예제에 이어서:
 
 ```tsx filename="app/actions/auth.tsx" switcher
 export async function signup(state: FormState, formData: FormData) {
-  // 1. Validate form fields
+  // 1. 폼 필드 검증
   // ...
 
-  // 2. Prepare data for insertion into database
+  // 2. 데이터베이스에 삽입할 데이터 준비
   const { name, email, password } = validatedFields.data;
-  // e.g. Hash the user's password before storing it
+  // 예: 저장하기 전에 사용자의 비밀번호를 해시화
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // 3. Insert the user into the database or call an Auth Library's API
+  // 3. 사용자를 데이터베이스에 삽입하거나 인증 라이브러리의 API 호출
   const data = await db
     .insert(users)
     .values({
@@ -333,22 +332,22 @@ export async function signup(state: FormState, formData: FormData) {
   }
 
   // TODO:
-  // 4. Create user session
-  // 5. Redirect user
+  // 4. 사용자 세션 생성
+  // 5. 사용자 리디렉션
 }
 ```
 
 ```jsx filename="app/actions/auth.js" switcher
 export async function signup(state, formData) {
-  // 1. Validate form fields
+  // 1. 폼 필드 검증
   // ...
 
-  // 2. Prepare data for insertion into database
+  // 2. 데이터베이스에 삽입할 데이터 준비
   const { name, email, password } = validatedFields.data;
-  // e.g. Hash the user's password before storing it
+  // 예: 저장하기 전에 사용자의 비밀번호를 해시화
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // 3. Insert the user into the database or call an Library API
+  // 3. 사용자를 데이터베이스에 삽입하거나 라이브러리 API 호출
   const data = await db
     .insert(users)
     .values({
@@ -367,64 +366,64 @@ export async function signup(state, formData) {
   }
 
   // TODO:
-  // 4. Create user session
-  // 5. Redirect user
+  // 4. 사용자 세션 생성
+  // 5. 사용자 리디렉션
 }
 ```
 
-After successfully creating the user account or verifying the user credentials, you can create a session to manage the user's auth state. Depending on your session management strategy, the session can be stored in a cookie or database, or both. Continue to the [Session Management](#session-management) section to learn more.
+사용자 계정을 성공적으로 생성하거나 사용자 자격 증명을 확인한 후, 사용자의 인증 상태를 관리하기 위한 세션을 생성할 수 있습니다. 세션 관리 전략에 따라 세션을 쿠키나 데이터베이스, 또는 둘 다에 저장할 수 있습니다. 자세한 내용은 [세션 관리](#session-management) 섹션을 계속 읽어보세요.
 
-> **Tips:**
+> **팁:**
 >
-> - The example above is verbose since it breaks down the authentication steps for the purpose of education. This highlights that implementing your own secure solution can quickly become complex. Consider using an [Auth Library](#auth-libraries) to simplify the process.
-> - To improve the user experience, you may want to check for duplicate emails or usernames earlier in the registration flow. For example, as the user types in a username or the input field loses focus. This can help prevent unnecessary form submissions and provide immediate feedback to the user. You can debounce requests with libraries such as [use-debounce](https://www.npmjs.com/package/use-debounce) to manage the frequency of these checks.
+> - 위의 예제는 교육 목적으로 인증 단계를 상세히 설명하기 위해 상당히 장황합니다. 이는 자체적으로 안전한 솔루션을 구현하는 것이 얼마나 빠르게 복잡해질 수 있는지를 강조합니다. 이 과정을 단순화하기 위해 [인증 라이브러리](#auth-libraries)를 사용하는 것을 고려해보세요.
+> - 사용자 경험을 개선하기 위해, 등록 과정 초기에 중복된 이메일이나 사용자 이름을 확인하고 싶을 수 있습니다. 예를 들어, 사용자가 사용자 이름을 입력하거나 입력 필드에서 포커스를 잃을 때 확인할 수 있습니다. 이는 불필요한 폼 제출을 방지하고 사용자에게 즉각적인 피드백을 제공하는 데 도움이 됩니다. [use-debounce](https://www.npmjs.com/package/use-debounce)와 같은 라이브러리를 사용하여 이러한 확인의 빈도를 관리할 수 있습니다.
 
-## Session Management
+## 세션 관리
 
-Session management ensures that the user's authenticated state is preserved across requests. It involves creating, storing, refreshing, and deleting sessions or tokens.
+세션 관리는 요청 간에 사용자의 인증 상태가 유지되도록 보장합니다. 여기에는 세션이나 토큰의 생성, 저장, 새로 고침, 삭제가 포함됩니다.
 
-There are two types of sessions:
+두 가지 유형의 세션이 있습니다:
 
-1. [**Stateless**](#stateless-sessions): Session data (or a token) is stored in the browser's cookies. The cookie is sent with each request, allowing the session to be verified on the server. This method is simpler, but can be less secure if not implemented correctly.
-2. [**Database**](#database-sessions): Session data is stored in a database, with the user's browser only receiving the encrypted session ID. This method is more secure, but can be complex and use more server resources.
+1. [**무상태**](#stateless-sessions): 세션 데이터(또는 토큰)가 브라우저의 쿠키에 저장됩니다. 쿠키는 각 요청과 함께 전송되어 서버에서 세션을 확인할 수 있게 합니다. 이 방법은 더 단순하지만, 올바르게 구현되지 않으면 덜 안전할 수 있습니다.
+2. [**데이터베이스**](#database-sessions): 세션 데이터가 데이터베이스에 저장되고, 사용자의 브라우저는 암호화된 세션 ID만 받습니다. 이 방법은 더 안전하지만, 복잡하고 더 많은 서버 리소스를 사용할 수 있습니다.
 
-> **Good to know:** While you can use either method, or both, we recommend using session management library such as [iron-session](https://github.com/vvo/iron-session) or [Jose](https://github.com/panva/jose).
+> **알아두면 좋은 점:** 두 방법 중 하나를 사용하거나 둘 다 사용할 수 있지만, [iron-session](https://github.com/vvo/iron-session)이나 [Jose](https://github.com/panva/jose)와 같은 세션 관리 라이브러리를 사용하는 것을 권장합니다.
 
-### Stateless Sessions
+### 무상태 세션
 
-To create and manage stateless sessions, there are a few steps you need to follow:
+무상태 세션을 생성하고 관리하려면 다음 단계를 따라야 합니다:
 
-1. Generate a secret key, which will be used to sign your session, and store it as an [environment variable](/docs/app/building-your-application/configuring/environment-variables).
-2. Write logic to encrypt/decrypt session data using a session management library.
-3. Manage cookies using the Next.js [`cookies()`](/docs/app/api-reference/functions/cookies) API.
+1. 세션에 서명하는 데 사용될 비밀 키를 생성하고 [환경 변수](/docs/app/building-your-application/configuring/environment-variables)로 저장합니다.
+2. 세션 관리 라이브러리를 사용하여 세션 데이터를 암호화/복호화하는 로직을 작성합니다.
+3. Next.js [`cookies()`](/docs/app/api-reference/functions/cookies) API를 사용하여 쿠키를 관리합니다.
 
-In addition to the above, consider adding functionality to [update (or refresh)](#updating-or-refreshing-sessions) the session when the user returns to the application, and [delete](#deleting-the-session) the session when the user logs out.
+위의 내용 외에도, 사용자가 애플리케이션으로 돌아올 때 세션을 [업데이트(또는 새로 고침)](#updating-or-refreshing-sessions)하고, 사용자가 로그아웃할 때 세션을 [삭제](#deleting-the-session)하는 기능을 추가하는 것을 고려해보세요.
 
-> **Good to know:** Check if your [auth library](#auth-libraries) includes session management.
+> **알아두면 좋은 점:** [인증 라이브러리](#auth-libraries)에 세션 관리가 포함되어 있는지 확인하세요.
 
-#### 1. Generating a secret key
+#### 1. 비밀 키 생성하기
 
-There are a few ways you can generate secret key to sign your session. For example, you may choose to use the `openssl` command in your terminal:
+세션에 서명할 비밀 키를 생성하는 방법은 여러 가지가 있습니다. 예를 들어, 터미널에서 `openssl` 명령을 사용할 수 있습니다:
 
 ```bash filename="terminal"
 openssl rand -base64 32
 ```
 
-This command generates a 32-character random string that you can use as your secret key and store in your [environment variables file](/docs/app/building-your-application/configuring/environment-variables):
+이 명령은 비밀 키로 사용할 수 있는 32자의 무작위 문자열을 생성하며, 이를 [환경 변수 파일](/docs/app/building-your-application/configuring/environment-variables)에 저장할 수 있습니다:
 
 ```bash filename=".env"
 SESSION_SECRET=your_secret_key
 ```
 
-You can then reference this key in your session management logic:
+그런 다음 세션 관리 로직에서 이 키를 참조할 수 있습니다:
 
 ```js filename="app/lib/session.js"
 const secretKey = process.env.SESSION_SECRET;
 ```
 
-#### 2. Encrypting and decrypting sessions
+#### 2. 세션 암호화 및 복호화하기
 
-Next, you can use your preferred [session management library](#session-management-libraries) to encrypt and decrypt sessions. Continuing from the previous example, we'll use [Jose](https://www.npmjs.com/package/jose) (compatible with the [Edge Runtime](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes)) and React's [`server-only`](https://www.npmjs.com/package/server-only) package to ensure that your session management logic is only executed on the server.
+다음으로, 선호하는 [세션 관리 라이브러리](#session-management-libraries)를 사용하여 세션을 암호화하고 복호화할 수 있습니다. 이전 예제에 이어서, [Jose](https://www.npmjs.com/package/jose)([Edge Runtime](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes)과 호환됨)와 React의 [`server-only`](https://www.npmjs.com/package/server-only) 패키지를 사용하여 세션 관리 로직이 서버에서만 실행되도록 보장할 수 있습니다.
 
 ```tsx filename="app/lib/session.ts" switcher
 import "server-only";
@@ -481,21 +480,21 @@ export async function decrypt(session) {
 }
 ```
 
-> **Tips**:
+> **팁**:
 >
-> - The payload should contain the **minimum**, unique user data that'll be used in subsequent requests, such as the user's ID, role, etc. It should not contain personally identifiable information like phone number, email address, credit card information, etc, or sensitive data like passwords.
+> - 페이로드는 후속 요청에서 사용될 **최소한의**, 고유한 사용자 데이터(예: 사용자 ID, 역할 등)만 포함해야 합니다. 전화번호, 이메일 주소, 신용카드 정보 등 개인 식별 정보나 비밀번호와 같은 민감한 데이터를 포함해서는 안 됩니다.
 
-#### 3. Setting cookies (recommended options)
+#### 3. 쿠키 설정하기 (권장 옵션)
 
-To store the session in a cookie, use the Next.js [`cookies()`](/docs/app/api-reference/functions/cookies) API. The cookie should be set on the server, and include the recommended options:
+세션을 쿠키에 저장하려면 Next.js [`cookies()`](/docs/app/api-reference/functions/cookies) API를 사용하세요. 쿠키는 서버에서 설정되어야 하며, 다음과 같은 권장 옵션을 포함해야 합니다:
 
-- **HttpOnly**: Prevents client-side JavaScript from accessing the cookie.
-- **Secure**: Use https to send the cookie.
-- **SameSite**: Specify whether the cookie can be sent with cross-site requests.
-- **Max-Age or Expires**: Delete the cookie after a certain period.
-- **Path**: Define the URL path for the cookie.
+- **HttpOnly**: 클라이언트 측 JavaScript가 쿠키에 접근하는 것을 방지합니다.
+- **Secure**: https를 사용하여 쿠키를 전송합니다.
+- **SameSite**: 쿠키가 크로스 사이트 요청과 함께 전송될 수 있는지 지정합니다.
+- **Max-Age 또는 Expires**: 일정 기간 후 쿠키를 삭제합니다.
+- **Path**: 쿠키의 URL 경로를 정의합니다.
 
-Please refer to [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) for more information on each of these options.
+이러한 각 옵션에 대한 자세한 정보는 [MDN](https://developer.mozilla.org/ko/docs/Web/HTTP/Cookies)을 참조하세요.
 
 ```ts filename="app/lib/session.ts" switcher
 import "server-only";
@@ -533,21 +532,21 @@ export async function createSession(userId) {
 }
 ```
 
-Back in your Server Action, you can invoke the `createSession()` function, and use the [`redirect()`](/docs/app/building-your-application/routing/redirecting) API to redirect the user to the appropriate page:
+Server Action으로 돌아가서, `createSession()` 함수를 호출하고 [`redirect()`](/docs/app/building-your-application/routing/redirecting) API를 사용하여 사용자를 적절한 페이지로 리디렉션할 수 있습니다:
 
 ```ts filename="app/actions/auth.ts" switcher
 import { createSession } from "@/app/lib/session";
 
 export async function signup(state: FormState, formData: FormData) {
-  // Previous steps:
-  // 1. Validate form fields
-  // 2. Prepare data for insertion into database
-  // 3. Insert the user into the database or call an Library API
+  // 이전 단계:
+  // 1. 폼 필드 검증
+  // 2. 데이터베이스에 삽입할 데이터 준비
+  // 3. 사용자를 데이터베이스에 삽입하거나 라이브러리 API 호출
 
-  // Current steps:
-  // 4. Create user session
+  // 현재 단계:
+  // 4. 사용자 세션 생성
   await createSession(user.id);
-  // 5. Redirect user
+  // 5. 사용자 리디렉션
   redirect("/profile");
 }
 ```
@@ -556,27 +555,27 @@ export async function signup(state: FormState, formData: FormData) {
 import { createSession } from "@/app/lib/session";
 
 export async function signup(state, formData) {
-  // Previous steps:
-  // 1. Validate form fields
-  // 2. Prepare data for insertion into database
-  // 3. Insert the user into the database or call an Library API
+  // 이전 단계:
+  // 1. 폼 필드 검증
+  // 2. 데이터베이스에 삽입할 데이터 준비
+  // 3. 사용자를 데이터베이스에 삽입하거나 라이브러리 API 호출
 
-  // Current steps:
-  // 4. Create user session
+  // 현재 단계:
+  // 4. 사용자 세션 생성
   await createSession(user.id);
-  // 5. Redirect user
+  // 5. 사용자 리디렉션
   redirect("/profile");
 }
 ```
 
-> **Tips**:
+> **팁**:
 >
-> - **Cookies should be set on the server** to prevent client-side tampering.
-> - 🎥 Watch: Learn more about stateless sessions and authentication with Next.js → [YouTube (11 minutes)](https://www.youtube.com/watch?v=DJvM2lSPn6w).
+> - **쿠키는 서버에서 설정되어야 합니다** 클라이언트 측 변조를 방지하기 위해서입니다.
+> - 🎥 시청하기: Next.js를 사용한 무상태 세션과 인증에 대해 더 자세히 알아보기 → [YouTube (11분)](https://www.youtube.com/watch?v=DJvM2lSPn6w).
 
-#### Updating (or refreshing) sessions
+#### 세션 업데이트 (또는 새로 고침)
 
-You can also extend the session's expiration time. This is useful for keeping the user logged in after they access the application again. For example:
+세션의 만료 시간을 연장할 수도 있습니다. 이는 사용자가 애플리케이션에 다시 접근한 후에도 로그인 상태를 유지하는 데 유용합니다. 예를 들어:
 
 ```ts filename="app/lib/session.ts" switcher
 import "server-only";
@@ -626,11 +625,11 @@ export async function updateSession() {
 }
 ```
 
-> **Tip:** Check if your auth library supports refresh tokens, which can be used to extend the user's session.
+> **팁:** 인증 라이브러리가 새로 고침 토큰을 지원하는지 확인하세요. 새로 고침 토큰은 사용자의 세션을 연장하는 데 사용될 수 있습니다.
 
-#### Deleting the session
+#### 세션 삭제하기
 
-To delete the session, you can delete the cookie:
+세션을 삭제하려면 쿠키를 삭제하면 됩니다:
 
 ```ts filename="app/lib/session.ts" switcher
 import "server-only";
@@ -650,7 +649,7 @@ export function deleteSession() {
 }
 ```
 
-Then you can reuse the `deleteSession()` function in your application, for example, on logout:
+그런 다음 애플리케이션에서 `deleteSession()` 함수를 재사용할 수 있습니다. 예를 들어, 로그아웃 시:
 
 ```ts filename="app/actions/auth.ts" switcher
 import { cookies } from "next/headers";
@@ -672,15 +671,15 @@ export async function logout() {
 }
 ```
 
-### Database Sessions
+### 데이터베이스 세션
 
-To create and manage database sessions, you'll need to follow these steps:
+데이터베이스 세션을 생성하고 관리하려면 다음 단계를 따라야 합니다:
 
-1. Create a table in your database to store session and data (or check if your Auth Library handles this).
-2. Implement functionality to insert, update, and delete sessions
-3. Encrypt the session ID before storing it in the user's browser, and ensure the database and cookie stay in sync (this is optional, but recommended for optimistic auth checks in [Middleware](#optimistic-checks-with-middleware-optional)).
+1. 데이터베이스에 세션과 데이터를 저장할 테이블을 생성합니다 (또는 인증 라이브러리가 이를 처리하는지 확인합니다).
+2. 세션을 삽입, 업데이트, 삭제하는 기능을 구현합니다.
+3. 사용자의 브라우저에 저장하기 전에 세션 ID를 암호화하고, 데이터베이스와 쿠키가 동기화 상태를 유지하도록 합니다 (이는 선택 사항이지만, [미들웨어에서 낙관적 인증 확인](#optimistic-checks-with-middleware-optional)을 위해 권장됩니다).
 
-For example:
+예를 들어:
 
 ```ts filename="app/lib/session.ts" switcher
 import cookies from "next/headers";
@@ -690,22 +689,22 @@ import { encrypt } from "@/app/lib/session";
 export async function createSession(id: number) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  // 1. Create a session in the database
+  // 1. 데이터베이스에 세션 생성
   const data = await db
     .insert(sessions)
     .values({
       userId: id,
       expiresAt,
     })
-    // Return the session ID
+    // 세션 ID 반환
     .returning({ id: sessions.id });
 
   const sessionId = data[0].id;
 
-  // 2. Encrypt the session ID
+  // 2. 세션 ID 암호화
   const session = await encrypt({ sessionId, expiresAt });
 
-  // 3. Store the session in cookies for optimistic auth checks
+  // 3. 낙관적 인증 확인을 위해 세션을 쿠키에 저장
   cookies().set("session", session, {
     httpOnly: true,
     secure: true,
@@ -724,22 +723,22 @@ import { encrypt } from "@/app/lib/session";
 export async function createSession(id) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  // 1. Create a session in the database
+  // 1. 데이터베이스에 세션 생성
   const data = await db
     .insert(sessions)
     .values({
       userId: id,
       expiresAt,
     })
-    // Return the session ID
+    // 세션 ID 반환
     .returning({ id: sessions.id });
 
   const sessionId = data[0].id;
 
-  // 2. Encrypt the session ID
+  // 2. 세션 ID 암호화
   const session = await encrypt({ sessionId, expiresAt });
 
-  // 3. Store the session in cookies for optimistic auth checks
+  // 3. 낙관적 인증 확인을 위해 세션을 쿠키에 저장
   cookies().set("session", session, {
     httpOnly: true,
     secure: true,
@@ -750,64 +749,64 @@ export async function createSession(id) {
 }
 ```
 
-> **Tips**:
+> **팁**:
 >
-> - For faster data retrieval, consider using a database like [Vercel Redis](https://vercel.com/docs/storage/vercel-kv). However, you can also keep the session data in your primary database, and combine data requests to reduce the number of queries.
-> - You may opt to use database sessions for more advanced use cases, such as keeping track of the last time a user logged in, or number of active devices, or give users the ability to log out of all devices.
+> - 더 빠른 데이터 검색을 위해 [Vercel Redis](https://vercel.com/docs/storage/vercel-kv)와 같은 데이터베이스 사용을 고려해보세요. 하지만 기본 데이터베이스에 세션 데이터를 유지하고 쿼리 수를 줄이기 위해 데이터 요청을 결합할 수도 있습니다.
+> - 사용자가 마지막으로 로그인한 시간 추적, 활성 기기 수 추적, 또는 사용자에게 모든 기기에서 로그아웃할 수 있는 기능 제공과 같은 더 고급 사용 사례를 위해 데이터베이스 세션을 사용할 수 있습니다.
 
-After implementing session management, you'll need to add authorization logic to control what users can access and do within your application. Continue to the [Authorization](#authorization) section to learn more.
+세션 관리를 구현한 후에는 사용자가 애플리케이션 내에서 접근하고 수행할 수 있는 작업을 제어하기 위한 권한 부여 로직을 추가해야 합니다. 자세한 내용은 [권한 부여](#authorization) 섹션을 계속 읽어보세요.
 
-## Authorization
+## 권한 부여
 
-Once a user is authenticated and a session is created, you can implement authorization to control what the user can access and do within your application.
+사용자가 인증되고 세션이 생성되면, 사용자가 애플리케이션 내에서 접근하고 수행할 수 있는 작업을 제어하기 위해 권한 부여를 구현할 수 있습니다.
 
-There are two main types of authorization checks:
+두 가지 주요 유형의 권한 부여 확인이 있습니다:
 
-1. **Optimistic**: Checks if the user is authorized to access a route or perform an action using the session data stored in the cookie. These checks are useful for quick operations, such as showing/hiding UI elements or redirecting users based on permissions or roles.
-2. **Secure**: Checks if the user is authorized to access a route or perform an action using the session data stored in the database. These checks are more secure and are used for operations that require access to sensitive data or actions.
+1. **낙관적**: 쿠키에 저장된 세션 데이터를 사용하여 사용자가 경로에 접근하거나 작업을 수행할 권한이 있는지 확인합니다. 이러한 확인은 UI 요소 표시/숨기기 또는 권한이나 역할에 따라 사용자를 리디렉션하는 등의 빠른 작업에 유용합니다.
+2. **안전**: 데이터베이스에 저장된 세션 데이터를 사용하여 사용자가 경로에 접근하거나 작업을 수행할 권한이 있는지 확인합니다. 이러한 확인은 더 안전하며 민감한 데이터나 작업에 대한 접근이 필요한 작업에 사용됩니다.
 
-For both cases, we recommend:
+두 경우 모두 다음을 권장합니다:
 
-- Creating a [Data Access Layer](#creating-a-data-access-layer-dal) to centralize your authorization logic
-- Using [Data Transfer Objects (DTO)](#using-data-transfer-objects-dto) to only return the necessary data
-- Optionally use [Middleware](#optimistic-checks-with-middleware-optional) to perform optimistic checks.
+- 권한 부여 로직을 중앙 집중화하기 위해 [데이터 접근 계층(DAL) 생성하기](#creating-a-data-access-layer-dal)
+- 필요한 데이터만 반환하기 위해 [데이터 전송 객체(DTO) 사용하기](#using-data-transfer-objects-dto)
+- 선택적으로 낙관적 확인을 수행하기 위해 [미들웨어](#optimistic-checks-with-middleware-optional) 사용하기
 
-### Optimistic checks with Middleware (Optional)
+### 미들웨어를 사용한 낙관적 확인 (선택 사항)
 
-There are some cases where you may want to use [Middleware](/docs/app/building-your-application/routing/middleware) and redirect users based on permissions:
+[미들웨어](/docs/app/building-your-application/routing/middleware)를 사용하여 권한에 따라 사용자를 리디렉션하고 싶은 경우가 있습니다:
 
-- To perform optimistic checks. Since Middleware runs on every route, it's a good way to centralize redirect logic and pre-filter unauthorized users.
-- To protect static routes that share data between users (e.g. content behind a paywall).
+- 낙관적 확인을 수행하기 위해. 미들웨어는 모든 경로에서 실행되므로 리디렉션 로직을 중앙 집중화하고 권한이 없는 사용자를 사전에 필터링하는 좋은 방법입니다.
+- 사용자 간에 데이터를 공유하는 정적 경로를 보호하기 위해 (예: 유료 콘텐츠).
 
-However, since Middleware runs on every route, including [prefetched](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching) routes, it's important to only read the session from the cookie (optimistic checks), and avoid database checks to prevent performance issues.
+그러나 미들웨어는 [프리페치된](/docs/app/building-your-application/routing/linking-and-navigating#2-prefetching) 경로를 포함한 모든 경로에서 실행되므로, 성능 문제를 방지하기 위해 쿠키에서 세션을 읽는 것(낙관적 확인)만 하고 데이터베이스 확인을 피하는 것이 중요합니다.
 
-For example:
+예를 들어:
 
 ```tsx filename="middleware.ts" switcher
 import { NextRequest, NextResponse } from "next/server";
 import { decrypt } from "@/app/lib/session";
 import { cookies } from "next/headers";
 
-// 1. Specify protected and public routes
+// 1. 보호된 경로와 공개 경로 지정
 const protectedRoutes = ["/dashboard"];
 const publicRoutes = ["/login", "/signup", "/"];
 
 export default async function middleware(req: NextRequest) {
-  // 2. Check if the current route is protected or public
+  // 2. 현재 경로가 보호된 경로인지 공개 경로인지 확인
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  // 3. Decrypt the session from the cookie
+  // 3. 쿠키에서 세션 복호화
   const cookie = cookies().get("session")?.value;
   const session = await decrypt(cookie);
 
-  // 5. Redirect to /login if the user is not authenticated
+  // 5. 사용자가 인증되지 않은 경우 /login으로 리디렉션
   if (isProtectedRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
-  // 6. Redirect to /dashboard if the user is authenticated
+  // 6. 사용자가 인증된 경우 /dashboard로 리디렉션
   if (
     isPublicRoute &&
     session?.userId &&
@@ -819,7 +818,7 @@ export default async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// Routes Middleware should not run on
+// 미들웨어가 실행되지 않아야 하는 경로
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };
@@ -830,26 +829,26 @@ import { NextResponse } from "next/server";
 import { decrypt } from "@/app/lib/session";
 import { cookies } from "next/headers";
 
-// 1. Specify protected and public routes
+// 1. 보호된 경로와 공개 경로 지정
 const protectedRoutes = ["/dashboard"];
 const publicRoutes = ["/login", "/signup", "/"];
 
 export default async function middleware(req) {
-  // 2. Check if the current route is protected or public
+  // 2. 현재 경로가 보호된 경로인지 공개 경로인지 확인
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  // 3. Decrypt the session from the cookie
+  // 3. 쿠키에서 세션 복호화
   const cookie = cookies().get("session")?.value;
   const session = await decrypt(cookie);
 
-  // 5. Redirect to /login if the user is not authenticated
+  // 5. 사용자가 인증되지 않은 경우 /login으로 리디렉션
   if (isProtectedRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
-  // 6. Redirect to /dashboard if the user is authenticated
+  // 6. 사용자가 인증된 경우 /dashboard로 리디렉션
   if (
     isPublicRoute &&
     session?.userId &&
@@ -861,27 +860,27 @@ export default async function middleware(req) {
   return NextResponse.next();
 }
 
-// Routes Middleware should not run on
+// 미들웨어가 실행되지 않아야 하는 경로
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };
 ```
 
-While Middleware can be useful for initial checks, it should not be your only line of defense in protecting your data. The majority of security checks should be performed as close as possible to your data source, see [Data Access Layer](#creating-a-data-access-layer-dal) for more information.
+미들웨어가 초기 확인에 유용할 수 있지만, 데이터를 보호하는 유일한 방어선이 되어서는 안 됩니다. 보안 확인의 대부분은 데이터 소스에 가능한 한 가깝게 수행되어야 합니다. 자세한 내용은 [데이터 액세스 계층](#creating-a-data-access-layer-dal)을 참조하세요.
 
-> **Tips**:
+> **팁**:
 >
-> - In Middleware, you can also read cookies using `req.cookies.get('session).value`.
-> - Middleware uses the [Edge Runtime](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes), check if your Auth library and session management library are compatible.
-> - You can use the `matcher` property in the Middleware to specify which routes Middleware should run on. Although, for auth, it's recommended Middleware runs on all routes.
+> - 미들웨어에서는 `req.cookies.get('session).value`를 사용하여 쿠키를 읽을 수도 있습니다.
+> - 미들웨어는 [Edge Runtime](/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes)을 사용합니다. 인증 라이브러리와 세션 관리 라이브러리가 호환되는지 확인하세요.
+> - 미들웨어에서 `matcher` 속성을 사용하여 미들웨어가 실행될 경로를 지정할 수 있습니다. 그러나 인증의 경우, 미들웨어가 모든 경로에서 실행되는 것이 권장됩니다.
 
-### Creating a Data Access Layer (DAL)
+### 데이터 액세스 계층(DAL) 생성하기
 
-We recommend creating a DAL to centralize your data requests and authorization logic.
+데이터 요청과 권한 부여 로직을 중앙 집중화하기 위해 DAL을 생성하는 것을 권장합니다.
 
-The DAL should include a function that verifies the user's session as they interact with your application. At the very least, the function should check if the session is valid, then redirect or return the user information needed to make further requests.
+DAL은 사용자가 애플리케이션과 상호 작용할 때 사용자의 세션을 확인하는 함수를 포함해야 합니다. 최소한 이 함수는 세션이 유효한지 확인한 다음, 추가 요청을 하는 데 필요한 사용자 정보를 리디렉션하거나 반환해야 합니다.
 
-For example, create a separate file for your DAL that includes a `verifySession()` function. Then use React's [cache](https://react.dev/reference/react/cache) API to memoize the return value of the function during a React render pass:
+예를 들어, `verifySession()` 함수를 포함하는 DAL용 별도의 파일을 만듭니다. 그런 다음 React의 [cache](https://react.dev/reference/react/cache) API를 사용하여 React 렌더링 과정 동안 함수의 반환 값을 메모이제이션합니다:
 
 ```tsx filename="app/lib/dal.ts" switcher
 import "server-only";
@@ -919,7 +918,7 @@ export const verifySession = cache(async () => {
 });
 ```
 
-You can then invoke the `verifySession()` function in your data requests, Server Actions, Route Handlers:
+그런 다음 데이터 요청, 서버 액션, 라우트 핸들러에서 `verifySession()` 함수를 호출할 수 있습니다:
 
 ```tsx filename="app/lib/dal.ts" switcher
 export const getUser = cache(async () => {
@@ -929,7 +928,7 @@ export const getUser = cache(async () => {
   try {
     const data = await db.query.users.findMany({
       where: eq(users.id, session.userId),
-      // Explicitly return the columns you need rather than the whole user object
+      // 전체 사용자 객체가 아닌 필요한 열만 명시적으로 반환
       columns: {
         id: true,
         name: true,
@@ -955,7 +954,7 @@ export const getUser = cache(async () => {
   try {
     const data = await db.query.users.findMany({
       where: eq(users.id, session.userId),
-      // Explicitly return the columns you need rather than the whole user object
+      // 전체 사용자 객체가 아닌 필요한 열만 명시적으로 반환
       columns: {
         id: true,
         name: true,
@@ -973,17 +972,17 @@ export const getUser = cache(async () => {
 });
 ```
 
-> **Tip**:
+> **팁**:
 >
-> - A DAL can be used to protect data fetched at request time. However, for static routes that share data between users, data will be fetched at build time and not at request time. Use [Middleware](#optimistic-checks-with-middleware-optional) to protect static routes.
-> - For secure checks, you can check if the session is valid by comparing the session ID with your database. Use React's [cache](https://react.dev/reference/react/cache) function to avoid unnecessary duplicate requests to the database during a render pass.
-> - You may wish to consolidate related data requests in a JavaScript class that runs `verifySession()` before any methods.
+> - DAL은 요청 시 가져온 데이터를 보호하는 데 사용될 수 있습니다. 그러나 사용자 간에 데이터를 공유하는 정적 경로의 경우, 데이터는 요청 시가 아닌 빌드 시에 가져옵니다. 정적 경로를 보호하려면 [미들웨어](#optimistic-checks-with-middleware-optional)를 사용하세요.
+> - 안전한 확인을 위해 세션 ID를 데이터베이스와 비교하여 세션이 유효한지 확인할 수 있습니다. 렌더링 과정 동안 데이터베이스에 대한 불필요한 중복 요청을 피하기 위해 React의 [cache](https://ko.react.dev/reference/react/cache) 함수를 사용하세요.
+> - 모든 메서드 실행 전에 `verifySession()`을 실행하는 JavaScript 클래스에서 관련 데이터 요청을 통합하고 싶을 수 있습니다.
 
-### Using Data Transfer Objects (DTO)
+### 데이터 전송 객체(DTO) 사용하기
 
-When retrieving data, it's recommended you return only the necessary data that will be used in your application, and not entire objects. For example, if you're fetching user data, you might only return the user's ID and name, rather than the entire user object which could contain passwords, phone numbers, etc.
+데이터를 검색할 때, 애플리케이션에서 사용될 필요한 데이터만 반환하고 전체 객체를 반환하지 않는 것이 좋습니다. 예를 들어, 사용자 데이터를 가져올 때 비밀번호, 전화번호 등이 포함될 수 있는 전체 사용자 객체 대신 사용자의 ID와 이름만 반환할 수 있습니다.
 
-However, if you have no control over the returned data structure, or are working in a team where you want to avoid whole objects being passed to the client, you can use strategies such as specifying what fields are safe to be exposed to the client.
+그러나 반환되는 데이터 구조를 제어할 수 없거나, 클라이언트에 전체 객체가 전달되는 것을 피하고 싶은 팀에서 작업하는 경우, 클라이언트에 노출해도 안전한 필드를 지정하는 등의 전략을 사용할 수 있습니다.
 
 ```tsx filename="app/lib/dto.ts" switcher
 import "server-only";
@@ -1000,13 +999,13 @@ function canSeePhoneNumber(viewer: User, team: string) {
 export async function getProfileDTO(slug: string) {
   const data = await db.query.users.findMany({
     where: eq(users.slug, slug),
-    // Return specific columns here
+    // 여기서 특정 열 반환
   });
   const user = data[0];
 
   const currentUser = await getUser(user.id);
 
-  // Or return only what's specific to the query here
+  // 또는 여기서 쿼리에 특정한 것만 반환
   return {
     username: canSeeUsername(currentUser) ? user.username : null,
     phonenumber: canSeePhoneNumber(currentUser, user.team)
@@ -1031,13 +1030,13 @@ function canSeePhoneNumber(viewer, team) {
 export async function getProfileDTO(slug) {
   const data = await db.query.users.findMany({
     where: eq(users.slug, slug),
-    // Return specific columns here
+    // 여기서 특정 열 반환
   });
   const user = data[0];
 
   const currentUser = await getUser(user.id);
 
-  // Or return only what's specific to the query here
+  // 또는 여기서 쿼리에 특정한 것만 반환
   return {
     username: canSeeUsername(currentUser) ? user.username : null,
     phonenumber: canSeePhoneNumber(currentUser, user.team)
@@ -1047,23 +1046,23 @@ export async function getProfileDTO(slug) {
 }
 ```
 
-By centralizing your data requests and authorization logic in a DAL and using DTOs, you can ensure that all data requests are secure and consistent, making it easier to maintain, audit, and debug as your application scales.
+DAL에서 데이터 요청과 권한 부여 로직을 중앙 집중화하고 DTO를 사용함으로써, 모든 데이터 요청이 안전하고 일관성 있게 이루어지도록 보장할 수 있습니다. 이는 애플리케이션이 확장됨에 따라 유지 관리, 감사, 디버깅을 더 쉽게 만듭니다.
 
-> **Good to know**:
+> **알아두면 좋은 점**:
 >
-> - There are a couple of different ways you can define a DTO, from using `toJSON()`, to individual functions like the example above, or JS classes. Since these are JavaScript patterns and not a React or Next.js feature, we recommend doing some research to find the best pattern for your application.
-> - Learn more about security best practices in our [Security in Next.js article](/blog/security-nextjs-server-components-actions).
+> - DTO를 정의하는 방법은 여러 가지가 있습니다. `toJSON()`을 사용하는 방법, 위의 예제와 같은 개별 함수, 또는 JS 클래스 등이 있습니다. 이는 JavaScript 패턴이며 React나 Next.js 기능이 아니므로, 애플리케이션에 가장 적합한 패턴을 찾기 위해 조사해 보는 것을 권장합니다.
+> - [Next.js의 보안 모범 사례 기사](/blog/security-nextjs-server-components-actions)에서 보안 모범 사례에 대해 자세히 알아보세요.
 
-### Server Components
+### 서버 컴포넌트
 
-Auth check in [Server Components](/docs/app/building-your-application/rendering/server-components) are useful for role-based access. For example, to conditionally render components based on the user's role:
+[서버 컴포넌트](/docs/app/building-your-application/rendering/server-components)에서의 인증 확인은 역할 기반 접근에 유용합니다. 예를 들어, 사용자의 역할에 따라 조건부로 컴포넌트를 렌더링하는 경우:
 
 ```tsx filename="app/dashboard/page.tsx" switcher
 import { verifySession } from "@/app/lib/dal";
 
 export default function Dashboard() {
   const session = await verifySession();
-  const userRole = session?.user?.role; // Assuming 'role' is part of the session object
+  const userRole = session?.user?.role; // 'role'이 세션 객체의 일부라고 가정
 
   if (userRole === "admin") {
     return <AdminDashboard />;
@@ -1080,7 +1079,7 @@ import { verifySession } from '@/app/lib/dal'
 
 export default function Dashboard() {
   const session = await verifySession()
-  const userRole = session.role // Assuming 'role' is part of the session object
+  const userRole = session.role // 'role'이 세션 객체의 일부라고 가정
 
   if (userRole === 'admin') {
     return <AdminDashboard />
@@ -1092,17 +1091,17 @@ export default function Dashboard() {
 }
 ```
 
-In the example, we use the `verifySession()` function from our DAL to check for 'admin', 'user', and unauthorized roles. This pattern ensures that each user interacts only with components appropriate to their role.
+이 예제에서는 DAL의 `verifySession()` 함수를 사용하여 'admin', 'user', 그리고 권한이 없는 역할을 확인합니다. 이 패턴은 각 사용자가 자신의 역할에 적합한 컴포넌트와만 상호 작용하도록 보장합니다.
 
-### Layouts and auth checks
+### 레이아웃과 인증 확인
 
-Due to [Partial Rendering](/docs/app/building-your-application/routing/linking-and-navigating#4-partial-rendering), be cautious when doing checks in [Layouts](/docs/app/building-your-application/routing/layouts-and-templates) as these don't re-render on navigation, meaning the user session won't be checked on every route change.
+[부분 렌더링](/docs/app/building-your-application/routing/linking-and-navigating#4-partial-rendering)으로 인해, [레이아웃](/docs/app/building-your-application/routing/layouts-and-templates)에서 확인을 수행할 때 주의해야 합니다. 레이아웃은 네비게이션 시 다시 렌더링되지 않기 때문에 사용자 세션이 모든 경로 변경에서 확인되지 않습니다.
 
-Instead, you should do the checks close to your data source or the component that'll be conditionally rendered.
+대신, 데이터 소스나 조건부로 렌더링될 컴포넌트에 가깝게 확인을 수행해야 합니다.
 
-For example, consider a shared layout that fetches the user data and displays the user image in a nav. Instead of doing the auth check in the layout, you should fetch the user data (`getUser()`) in the layout and do the auth check in your DAL.
+예를 들어, 사용자 데이터를 가져오고 네비게이션에 사용자 이미지를 표시하는 공유 레이아웃을 고려해보세요. 레이아웃에서 인증 확인을 수행하는 대신, 레이아웃에서 사용자 데이터(`getUser()`)를 가져오고 DAL에서 인증 확인을 수행해야 합니다.
 
-This guarantees that wherever `getUser()` is called within your application, the auth check is performed, and prevents developers forgetting to check the user is authorized to access the data.
+이렇게 하면 애플리케이션 내에서 `getUser()`가 호출되는 곳마다 인증 확인이 수행되도록 보장하며, 개발자가 데이터에 접근할 권한이 있는지 확인하는 것을 잊는 것을 방지합니다.
 
 ```tsx filename="app/layout.tsx" switcher
 export default async function Layout({
@@ -1133,7 +1132,7 @@ export const getUser = cache(async () => {
   const session = await verifySession();
   if (!session) return null;
 
-  // Get user ID from session and fetch data
+  // 세션에서 사용자 ID를 가져와 데이터 조회
 });
 ```
 
@@ -1142,19 +1141,19 @@ export const getUser = cache(async () => {
   const session = await verifySession();
   if (!session) return null;
 
-  // Get user ID from session and fetch data
+  // 세션에서 사용자 ID를 가져와 데이터 조회
 });
 ```
 
-> **Good to know:**
+> **알아두면 좋은 점:**
 >
-> - A common pattern in SPAs is to `return null` in a layout or a top-level component if a user is not authorized. This pattern is not **not recommended** since Next.js applications have multiple entry points, which will not prevent nested route segments and Server Actions from being accessed.
+> - SPA에서 흔한 패턴은 사용자가 인증되지 않은 경우 레이아웃이나 최상위 컴포넌트에서 `return null`을 하는 것입니다. 이 패턴은 **권장되지 않습니다**. Next.js 애플리케이션은 여러 진입점이 있어 중첩된 경로 세그먼트와 서버 액션에 대한 접근을 방지하지 못하기 때문입니다.
 
-### Server Actions
+### 서버 액션
 
-Treat [Server Actions](/docs/app/building-your-application/data-fetching/server-actions-and-mutations) with the same security considerations as public-facing API endpoints, and verify if the user is allowed to perform a mutation.
+[서버 액션](/docs/app/building-your-application/data-fetching/server-actions-and-mutations)를 공개 API 엔드포인트와 동일한 보안 고려사항으로 취급하고, 사용자가 변경을 수행할 권한이 있는지 확인하세요.
 
-In the example below, we check the user's role before allowing the action to proceed:
+아래 예제에서는 작업을 진행하기 전에 사용자의 역할을 확인합니다:
 
 ```ts filename="app/lib/actions.ts" switcher
 "use server";
@@ -1164,12 +1163,12 @@ export async function serverAction(formData: FormData) {
   const session = await verifySession();
   const userRole = session?.user?.role;
 
-  // Return early if user is not authorized to perform the action
+  // 사용자가 작업을 수행할 권한이 없으면 일찍 반환
   if (userRole !== "admin") {
     return null;
   }
 
-  // Proceed with the action for authorized users
+  // 권한이 있는 사용자에 대해 작업 진행
 }
 ```
 
@@ -1181,41 +1180,41 @@ export async function serverAction() {
   const session = await verifySession();
   const userRole = session.user.role;
 
-  // Return early if user is not authorized to perform the action
+  // 사용자가 작업을 수행할 권한이 없으면 일찍 반환
   if (userRole !== "admin") {
     return null;
   }
 
-  // Proceed with the action for authorized users
+  // 권한이 있는 사용자에 대해 작업 진행
 }
 ```
 
-### Route Handlers
+### 라우트 핸들러
 
-Treat [Route Handlers](/docs/app/building-your-application/routing/route-handlers) with the same security considerations as public-facing API endpoints, and verify if the user is allowed to access the Route Handler.
+[라우트 핸들러](/docs/app/building-your-application/routing/route-handlers)를 공개 API 엔드포인트와 동일한 보안 고려사항으로 취급하고, 사용자가 Route Handler에 접근할 권한이 있는지 확인하세요.
 
-For example:
+예를 들어:
 
 ```ts filename="app/api/route.ts" switcher
 import { verifySession } from "@/app/lib/dal";
 
 export async function GET() {
-  // User authentication and role verification
+  // 사용자 인증 및 역할 확인
   const session = await verifySession();
 
-  // Check if the user is authenticated
+  // 사용자가 인증되었는지 확인
   if (!session) {
-    // User is not authenticated
+    // 사용자가 인증되지 않음
     return new Response(null, { status: 401 });
   }
 
-  // Check if the user has the 'admin' role
+  // 사용자가 'admin' 역할을 가지고 있는지 확인
   if (session.user.role !== "admin") {
-    // User is authenticated but does not have the right permissions
+    // 사용자가 인증되었지만 적절한 권한이 없음
     return new Response(null, { status: 403 });
   }
 
-  // Continue for authorized users
+  // 권한이 있는 사용자에 대해 계속 진행
 }
 ```
 
@@ -1223,32 +1222,32 @@ export async function GET() {
 import { verifySession } from "@/app/lib/dal";
 
 export async function GET() {
-  // User authentication and role verification
+  // 사용자 인증 및 역할 확인
   const session = await verifySession();
 
-  // Check if the user is authenticated
+  // 사용자가 인증되었는지 확인
   if (!session) {
-    // User is not authenticated
+    // 사용자가 인증되지 않음
     return new Response(null, { status: 401 });
   }
 
-  // Check if the user has the 'admin' role
+  // 사용자가 'admin' 역할을 가지고 있는지 확인
   if (session.user.role !== "admin") {
-    // User is authenticated but does not have the right permissions
+    // 사용자가 인증되었지만 적절한 권한이 없음
     return new Response(null, { status: 403 });
   }
 
-  // Continue for authorized users
+  // 권한이 있는 사용자에 대해 계속 진행
 }
 ```
 
-The example above demonstrates a Route Handler with a two-tier security check. It first checks for an active session, and then verifies if the logged-in user is an 'admin'.
+위의 예제는 2단계 보안 확인이 있는 Route Handler를 보여줍니다. 먼저 활성 세션이 있는지 확인하고, 그 다음 로그인한 사용자가 'admin'인지 확인합니다.
 
-## Context Providers
+## 컨텍스트 프로바이더 (Context Providers)
 
-Using context providers for auth work due to [interleaving](/docs/app/building-your-application/rendering/composition-patterns#interleaving-server-and-client-components). However, React `context` is not supported in Server Components, making them only applicable to Client Components.
+[인터리빙](#interleaving-server-and-client-components) 덕분에 인증을 위한 컨텍스트 프로바이더(Context Providers) 사용이 가능합니다. 그러나 React의 `context`는 서버 컴포넌트에서는 지원되지 않아 클라이언트 컴포넌트에만 적용할 수 있습니다.
 
-This works, but any child Server Components will be rendered on the server first, and will not have access to the context provider’s session data:
+이 방식은 작동하지만, 자식 서버 컴포넌트는 먼저 서버에서 렌더링되며, 컨텍스트 프로바이더(Context Providers)의 세션 데이터에 접근할 수 없습니다.
 
 ```tsx filename="app/layout.ts" switcher
 import { ContextProvider } from "auth-lib";
@@ -1294,13 +1293,13 @@ export default function Profile() {
 }
 ```
 
-If session data is needed in Client Components (e.g. for client-side data fetching),use React’s [`taintUniqueValue`](https://react.dev/reference/react/experimental_taintUniqueValue) API to prevent sensitive session data from being exposed to the client.
+Client Components에서 세션 데이터가 필요한 경우(예: 클라이언트 측 데이터 가져오기), React의 [`taintUniqueValue`](https://react.dev/reference/react/experimental_taintUniqueValue) API를 사용하여 민감한 세션 데이터가 클라이언트에 노출되는 것을 방지하세요.
 
-## Resources
+## 리소스
 
-Now that you've learned about authentication in Next.js, here are Next.js-compatible libraries and resources to help you implement secure authentication and session management:
+이제 Next.js의 인증에 대해 배웠으니, 안전한 인증 및 세션 관리를 구현하는 데 도움이 되는 Next.js 호환 라이브러리와 리소스를 소개합니다:
 
-### Auth Libraries
+### 인증 라이브러리
 
 - [Auth0](https://auth0.com/docs/quickstart/webapp/nextjs/01-login)
 - [Clerk](https://clerk.com/docs/quickstarts/nextjs)
@@ -1312,16 +1311,16 @@ Now that you've learned about authentication in Next.js, here are Next.js-compat
 - [Stytch](https://stytch.com/docs/guides/quickstarts/nextjs)
 - [WorkOS](https://workos.com/docs/user-management)
 
-### Session Management Libraries
+### 세션 관리 라이브러리
 
 - [Iron Session](https://github.com/vvo/iron-session)
 - [Jose](https://github.com/panva/jose)
 
-## Further Reading
+## 추가 읽기
 
-To continue learning about authentication and security, check out the following resources:
+인증과 보안에 대해 계속 학습하려면 다음 리소스를 확인하세요:
 
-- [How to think about security in Next.js](/blog/security-nextjs-server-components-actions)
-- [Understanding XSS Attacks](https://vercel.com/guides/understanding-xss-attacks)
-- [Understanding CSRF Attacks](https://vercel.com/guides/understanding-csrf-attacks)
+- [Next.js에서 보안에 대해 생각하는 방법](/blog/security-nextjs-server-components-actions)
+- [XSS 공격 이해하기](https://vercel.com/guides/understanding-xss-attacks)
+- [CSRF 공격 이해하기](https://vercel.com/guides/understanding-csrf-attacks)
 - [The Copenhagen Book](https://thecopenhagenbook.com/)

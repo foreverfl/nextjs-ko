@@ -1,75 +1,77 @@
 ---
-title: Memory Usage
-description: Optimize memory used by your application in development and production.
+title: 메모리 사용량
+description: 개발 및 프로덕션 환경에서 애플리케이션의 메모리 사용을 최적화하세요.
 ---
 
-As applications grow and become more feature rich, they can demand more resources when developing locally or creating production builds.
+# 메모리 사용량
 
-Let's explore some strategies and techniques to optimize memory and address common memory issues in Next.js.
+애플리케이션이 성장하고 더 많은 기능이 풍부해짐에 따라, 로컬에서 개발하거나 프로덕션 빌드를 생성할 때 더 많은 리소스를 요구할 수 있습니다.
 
-## Reduce number of dependencies
+Next.js에서 메모리를 최적화하고 일반적인 메모리 문제를 해결하기 위한 몇 가지 전략과 기술을 살펴보겠습니다.
 
-Applications with a large amount of dependencies will use more memory.
+## 의존성 수 줄이기
 
-The [Bundle Analyzer](/docs/app/building-your-application/optimizing/package-bundling) can help you investigate large dependencies in your application that may be able to be removed to improve performance and memory usage.
+많은 수의 의존성을 가진 애플리케이션은 더 많은 메모리를 사용합니다.
 
-## Try `experimental.webpackMemoryOptimizations`
+[번들 분석기](/docs/app/building-your-application/optimizing/package-bundling)는 애플리케이션에서 성능과 메모리 사용량을 개선하기 위해 제거할 수 있는 대규모 의존성을 조사하는 데 도움이 될 수 있습니다.
 
-Starting in `v15.0.0`, you can add `experimental.webpackMemoryOptimizations: true` to your `next.config.js` file to change behavior in Webpack that reduces max memory usage but may increase compilation times by a slight amount.
+## `experimental.webpackMemoryOptimizations` 시도하기
 
-> **Good to know**: This feature is currently experimental to test on more projects first, but it is considered to be low-risk.
+`v15.0.0`부터 `next.config.js` 파일에 `experimental.webpackMemoryOptimizations: true`를 추가하여 Webpack의 동작을 변경할 수 있습니다. 이는 최대 메모리 사용량을 줄이지만 컴파일 시간을 약간 증가시킬 수 있습니다.
 
-## Run `next build` with `--experimental-debug-memory-usage`
+> **알아두면 좋은 점**: 이 기능은 현재 더 많은 프로젝트에서 먼저 테스트하기 위해 실험적이지만, 위험도가 낮은 것으로 간주됩니다.
 
-Starting in `14.2.0`, you can run `next build --experimental-debug-memory-usage` to run the build in a mode where Next.js will print out information about memory usage continuously throughout the build, such as heap usage and garbage collection statistics. Heap snapshots will also be taken automatically when memory usage gets close to the configured limit.
+## `--experimental-debug-memory-usage`로 `next build` 실행하기
 
-> **Good to know**: This feature is not compatible with the Webpack build worker option which is auto-enabled unless you have custom webpack config.
+`14.2.0`부터 `next build --experimental-debug-memory-usage`를 실행하여 빌드 중 힙 사용량 및 가비지 컬렉션 통계와 같은 메모리 사용량 정보를 지속적으로 출력하는 모드에서 빌드를 실행할 수 있습니다. 메모리 사용량이 구성된 제한에 가까워지면 힙 스냅샷도 자동으로 생성됩니다.
 
-## Record a heap profile
+> **알아두면 좋은 점**: 이 기능은 사용자 지정 webpack 구성이 없는 한 자동으로 활성화되는 Webpack 빌드 워커 옵션과 호환되지 않습니다.
 
-To look for memory issues, you can record a heap profile from Node.js and load it in Chrome DevTools to identify potential sources of memory leaks.
+## 힙 프로파일(Heap Profile) 기록하기
 
-In your terminal, pass the `--heap-prof` flag to Node.js when starting your Next.js build:
+메모리 문제를 찾기 위해 Node.js에서 힙 프로파일을 기록하고 이를 Chrome DevTools에 로드하여 잠재적인 메모리 누수 원인을 식별할 수 있습니다.
+
+터미널에서 Next.js 빌드를 시작할 때 Node.js에 `--heap-prof` 플래그를 전달하세요:
 
 ```sh
 node --heap-prof node_modules/next/dist/bin/next build
 ```
 
-At the end of the build, a `.heapprofile` file will be created by Node.js.
+빌드가 끝나면 Node.js에 의해 `.heapprofile` 파일이 생성됩니다.
 
-In Chrome DevTools, you can open the Memory tab and click on the "Load Profile" button to visualize the file.
+Chrome DevTools에서 메모리 탭을 열고 "프로파일 로드" 버튼을 클릭하여 파일을 시각화할 수 있습니다.
 
-## Analyze a snapshot of the heap
+## 힙(Heap)의 스냅샷 분석하기
 
-You can use an inspector tool to analyze the memory usage of the application.
+검사 도구를 사용하여 애플리케이션의 메모리 사용량을 분석할 수 있습니다.
 
-When running the `next build` or `next dev` command, add `NODE_OPTIONS=--inspect` to the beginning of the command. This will expose the inspector agent on the default port.
-If you wish to break before any user code starts, you can pass `--inspect-brk` instead. While the process is running, you can use a tool such as Chrome DevTools to connect to the debugging port to record and analyze a snapshot of the heap to see what memory is being retained.
+`next build` 또는 `next dev` 명령을 실행할 때, 명령 앞에 `NODE_OPTIONS=--inspect`를 추가하세요. 이렇게 하면 기본 포트에서 인스펙터 에이전트가 노출됩니다.
+사용자 코드가 시작되기 전에 중단하려면 대신 `--inspect-brk`를 전달할 수 있습니다. 프로세스가 실행되는 동안 Chrome DevTools와 같은 도구를 사용하여 디버깅 포트에 연결하여 힙의 스냅샷을 기록하고 분석하여 어떤 메모리가 유지되고 있는지 볼 수 있습니다.
 
-Starting in `14.2.0`, you can also run `next build` with the `--experimental-debug-memory-usage` flag to make it easier to take heap snapshots.
+`14.2.0`부터는 `--experimental-debug-memory-usage` 플래그와 함께 `next build`를 실행하여 힙 스냅샷을 더 쉽게 생성할 수 있습니다.
 
-While running in this mode, you can send a `SIGUSR2` signal to the process at any point, and the process will take a heap snapshot.
+이 모드에서 실행하는 동안 언제든지 프로세스에 `SIGUSR2` 신호를 보낼 수 있으며, 프로세스는 힙 스냅샷을 생성합니다.
 
-The heap snapshot will be saved to the project root of the Next.js application and can be loaded in any heap analyzer, such as Chrome DevTools, to see what memory is retained. This mode is not yet compatible with Webpack build workers.
+힙 스냅샷은 Next.js 애플리케이션의 프로젝트 루트에 저장되며 Chrome DevTools와 같은 모든 힙 분석기에서 로드하여 어떤 메모리가 유지되고 있는지 확인할 수 있습니다. 이 모드는 아직 Webpack 빌드 워커와 호환되지 않습니다.
 
-See [how to record and analyze heap snapshots](https://developer.chrome.com/docs/devtools/memory-problems/heap-snapshots) for more information.
+자세한 정보는 [힙 스냅샷 기록 및 분석 방법](https://developer.chrome.com/docs/devtools/memory-problems/heap-snapshots)을 참조하세요.
 
-## Webpack build worker
+## Webpack 빌드 워커
 
-The Webpack build worker allows you to run Webpack compilations inside a separate Node.js worker which will decrease memory usage of your application during builds.
+Webpack 빌드 워커를 사용하면 별도의 Node.js 워커 내에서 Webpack 컴파일을 실행할 수 있어 빌드 중 애플리케이션의 메모리 사용량을 줄일 수 있습니다.
 
-This option is enabled by default if your application does not have a custom Webpack configuration starting in `v14.1.0`.
+이 옵션은 `v14.1.0`부터 사용자 지정 Webpack 구성이 없는 애플리케이션에서 기본적으로 활성화됩니다.
 
-If you are using an older version of Next.js or you have a custom Webpack configuration, you can enable this option by setting `experimental.webpackBuildWorker: true` inside your `next.config.js`.
+이전 버전의 Next.js를 사용하거나 사용자 지정 Webpack 구성이 있는 경우, `next.config.js` 내에서 `experimental.webpackBuildWorker: true`를 설정하여 이 옵션을 활성화할 수 있습니다.
 
-> **Good to know**: This feature may not be compatible with all custom Webpack plugins.
+> **알아두면 좋은 점**: 이 기능은 모든 사용자 지정 Webpack 플러그인과 호환되지 않을 수 있습니다.
 
-## Disable Webpack cache
+## Webpack 캐시 비활성화하기
 
-The [Webpack cache](https://webpack.js.org/configuration/cache/) saves generated Webpack modules in memory and/or to disk to improve the speed of builds. This can
-help with performance, but it will also increase the memory usage of your application to store the cached data.
+[Webpack 캐시](https://webpack.js.org/configuration/cache/)는 생성된 Webpack 모듈을 메모리 및/또는 디스크에 저장하여 빌드 속도를 향상시킵니다. 이는
+성능에 도움이 될 수 있지만, 캐시된 데이터를 저장하기 위해 애플리케이션의 메모리 사용량도 증가시킵니다.
 
-You can disable this behavior by adding a [custom Webpack configuration](/docs/app/api-reference/next-config-js/webpack) to your application:
+애플리케이션에 [사용자 지정 Webpack 구성](/docs/app/api-reference/next-config-js/webpack)을 추가하여 이 동작을 비활성화할 수 있습니다:
 
 ```js filename="next.config.mjs"
 /** @type {import('next').NextConfig} */
@@ -83,7 +85,7 @@ const nextConfig = {
         type: "memory",
       });
     }
-    // Important: return the modified config
+    // 중요: 수정된 구성을 반환합니다
     return config;
   },
 };
@@ -91,14 +93,14 @@ const nextConfig = {
 export default nextConfig;
 ```
 
-## Disable source maps
+## 소스 맵 비활성화하기
 
-Generating source maps consumes extra memory during the build process.
+소스 맵을 생성하면 빌드 프로세스 중에 추가 메모리를 소비합니다.
 
-You can disable source map generation by adding `productionBrowserSourceMaps: false` and `experimental.serverSourceMaps: false` to your Next.js configuration.
+Next.js 구성에 `productionBrowserSourceMaps: false`와 `experimental.serverSourceMaps: false`를 추가하여 소스 맵 생성을 비활성화할 수 있습니다.
 
-> **Good to know**: Some plugins may turn on source maps and may require custom configuration to disable.
+> **알아두면 좋은 점**: 일부 플러그인은 소스 맵을 켜고 비활성화하려면 사용자 지정 구성이 필요할 수 있습니다.
 
-## Edge memory issues
+## Edge 메모리 문제
 
-Next.js `v14.1.3` fixed a memory issue when using the Edge runtime. Please update to this version (or later) to see if it addresses your issue.
+Next.js `v14.1.3`는 Edge 런타임을 사용할 때의 메모리 문제를 수정했습니다. 이 버전(또는 이후 버전)으로 업데이트하여 문제가 해결되는지 확인하세요.
